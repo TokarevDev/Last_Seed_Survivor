@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+using LastSeed.Core.World;
 using UnityEngine;
+using NumericVector3 = System.Numerics.Vector3;
 
 public enum RailPathInterpolationMode
 {
@@ -8,7 +10,7 @@ public enum RailPathInterpolationMode
 }
 
 [DisallowMultipleComponent]
-public sealed partial class RailPath : MonoBehaviour, IWormRailPath
+public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<NumericVector3>
 {
     private const float DefaultSampleStep = 0.1f;
     private const float MinSampleStep = 0.01f;
@@ -90,6 +92,12 @@ public sealed partial class RailPath : MonoBehaviour, IWormRailPath
             _samples[index],
             _samples[index + 1],
             t);
+    }
+
+    NumericVector3 IPathSampler<NumericVector3>.GetPoint(float distance)
+    {
+        Vector3 point = GetPoint(distance);
+        return new NumericVector3(point.x, point.y, point.z);
     }
 
     public float GetClosestDistance(Vector3 worldPosition)

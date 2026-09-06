@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using LastSeed.Core.World;
 using UnityEngine;
+using NumericVector3 = System.Numerics.Vector3;
 
 public sealed class WormSegmentChainPresenter
 {
-    private const float MinimumSpacing = 0.01f;
-    private const float DirectionSqrMagnitudeThreshold = 0.0001f;
     private const float PositionSqrMagnitudeThreshold = 0.000001f;
     private const float RotationThresholdDegrees = 0.1f;
 
@@ -20,7 +20,7 @@ public sealed class WormSegmentChainPresenter
 
     public void Render(
         IReadOnlyList<WormSegment> segments,
-        RailPath rail,
+        IPathSampler<NumericVector3> rail,
         IReadOnlyDictionary<WormSegment, float> rollbackAnchoredDistances,
         in WormSegmentChainLayout layout)
     {
@@ -33,7 +33,12 @@ public sealed class WormSegmentChainPresenter
             return;
         }
 
-        if (!TryGetActiveRange(segments.Count, rail.TotalLength, layout, out int start, out int end))
+        if (!WormSegmentPoseCalculator.TryGetActiveRange(
+                segments.Count,
+                rail.TotalLength,
+                layout,
+                out int start,
+                out int end))
         {
             HidePreviousActiveRange(segments, -1, -1);
             return;
@@ -53,7 +58,10 @@ public sealed class WormSegmentChainPresenter
                 index,
                 segment,
                 layout);
-            Vector3 position = CalculatePositionAtDistance(rail, distance, layout);
+            NumericVector3 position = WormSegmentPoseCalculator.CalculatePosition(
+                rail,
+                distance,
+                layout);
 
             UpdateSegmentPosition(segment, position);
             UpdateHeadFollowChain(segments, rail, index, segment, distance, layout);
@@ -72,7 +80,7 @@ public sealed class WormSegmentChainPresenter
 
     private void RenderDuringRollback(
         IReadOnlyList<WormSegment> segments,
-        RailPath rail,
+        IPathSampler<NumericVector3> rail,
         IReadOnlyDictionary<WormSegment, float> rollbackAnchoredDistances,
         in WormSegmentChainLayout layout)
     {
@@ -97,7 +105,10 @@ public sealed class WormSegmentChainPresenter
                 continue;
             }
 
-            Vector3 position = CalculatePositionAtDistance(rail, distance, layout);
+            NumericVector3 position = WormSegmentPoseCalculator.CalculatePosition(
+                rail,
+                distance,
+                layout);
             UpdateSegmentPosition(segment, position);
             UpdateHeadFollowChain(segments, rail, index, segment, distance, layout);
 
@@ -110,26 +121,6 @@ public sealed class WormSegmentChainPresenter
         }
 
         Reset();
-    }
-
-    private static bool TryGetActiveRange(
-        int segmentCount,
-        float railLength,
-        in WormSegmentChainLayout layout,
-        out int startIndex,
-        out int endIndex)
-    {
-        float spacing = Mathf.Max(MinimumSpacing, layout.SegmentSpacing);
-        float maxDistance = railLength + layout.ActiveDistancePadding;
-
-        startIndex = Mathf.Max(
-            0,
-            Mathf.CeilToInt((layout.HeadDistance - maxDistance) / spacing));
-        endIndex = Mathf.Min(
-            segmentCount - 1,
-            Mathf.FloorToInt(layout.HeadDistance / spacing));
-
-        return startIndex <= endIndex;
     }
 
     private void HidePreviousActiveRange(
@@ -154,20 +145,9 @@ public sealed class WormSegmentChainPresenter
         }
     }
 
-    private static Vector3 CalculatePositionAtDistance(
-        RailPath rail,
-        float distance,
-        in WormSegmentChainLayout layout)
-    {
-        Vector3 position = rail.GetPoint(distance);
-        float wave = Mathf.Sin(distance * layout.WaveFrequency + layout.WaveTime);
-        position.y += wave * layout.WaveAmplitude + layout.VerticalOffset;
-        return position;
-    }
-
     private static void UpdateTailVisualChain(
         IReadOnlyList<WormSegment> segments,
-        RailPath rail,
+        IPathSampler<NumericVector3> rail,
         int index,
         WormSegment segment,
         float tailDistance,
@@ -177,17 +157,24 @@ public sealed class WormSegmentChainPresenter
             return;
 
         segment.ResetTailVisualRootRotation();
-        float spacing = Mathf.Max(
-            MinimumSpacing,
-            layout.SegmentSpacing * layout.TailVisualSpacingMultiplier);
-        Vector3 previousPosition = ResolveTailLeaderPosition(segments, index, segment);
+        float spacing = WormSegmentPoseCalculator.GetTailVisualSpacing(layout);
+        NumericVector3 previousPosition = ToNumeric(
+            ResolveTailLeaderPosition(segments, index, segment));
 
         for (int partIndex = 0; partIndex < segment.TailVisualPartCount; partIndex++)
         {
-            float visualDistance = Mathf.Max(0f, tailDistance - partIndex * spacing);
-            Vector3 visualPosition = CalculatePositionAtDistance(rail, visualDistance, layout);
-            float angle = CalculateLookAngle(visualPosition, previousPosition);
-            segment.SetTailVisualPartPose(partIndex, visualPosition, angle);
+            float visualDistance = WormSegmentPoseCalculator.GetTailVisualDistance(
+                tailDistance,
+                partIndex,
+                spacing);
+            NumericVector3 visualPosition = WormSegmentPoseCalculator.CalculatePosition(
+                rail,
+                visualDistance,
+                layout);
+            float angle = WormSegmentPoseCalculator.CalculateLookAngle(
+                visualPosition,
+                previousPosition);
+            segment.SetTailVisualPartPose(partIndex, ToUnity(visualPosition), angle);
             previousPosition = visualPosition;
         }
     }
@@ -219,7 +206,7 @@ public sealed class WormSegmentChainPresenter
 
     private static void UpdateHeadFollowChain(
         IReadOnlyList<WormSegment> segments,
-        RailPath rail,
+        IPathSampler<NumericVector3> rail,
         int index,
         WormSegment segment,
         float headDistance,
@@ -234,52 +221,57 @@ public sealed class WormSegmentChainPresenter
         if (!visible)
             return;
 
-        float spacing = GetHeadBridgeSpacing(layout);
-        Vector3 previousPosition = segment.CachedTransform.position;
+        float spacing = WormSegmentPoseCalculator.GetHeadBridgeSpacing(layout);
+        NumericVector3 previousPosition = ToNumeric(segment.CachedTransform.position);
 
         for (int partIndex = 0; partIndex < segment.HeadFollowPartCount; partIndex++)
         {
-            float visualDistance = Mathf.Max(
-                0f,
-                headDistance - (partIndex + 1) * spacing);
-            Vector3 visualPosition = CalculatePositionAtDistance(rail, visualDistance, layout);
-            float angle = CalculateLookAngle(visualPosition, previousPosition);
-            segment.SetHeadFollowPartPose(partIndex, visualPosition, angle);
+            float visualDistance = WormSegmentPoseCalculator.GetHeadFollowVisualDistance(
+                headDistance,
+                partIndex,
+                spacing);
+            NumericVector3 visualPosition = WormSegmentPoseCalculator.CalculatePosition(
+                rail,
+                visualDistance,
+                layout);
+            float angle = WormSegmentPoseCalculator.CalculateLookAngle(
+                visualPosition,
+                previousPosition);
+            segment.SetHeadFollowPartPose(partIndex, ToUnity(visualPosition), angle);
             previousPosition = visualPosition;
         }
     }
 
-    private static float CalculateLookAngle(Vector3 from, Vector3 to)
-    {
-        Vector3 direction = to - from;
-        return direction.sqrMagnitude <= DirectionSqrMagnitudeThreshold
-            ? 0f
-            : Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-    }
-
-    private static void UpdateSegmentPosition(WormSegment segment, Vector3 position)
+    private static void UpdateSegmentPosition(WormSegment segment, NumericVector3 position)
     {
         Transform segmentTransform = segment.CachedTransform;
+        Vector3 unityPosition = ToUnity(position);
 
-        if ((segmentTransform.position - position).sqrMagnitude > PositionSqrMagnitudeThreshold)
-            segmentTransform.position = position;
+        if ((segmentTransform.position - unityPosition).sqrMagnitude >
+            PositionSqrMagnitudeThreshold)
+        {
+            segmentTransform.position = unityPosition;
+        }
     }
 
     private void UpdateSegmentRotation(
         IReadOnlyList<WormSegment> segments,
         int index,
         WormSegment segment,
-        Vector3 position)
+        NumericVector3 position)
     {
         WormSegment previous = segments[index - 1];
         if (previous == null)
             return;
 
-        Vector3 direction = previous.CachedTransform.position - position;
-        if (direction.sqrMagnitude <= DirectionSqrMagnitudeThreshold)
+        if (!WormSegmentPoseCalculator.TryCalculateLookAngle(
+                position,
+                ToNumeric(previous.CachedTransform.position),
+                out float angle))
+        {
             return;
+        }
 
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         Transform visual = segment.VisualRoot;
         if (visual == null)
             return;
@@ -299,17 +291,23 @@ public sealed class WormSegmentChainPresenter
         WormSegment segment,
         in WormSegmentChainLayout layout)
     {
-        float distance = layout.HeadDistance - index * layout.SegmentSpacing;
+        float headFollowDistanceOffset = ShouldAttachTailToHeadFollowChain(
+            segments,
+            index,
+            segment)
+            ? GetHeadFollowChainDistanceOffset(segments, layout)
+            : 0f;
+        float anchoredDistance = 0f;
+        bool hasRollbackAnchor = layout.IsSectionRollback
+            && segment != null
+            && rollbackAnchoredDistances.TryGetValue(segment, out anchoredDistance);
 
-        if (ShouldAttachTailToHeadFollowChain(segments, index, segment))
-            distance -= GetHeadFollowChainDistanceOffset(segments, layout);
-
-        if (!layout.IsSectionRollback || segment == null)
-            return distance;
-
-        return rollbackAnchoredDistances.TryGetValue(segment, out float anchoredDistance)
-            ? Mathf.Min(distance, anchoredDistance)
-            : distance;
+        return WormSegmentPoseCalculator.GetSegmentDistance(
+            index,
+            layout,
+            headFollowDistanceOffset,
+            hasRollbackAnchor,
+            anchoredDistance);
     }
 
     private static bool ShouldShowHeadFollowChain(
@@ -345,15 +343,19 @@ public sealed class WormSegmentChainPresenter
     {
         WormSegment head = segments.Count > 0 ? segments[0] : null;
         return head != null
-            ? (head.HeadFollowPartCount + 1) * GetHeadBridgeSpacing(layout)
-                - Mathf.Max(MinimumSpacing, layout.SegmentSpacing)
+            ? WormSegmentPoseCalculator.GetHeadFollowDistanceOffset(
+                head.HeadFollowPartCount,
+                layout)
             : 0f;
     }
 
-    private static float GetHeadBridgeSpacing(in WormSegmentChainLayout layout)
+    private static NumericVector3 ToNumeric(Vector3 value)
     {
-        return Mathf.Max(
-            MinimumSpacing,
-            layout.SegmentSpacing * layout.HeadBridgeSpacingMultiplier);
+        return new NumericVector3(value.x, value.y, value.z);
+    }
+
+    private static Vector3 ToUnity(in NumericVector3 value)
+    {
+        return new Vector3(value.X, value.Y, value.Z);
     }
 }
