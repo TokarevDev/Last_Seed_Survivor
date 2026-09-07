@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using LastSeed.Gameplay.Signals;
 using UnityEngine;
@@ -15,12 +16,13 @@ public sealed class WormCombatController : MonoBehaviour
     private int _totalProgressSegments;
     private int _destroyedProgressSegments;
     private bool _isWormDead;
-    private SignalBus _signalBus;
+    private IWormCombatEventPublisher _eventPublisher;
 
     [Inject]
-    public void Construct(SignalBus signalBus)
+    public void Construct(IWormCombatEventPublisher eventPublisher)
     {
-        _signalBus = signalBus;
+        _eventPublisher = eventPublisher ??
+            throw new ArgumentNullException(nameof(eventPublisher));
     }
 
     public int TotalProgressSegments => _totalProgressSegments;
@@ -71,8 +73,8 @@ public sealed class WormCombatController : MonoBehaviour
             return;
 
         section.Damage(hit.Damage.Amount);
-        _signalBus.Fire(new WormDamageDealtSignal(
-            DamageViewRequest.FromDamageHit(hit)));
+        DamageViewRequest damageViewRequest = DamageViewRequest.FromDamageHit(hit);
+        _eventPublisher.PublishDamage(damageViewRequest);
 
         if (!section.IsDestroyed)
             return;
@@ -129,10 +131,10 @@ public sealed class WormCombatController : MonoBehaviour
                 ? _wormController.HeadPathProgressNormalized
                 : 0f;
 
-            _signalBus.Fire(new WormRewardRequestedSignal(
+            _eventPublisher.PublishRewardRequested(
                 rewardProfile,
                 headProgress,
-                DestructionProgressNormalized));
+                DestructionProgressNormalized);
         }
     }
 
@@ -225,15 +227,15 @@ public sealed class WormCombatController : MonoBehaviour
             _tail.KillVisualAndCollision();
 
         _wormController?.ClearWorm();
-        _signalBus.Fire<WormDiedSignal>();
+        _eventPublisher.PublishWormDied();
     }
 
     private void NotifyDestructionProgressChanged()
     {
-        _signalBus.Fire(new WormDestructionProgressChangedSignal(
+        _eventPublisher.PublishDestructionProgressChanged(
             _destroyedProgressSegments,
             _totalProgressSegments,
-            DestructionProgressNormalized));
+            DestructionProgressNormalized);
     }
 
     private static int CountProgressSegments(List<WormSection> sections)

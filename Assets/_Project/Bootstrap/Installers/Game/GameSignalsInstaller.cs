@@ -25,6 +25,7 @@ namespace LastSeed.Bootstrap.Installers
 
             Container.BindInterfacesAndSelfTo<WeaponRuntimeStatsSignalPublisher>().AsSingle();
             Container.BindInterfacesAndSelfTo<WeaponAttackCycleSignalPublisher>().AsSingle();
+            Container.BindInterfacesTo<WormCombatSignalPublisher>().AsSingle();
         }
     }
 }
