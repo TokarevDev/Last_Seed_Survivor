@@ -5,13 +5,11 @@ public sealed class RewardFlowController : IDisposable
     private readonly IRewardChoiceRollService _choiceRollService;
     private readonly IRewardChoiceApplier _applyService;
     private readonly RewardGrantedActionService _grantedActionService;
-    private readonly RewardPopupView _popup;
-    private readonly PopupRoot _popupRoot;
+    private readonly RewardPopupGateway _popupGateway;
     private readonly RewardAdOperation _rewardAdOperation;
     private readonly RewardAttemptState _attempts;
     private readonly RewardRequestCoordinator _requestCoordinator;
     private readonly RewardRequestLifecycle _requestLifecycle;
-    private readonly RewardPopupStateFactory _popupStateFactory;
 
     private bool _isDisposed;
 
@@ -19,21 +17,19 @@ public sealed class RewardFlowController : IDisposable
         IRewardChoiceRollService choiceRollService,
         IRewardChoiceApplier applyService,
         RewardGrantedActionService grantedActionService,
-        RewardPopupView popup,
-        PopupRoot popupRoot,
+        RewardPopupGateway popupGateway,
         RewardAdOperation rewardAdOperation,
         RewardAttemptState attempts,
         RewardRequestCoordinator requestCoordinator,
-        RewardRequestLifecycle requestLifecycle,
-        RewardPopupStateFactory popupStateFactory)
+        RewardRequestLifecycle requestLifecycle)
     {
         _choiceRollService = choiceRollService ??
             throw new ArgumentNullException(nameof(choiceRollService));
         _applyService = applyService ?? throw new ArgumentNullException(nameof(applyService));
         _grantedActionService = grantedActionService ??
             throw new ArgumentNullException(nameof(grantedActionService));
-        _popup = popup;
-        _popupRoot = popupRoot;
+        _popupGateway = popupGateway ??
+            throw new ArgumentNullException(nameof(popupGateway));
         _rewardAdOperation = rewardAdOperation
             ?? throw new ArgumentNullException(nameof(rewardAdOperation));
         _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
@@ -41,20 +37,11 @@ public sealed class RewardFlowController : IDisposable
             throw new ArgumentNullException(nameof(requestCoordinator));
         _requestLifecycle = requestLifecycle
             ?? throw new ArgumentNullException(nameof(requestLifecycle));
-        _popupStateFactory = popupStateFactory
-            ?? throw new ArgumentNullException(nameof(popupStateFactory));
-
-        if (_popup == null)
-        {
-            UnityEngine.Debug.LogWarning("RewardFlowController: reward popup is not assigned.");
-            return;
-        }
-
-        _popup.Selected += HandleSelected;
-        _popup.RerollRequested += HandleRerollRequested;
-        _popup.AdRerollRequested += HandleAdRerollRequested;
-        _popup.TakeAllRequested += HandleTakeAllRequested;
-        _popup.Hidden += HandlePopupHidden;
+        _popupGateway.Selected += HandleSelected;
+        _popupGateway.RerollRequested += HandleRerollRequested;
+        _popupGateway.AdRerollRequested += HandleAdRerollRequested;
+        _popupGateway.TakeAllRequested += HandleTakeAllRequested;
+        _popupGateway.Hidden += HandlePopupHidden;
     }
 
     public void Dispose()
@@ -62,14 +49,11 @@ public sealed class RewardFlowController : IDisposable
         if (_isDisposed)
             return;
 
-        if (_popup != null)
-        {
-            _popup.Selected -= HandleSelected;
-            _popup.RerollRequested -= HandleRerollRequested;
-            _popup.AdRerollRequested -= HandleAdRerollRequested;
-            _popup.TakeAllRequested -= HandleTakeAllRequested;
-            _popup.Hidden -= HandlePopupHidden;
-        }
+        _popupGateway.Selected -= HandleSelected;
+        _popupGateway.RerollRequested -= HandleRerollRequested;
+        _popupGateway.AdRerollRequested -= HandleAdRerollRequested;
+        _popupGateway.TakeAllRequested -= HandleTakeAllRequested;
+        _popupGateway.Hidden -= HandlePopupHidden;
 
         _rewardAdOperation.Cancel();
         _requestCoordinator.Reset();
@@ -133,7 +117,7 @@ public sealed class RewardFlowController : IDisposable
 
         if (!RollCurrentChoices())
         {
-            _popup?.SetAllButtonsInteractable(true);
+            _popupGateway.SetInteractable(true);
             return;
         }
 
@@ -149,9 +133,9 @@ public sealed class RewardFlowController : IDisposable
         if (_rewardAdOperation.IsPending)
             return;
 
-        _popup?.SetAllButtonsInteractable(false);
+        _popupGateway.SetInteractable(false);
         if (!_rewardAdOperation.TryBegin(CompleteAdRerollReward))
-            _popup?.SetAllButtonsInteractable(true);
+            _popupGateway.SetInteractable(true);
     }
 
     private void HandleTakeAllRequested()
@@ -165,9 +149,9 @@ public sealed class RewardFlowController : IDisposable
         if (!_attempts.HasTakeAll || _rewardAdOperation.IsPending)
             return;
 
-        _popup?.SetAllButtonsInteractable(false);
+        _popupGateway.SetInteractable(false);
         if (!_rewardAdOperation.TryBegin(CompleteTakeAllReward))
-            _popup?.SetAllButtonsInteractable(true);
+            _popupGateway.SetInteractable(true);
     }
 
     private void CompleteAdRerollReward(bool rewardGranted)
@@ -183,7 +167,7 @@ public sealed class RewardFlowController : IDisposable
 
         if (!_grantedActionService.CompleteAdReroll())
         {
-            _popup?.SetAllButtonsInteractable(true);
+            _popupGateway.SetInteractable(true);
             return;
         }
 
@@ -203,16 +187,16 @@ public sealed class RewardFlowController : IDisposable
 
         if (!_grantedActionService.CompleteTakeAll())
         {
-            _popup?.SetAllButtonsInteractable(true);
+            _popupGateway.SetInteractable(true);
             return;
         }
 
-        _popup?.Close();
+        _popupGateway.Close();
     }
 
-    private void HandlePopupHidden(PopupView popup)
+    private void HandlePopupHidden(PopupView _)
     {
-        if (popup != _popup || _isDisposed)
+        if (_isDisposed)
             return;
 
         bool shouldOpenNext = CompleteCurrentPopupRequest();
@@ -261,26 +245,9 @@ public sealed class RewardFlowController : IDisposable
 
     private bool ShowCurrentChoices(bool animateChoiceChanges)
     {
-        if (_popup == null || _popupRoot == null)
-        {
-            UnityEngine.Debug.LogWarning("RewardFlowController: reward popup or popup root is not assigned.");
-            return false;
-        }
-
-        bool isBound = _popup.Bind(
-            _requestLifecycle.Choices,
-            _popupStateFactory.Create(
-                _requestLifecycle.GuaranteeRarity,
-                _requestLifecycle.CocoonProfile,
-                _requestLifecycle.RollContext,
-                _rewardAdOperation.IsPending),
-            animateChoiceChanges);
-
-        if (!isBound)
-            return false;
-
-        _popupRoot.Show(_popup);
-        return true;
+        return _popupGateway.Show(
+            animateChoiceChanges,
+            _rewardAdOperation.IsPending);
     }
 
 }

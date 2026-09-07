@@ -53,6 +53,7 @@ namespace LastSeed.Tests.PlayMode
             Assert.That(sceneContext.Container.Resolve<RewardRequestQueue>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<RewardRequestLifecycle>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<RewardRequestCoordinator>(), Is.Not.Null);
+            Assert.That(sceneContext.Container.Resolve<RewardPopupGateway>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRewardChoiceApplier>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRewardRuntimeContextProvider>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRewardChoiceRoller>(), Is.Not.Null);
