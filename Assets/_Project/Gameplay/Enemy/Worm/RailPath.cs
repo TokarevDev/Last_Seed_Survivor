@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LastSeed.Core.Collections;
 using LastSeed.Core.World;
 using UnityEngine;
 using NumericVector3 = System.Numerics.Vector3;
@@ -147,18 +148,9 @@ public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSample
             return 0f;
 
         float clampedDistance = Mathf.Clamp(distance, 0f, _totalLength);
-        int passedPointIndex = 0;
-
-        for (int i = 1; i < PointCount; i++)
-        {
-            if (!TryGetControlPointDistance(i, out float pointDistance))
-                break;
-
-            if (clampedDistance + MinSegmentLength < pointDistance)
-                break;
-
-            passedPointIndex = i;
-        }
+        int passedPointIndex = SortedSearch.FindLastIndexAtMost(
+            _controlPointDistances,
+            clampedDistance + MinSegmentLength);
 
         return Mathf.Clamp01(passedPointIndex / (float)(PointCount - 1));
     }
@@ -282,11 +274,18 @@ public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSample
     {
         int controlPointCount = GetAvailableControlPointCount();
         _controlPointDistances = new float[controlPointCount];
+        float previousDistance = 0f;
 
         for (int i = 0; i < controlPointCount; i++)
         {
             if (TryGetControlPointWorldPosition(i, out Vector3 worldPosition))
-                _controlPointDistances[i] = FindClosestSampleDistance(worldPosition);
+            {
+                previousDistance = Mathf.Max(
+                    previousDistance,
+                    FindClosestSampleDistance(worldPosition));
+            }
+
+            _controlPointDistances[i] = previousDistance;
         }
     }
 
