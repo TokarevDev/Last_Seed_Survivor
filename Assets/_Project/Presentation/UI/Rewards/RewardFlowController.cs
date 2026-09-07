@@ -13,15 +13,10 @@ public sealed class RewardFlowController : IDisposable
     private readonly IRandomSource _randomSource;
     private readonly RewardAttemptState _attempts;
     private readonly RewardRequestQueue _requestQueue;
+    private readonly RewardRequestLifecycle _requestLifecycle;
     private readonly RewardPopupStateFactory _popupStateFactory;
 
-    private List<RewardChoiceData> _currentChoices;
-    private CocoonRewardProfile _currentCocoonProfile;
-    private RewardRollContext _currentRollContext;
-    private RewardRarity _currentGuaranteeRarity;
     private bool _isDisposed;
-    private bool _isPopupRequestActive;
-    private bool _shouldOpenNextPendingRequest;
 
     public RewardFlowController(
         RewardRollService rollService,
@@ -32,6 +27,7 @@ public sealed class RewardFlowController : IDisposable
         IRandomSource randomSource,
         RewardAttemptState attempts,
         RewardRequestQueue requestQueue,
+        RewardRequestLifecycle requestLifecycle,
         RewardPopupStateFactory popupStateFactory)
     {
         _rollService = rollService;
@@ -44,6 +40,8 @@ public sealed class RewardFlowController : IDisposable
             ?? throw new ArgumentNullException(nameof(randomSource));
         _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
         _requestQueue = requestQueue ?? throw new ArgumentNullException(nameof(requestQueue));
+        _requestLifecycle = requestLifecycle
+            ?? throw new ArgumentNullException(nameof(requestLifecycle));
         _popupStateFactory = popupStateFactory
             ?? throw new ArgumentNullException(nameof(popupStateFactory));
 
@@ -76,6 +74,7 @@ public sealed class RewardFlowController : IDisposable
 
         _rewardAdOperation.Cancel();
         _requestQueue.Clear();
+        _requestLifecycle.Reset();
         _isDisposed = true;
     }
 
@@ -88,7 +87,7 @@ public sealed class RewardFlowController : IDisposable
 
         RewardOpenRequest request = new(cocoonProfile, rollContext);
 
-        if (_isPopupRequestActive)
+        if (_requestLifecycle.IsActive)
         {
             _requestQueue.Enqueue(request);
             return true;
@@ -99,9 +98,7 @@ public sealed class RewardFlowController : IDisposable
 
     private bool StartOpenRequest(RewardOpenRequest request)
     {
-        _isPopupRequestActive = true;
-        _currentCocoonProfile = request.CocoonProfile;
-        _currentRollContext = request.RollContext;
+        _requestLifecycle.Begin(request);
         _rewardAdOperation.Cancel();
 
         if (!RollCurrentChoices())
@@ -112,7 +109,6 @@ public sealed class RewardFlowController : IDisposable
 
         if (ShowCurrentChoices(false))
         {
-            _shouldOpenNextPendingRequest = false;
             return true;
         }
 
@@ -123,14 +119,9 @@ public sealed class RewardFlowController : IDisposable
     public void ResetSession()
     {
         _requestQueue.Clear();
-        _currentChoices = null;
-        _currentCocoonProfile = null;
-        _currentRollContext = default;
-        _currentGuaranteeRarity = default;
+        _requestLifecycle.Reset();
         _attempts.Reset();
         _rewardAdOperation.Cancel();
-        _isPopupRequestActive = false;
-        _shouldOpenNextPendingRequest = false;
     }
 
     private void HandleSelected(RewardChoiceData choice)
@@ -138,7 +129,7 @@ public sealed class RewardFlowController : IDisposable
         if (_rewardAdOperation.IsPending)
             return;
 
-        _shouldOpenNextPendingRequest = true;
+        _requestLifecycle.MarkShouldOpenNext();
         _applyService.Apply(choice);
     }
 
@@ -172,10 +163,10 @@ public sealed class RewardFlowController : IDisposable
 
     private void HandleTakeAllRequested()
     {
-        if (_currentChoices == null || _currentChoices.Count == 0)
+        if (_requestLifecycle.Choices == null || _requestLifecycle.Choices.Count == 0)
             return;
 
-        if (!RewardAdRerollPolicy.CanOfferTakeAll(_currentRollContext))
+        if (!RewardAdRerollPolicy.CanOfferTakeAll(_requestLifecycle.RollContext))
             return;
 
         if (!_attempts.HasTakeAll || _rewardAdOperation.IsPending)
@@ -201,8 +192,8 @@ public sealed class RewardFlowController : IDisposable
 
         RewardRarity adGuaranteeRarity = RewardAdRerollPolicy.RollGuaranteedRarity(
             _applyService?.RuntimeContext,
-            _currentCocoonProfile,
-            _currentRollContext,
+            _requestLifecycle.CocoonProfile,
+            _requestLifecycle.RollContext,
             _randomSource);
 
         if (!RollCurrentChoices(
@@ -229,11 +220,11 @@ public sealed class RewardFlowController : IDisposable
         }
 
         _attempts.ConsumeTakeAll();
-        _shouldOpenNextPendingRequest = true;
+        _requestLifecycle.MarkShouldOpenNext();
 
-        for (int i = 0; i < _currentChoices.Count; i++)
+        for (int i = 0; i < _requestLifecycle.Choices.Count; i++)
         {
-            _applyService.Apply(_currentChoices[i]);
+            _applyService.Apply(_requestLifecycle.Choices[i]);
         }
 
         _popup?.Close();
@@ -244,9 +235,7 @@ public sealed class RewardFlowController : IDisposable
         if (popup != _popup || _isDisposed)
             return;
 
-        bool shouldOpenNext = _shouldOpenNextPendingRequest;
-
-        CompleteCurrentPopupRequest();
+        bool shouldOpenNext = CompleteCurrentPopupRequest();
 
         if (shouldOpenNext)
         {
@@ -257,15 +246,10 @@ public sealed class RewardFlowController : IDisposable
         _requestQueue.Clear();
     }
 
-    private void CompleteCurrentPopupRequest()
+    private bool CompleteCurrentPopupRequest()
     {
-        _currentChoices = null;
-        _currentCocoonProfile = null;
-        _currentRollContext = default;
-        _currentGuaranteeRarity = default;
         _rewardAdOperation.Cancel();
-        _isPopupRequestActive = false;
-        _shouldOpenNextPendingRequest = false;
+        return _requestLifecycle.Complete();
     }
 
     private void TryOpenNextPendingRequest()
@@ -274,7 +258,7 @@ public sealed class RewardFlowController : IDisposable
 
         for (int index = 0; index < pendingRequestCount; index++)
         {
-            if (_isDisposed || _isPopupRequestActive ||
+            if (_isDisposed || _requestLifecycle.IsActive ||
                 !_requestQueue.TryDequeue(out RewardOpenRequest request))
             {
                 return;
@@ -291,23 +275,24 @@ public sealed class RewardFlowController : IDisposable
         bool isPaidAssistRoll = false)
     {
         RewardRollContext rollContext = isPaidAssistRoll
-            ? _currentRollContext.WithPaidAssistRoll()
-            : _currentRollContext;
+            ? _requestLifecycle.RollContext.WithPaidAssistRoll()
+            : _requestLifecycle.RollContext;
 
-        _currentGuaranteeRarity = forcedGuaranteeRarity
+        RewardRarity guaranteeRarity = forcedGuaranteeRarity
             ?? _rollService.RollGuaranteeRarity(
                 _applyService.RuntimeContext,
-                _currentCocoonProfile,
+                _requestLifecycle.CocoonProfile,
                 rollContext);
 
-        _currentChoices = _rollService.Roll3(
+        List<RewardChoiceData> choices = _rollService.Roll3(
             _applyService.RuntimeContext,
-            _currentCocoonProfile,
-            _currentGuaranteeRarity,
+            _requestLifecycle.CocoonProfile,
+            guaranteeRarity,
             forcedGuaranteeSlotCount,
             rollContext);
+        _requestLifecycle.SetRollResult(guaranteeRarity, choices);
 
-        return _currentChoices != null && _currentChoices.Count > 0;
+        return choices != null && choices.Count > 0;
     }
 
     private bool ShowCurrentChoices(bool animateChoiceChanges)
@@ -319,11 +304,11 @@ public sealed class RewardFlowController : IDisposable
         }
 
         bool isBound = _popup.Bind(
-            _currentChoices,
+            _requestLifecycle.Choices,
             _popupStateFactory.Create(
-                _currentGuaranteeRarity,
-                _currentCocoonProfile,
-                _currentRollContext,
+                _requestLifecycle.GuaranteeRarity,
+                _requestLifecycle.CocoonProfile,
+                _requestLifecycle.RollContext,
                 _rewardAdOperation.IsPending),
             animateChoiceChanges);
 
