@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-public sealed class RewardChoiceRollService
+public sealed class RewardChoiceRollService : IRewardChoiceRollService
 {
     private const int StandardGuaranteedSlotCount = 1;
     private const int AdGuaranteedSlotCount = 1;

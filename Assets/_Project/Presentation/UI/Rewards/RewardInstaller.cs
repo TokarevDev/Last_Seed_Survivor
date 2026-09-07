@@ -46,8 +46,9 @@ public sealed class RewardInstaller : MonoInstaller
         Container.Bind<RewardAdOperation>().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardRollService>().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardApplyService>().AsSingle();
-        Container.Bind<RewardChoiceRollService>().AsSingle();
+        Container.BindInterfacesAndSelfTo<RewardChoiceRollService>().AsSingle();
         Container.Bind<RewardBatchApplyService>().AsSingle();
+        Container.Bind<RewardGrantedActionService>().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardFlowController>().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardSessionController>()
             .AsSingle()

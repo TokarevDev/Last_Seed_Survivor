@@ -2,9 +2,9 @@ using System;
 
 public sealed class RewardFlowController : IDisposable
 {
-    private readonly RewardChoiceRollService _choiceRollService;
+    private readonly IRewardChoiceRollService _choiceRollService;
     private readonly IRewardChoiceApplier _applyService;
-    private readonly RewardBatchApplyService _batchApplyService;
+    private readonly RewardGrantedActionService _grantedActionService;
     private readonly RewardPopupView _popup;
     private readonly PopupRoot _popupRoot;
     private readonly RewardAdOperation _rewardAdOperation;
@@ -16,9 +16,9 @@ public sealed class RewardFlowController : IDisposable
     private bool _isDisposed;
 
     public RewardFlowController(
-        RewardChoiceRollService choiceRollService,
+        IRewardChoiceRollService choiceRollService,
         IRewardChoiceApplier applyService,
-        RewardBatchApplyService batchApplyService,
+        RewardGrantedActionService grantedActionService,
         RewardPopupView popup,
         PopupRoot popupRoot,
         RewardAdOperation rewardAdOperation,
@@ -30,8 +30,8 @@ public sealed class RewardFlowController : IDisposable
         _choiceRollService = choiceRollService ??
             throw new ArgumentNullException(nameof(choiceRollService));
         _applyService = applyService ?? throw new ArgumentNullException(nameof(applyService));
-        _batchApplyService = batchApplyService ??
-            throw new ArgumentNullException(nameof(batchApplyService));
+        _grantedActionService = grantedActionService ??
+            throw new ArgumentNullException(nameof(grantedActionService));
         _popup = popup;
         _popupRoot = popupRoot;
         _rewardAdOperation = rewardAdOperation
@@ -186,9 +186,7 @@ public sealed class RewardFlowController : IDisposable
             return;
         }
 
-        _attempts.ConsumeAdReroll();
-
-        if (!RollCurrentChoices(isPaidAssistRoll: true))
+        if (!_grantedActionService.CompleteAdReroll())
         {
             _popup?.SetAllButtonsInteractable(true);
             return;
@@ -208,10 +206,11 @@ public sealed class RewardFlowController : IDisposable
             return;
         }
 
-        _attempts.ConsumeTakeAll();
-        _requestLifecycle.MarkShouldOpenNext();
-
-        _batchApplyService.ApplyAll(_requestLifecycle.Choices);
+        if (!_grantedActionService.CompleteTakeAll())
+        {
+            _popup?.SetAllButtonsInteractable(true);
+            return;
+        }
 
         _popup?.Close();
     }
@@ -255,15 +254,11 @@ public sealed class RewardFlowController : IDisposable
         }
     }
 
-    private bool RollCurrentChoices(bool isPaidAssistRoll = false)
+    private bool RollCurrentChoices()
     {
-        RewardChoiceRollResult result = isPaidAssistRoll
-            ? _choiceRollService.RollAdAssisted(
-                _requestLifecycle.CocoonProfile,
-                _requestLifecycle.RollContext)
-            : _choiceRollService.RollStandard(
-                _requestLifecycle.CocoonProfile,
-                _requestLifecycle.RollContext);
+        RewardChoiceRollResult result = _choiceRollService.RollStandard(
+            _requestLifecycle.CocoonProfile,
+            _requestLifecycle.RollContext);
 
         _requestLifecycle.SetRollResult(result.GuaranteeRarity, result.Choices);
         return result.HasChoices;
