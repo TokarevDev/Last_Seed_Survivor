@@ -1,4 +1,5 @@
 using LastSeed.Core.Timing;
+using LastSeed.Core.Pooling;
 using LastSeed.Gameplay.Signals;
 using UnityEngine;
 using Zenject;
@@ -14,7 +15,9 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     private float _currentCooldown;
     private bool _initialized;
     private SignalBus _signalBus;
-    private AcaciaThornProjectilePool _pool;
+    private IConfigurablePooledSpawnService<
+        AcaciaThornProjectilePoolSetup,
+        AcaciaThornProjectileSpawnRequest> _pool;
     private readonly CooldownBurstCycle _fireCycle = new();
 
     public AcaciaThornWeaponConfig Config => _config;
@@ -23,7 +26,9 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     [Inject]
     public void Construct(
         SignalBus signalBus,
-        AcaciaThornProjectilePool pool)
+        IConfigurablePooledSpawnService<
+            AcaciaThornProjectilePoolSetup,
+            AcaciaThornProjectileSpawnRequest> pool)
     {
         _signalBus = signalBus;
         _pool = pool;
@@ -65,11 +70,12 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
         ApplyRuntimeLimits();
         _runtimeState.SetBaseDamage(_config.Damage);
 
-        _pool.Init(
+        AcaciaThornProjectilePoolSetup poolSetup = new(
             _config.ProjectilePrefab,
             projectileParent != null ? projectileParent : transform,
             screenBounds,
             _config.PrewarmCount);
+        _pool.Initialize(in poolSetup);
 
         RebuildCooldown(resetTimer: true);
         _initialized = true;
@@ -161,7 +167,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
     public void ClearTransientState()
     {
-        _pool.ReleaseAllActive();
+        _pool.ReleaseAll();
         _fireCycle.CancelBurst();
     }
 
@@ -216,7 +222,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
             (Vector3)(direction * Mathf.Max(0f, _config.SpawnOffset));
 
         int damage = BuildDamage(out DamageKind damageKind, out bool isCritical);
-        _pool.Spawn(
+        AcaciaThornProjectileSpawnRequest request = new(
             position,
             direction,
             damage,
@@ -227,6 +233,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
             _config.BounceCount,
             GetSplitCount(),
             true);
+        _pool.Spawn(in request);
     }
 
     private int BuildDamage(out DamageKind damageKind, out bool isCritical)

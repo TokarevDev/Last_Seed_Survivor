@@ -2,7 +2,8 @@ using LastSeed.Core.Pooling;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public sealed class ProjectilePool : MonoBehaviour
+public sealed class ProjectilePool : MonoBehaviour,
+    IPooledSpawnService<ProjectileSpawnRequest>
 {
     [SerializeField] private int _prewarmCount = 40;
 
@@ -10,6 +11,8 @@ public sealed class ProjectilePool : MonoBehaviour
     private IScreenBounds _screenBounds;
     private ObjectPool<Projectile> _pool;
     private bool _initialized;
+
+    public bool IsInitialized => _initialized;
 
     public void SetPrefab(Projectile prefab, IScreenBounds screenBounds)
     {
@@ -22,14 +25,9 @@ public sealed class ProjectilePool : MonoBehaviour
         _initialized = true;
     }
 
-    public Projectile Spawn(
-        ProjectileConfig config,
-        ProjectileRuntimeStats stats,
-        Vector3 position,
-        Quaternion rotation)
+    public void Spawn(in ProjectileSpawnRequest request)
     {
-        ProjectileSpawnRequest request = new(config, stats, position, rotation);
-        return _pool.Rent(request, InitializeProjectile);
+        _pool.Rent(request, InitializeProjectile);
     }
 
     public void Release(Projectile projectile)
@@ -40,6 +38,11 @@ public sealed class ProjectilePool : MonoBehaviour
     public void ReleaseAllActive()
     {
         _pool?.ReturnAll();
+    }
+
+    public void ReleaseAll()
+    {
+        ReleaseAllActive();
     }
 
     private Projectile CreateNew()

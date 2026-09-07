@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using LastSeed.Core.Pooling;
 using LastSeed.Core.Timing;
 using LastSeed.Gameplay.Signals;
 using UnityEngine;
@@ -11,7 +12,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     [SerializeField][Min(1)] private int _maxShots = 200;
 
     private WeaponConfig _config;
-    private ProjectilePool _pool;
+    private IPooledSpawnService<ProjectileSpawnRequest> _pool;
     private Transform _firePoint;
 
     private float _currentShotCooldown;
@@ -34,7 +35,9 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
         _signalBus = signalBus;
     }
 
-    public void Init(ProjectilePool pool, Transform firePoint)
+    public void Init(
+        IPooledSpawnService<ProjectileSpawnRequest> pool,
+        Transform firePoint)
     {
         _pool = pool;
         _firePoint = firePoint;
@@ -55,7 +58,8 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
 
     public void Tick(float deltaTime)
     {
-        if (_pool == null || _firePoint == null || _config == null) return;
+        if (_pool == null || !_pool.IsInitialized || _firePoint == null || _config == null)
+            return;
 
         if (_fireCycle.IsBurstActive)
         {
@@ -241,7 +245,12 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     private void Spawn(ShotSpawnData shot)
     {
         ProjectileRuntimeStats stats = BuildProjectileStats();
-        _pool.Spawn(_config.Projectile, stats, shot.Position, shot.Rotation);
+        ProjectileSpawnRequest request = new(
+            _config.Projectile,
+            stats,
+            shot.Position,
+            shot.Rotation);
+        _pool.Spawn(in request);
     }
 
     private ProjectileRuntimeStats BuildProjectileStats()

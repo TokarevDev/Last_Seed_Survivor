@@ -2,7 +2,10 @@ using System;
 using LastSeed.Core.Pooling;
 using UnityEngine;
 
-public sealed class AcaciaThornProjectilePool
+public sealed class AcaciaThornProjectilePool :
+    IConfigurablePooledSpawnService<
+        AcaciaThornProjectilePoolSetup,
+        AcaciaThornProjectileSpawnRequest>
 {
     private ObjectPool<AcaciaThornProjectile> _pool;
 
@@ -13,7 +16,16 @@ public sealed class AcaciaThornProjectilePool
 
     public bool IsInitialized => _initialized;
 
-    public void Init(
+    public void Initialize(in AcaciaThornProjectilePoolSetup setup)
+    {
+        InitializePool(
+            setup.Prefab,
+            setup.Parent,
+            setup.ScreenBounds,
+            setup.PrewarmCount);
+    }
+
+    private void InitializePool(
         AcaciaThornProjectile prefab,
         Transform parent,
         IScreenBounds screenBounds,
@@ -68,6 +80,11 @@ public sealed class AcaciaThornProjectilePool
         return _pool.Rent(request, InitializeProjectile);
     }
 
+    public void Spawn(in AcaciaThornProjectileSpawnRequest request)
+    {
+        _pool.Rent(request, InitializeProjectile);
+    }
+
     public void Release(AcaciaThornProjectile projectile)
     {
         _pool?.Return(projectile);
@@ -76,6 +93,11 @@ public sealed class AcaciaThornProjectilePool
     public void ReleaseAllActive()
     {
         _pool?.ReturnAll();
+    }
+
+    public void ReleaseAll()
+    {
+        ReleaseAllActive();
     }
 
     private AcaciaThornProjectile CreateNew()

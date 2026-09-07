@@ -1,8 +1,11 @@
+using LastSeed.Core.Pooling;
 using UnityEngine;
 
 public interface IWeapon
 {
-    void Init(ProjectilePool pool, Transform firePoint);
+    void Init(
+        IPooledSpawnService<ProjectileSpawnRequest> pool,
+        Transform firePoint);
 
     void Tick(float deltaTime);
 
