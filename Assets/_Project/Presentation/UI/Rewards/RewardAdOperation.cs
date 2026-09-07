@@ -24,8 +24,17 @@ public sealed class RewardAdOperation
 
         IsPending = true;
         int operationVersion = ++_version;
-        _rewardedAdService.ShowRewardedAd(
-            rewardGranted => Complete(operationVersion, onCompleted, rewardGranted));
+        try
+        {
+            _rewardedAdService.ShowRewardedAd(
+                rewardGranted => Complete(operationVersion, onCompleted, rewardGranted));
+        }
+        catch
+        {
+            Rollback(operationVersion);
+            throw;
+        }
+
         return true;
     }
 
@@ -45,5 +54,14 @@ public sealed class RewardAdOperation
 
         IsPending = false;
         onCompleted(rewardGranted);
+    }
+
+    private void Rollback(int operationVersion)
+    {
+        if (operationVersion != _version)
+            return;
+
+        IsPending = false;
+        _version++;
     }
 }

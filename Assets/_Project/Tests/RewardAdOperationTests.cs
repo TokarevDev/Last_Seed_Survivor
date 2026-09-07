@@ -22,6 +22,29 @@ namespace LastSeed.Tests
         }
 
         [Test]
+        public void TryBegin_WhenAdIsDenied_ForwardsDenialAndClearsPending()
+        {
+            DelayedRewardedAdService adService = new();
+            RewardAdOperation operation = new(adService);
+            bool? result = null;
+
+            operation.TryBegin(value => result = value);
+            adService.Complete(0, false);
+
+            Assert.That(result, Is.False);
+            Assert.That(operation.IsPending, Is.False);
+        }
+
+        [Test]
+        public void TryBegin_WhenServiceThrows_RollsBackPendingState()
+        {
+            RewardAdOperation operation = new(new ThrowingRewardedAdService());
+
+            Assert.Throws<InvalidOperationException>(() => operation.TryBegin(_ => { }));
+            Assert.That(operation.IsPending, Is.False);
+        }
+
+        [Test]
         public void Cancel_InvalidatesLateCallback()
         {
             DelayedRewardedAdService adService = new();
@@ -72,6 +95,16 @@ namespace LastSeed.Tests
             public void Complete(int index, bool rewardGranted)
             {
                 _callbacks[index](rewardGranted);
+            }
+        }
+
+        private sealed class ThrowingRewardedAdService : IRewardedAdService
+        {
+            public bool IsReady => true;
+
+            public void ShowRewardedAd(Action<bool> onCompleted)
+            {
+                throw new InvalidOperationException("Ad service failed to start.");
             }
         }
     }
