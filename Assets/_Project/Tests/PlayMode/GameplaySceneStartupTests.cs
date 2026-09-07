@@ -6,6 +6,7 @@ using LastSeed.Core.Input;
 using LastSeed.Core.Timing;
 using LastSeed.Gameplay.Combat;
 using LastSeed.Gameplay.Signals;
+using LastSeed.Presentation.Signals;
 using LastSeed.Infrastructure.Input;
 using LastSeed.Infrastructure.Navigation;
 using NUnit.Framework;
@@ -46,6 +47,9 @@ namespace LastSeed.Tests.PlayMode
             Assert.That(sceneContext.Container.Resolve<IGameTimeProvider>(), Is.Not.Null);
             Assert.That(
                 sceneContext.Container.Resolve<WeaponRuntimeStatsSignalPublisher>(),
+                Is.Not.Null);
+            Assert.That(
+                sceneContext.Container.Resolve<IWeaponRuntimeStatsPublisher>(),
                 Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRewardedAdService>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<RewardFlowController>(), Is.Not.Null);

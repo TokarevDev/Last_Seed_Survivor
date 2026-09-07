@@ -1,4 +1,5 @@
 using LastSeed.Gameplay.Signals;
+using LastSeed.Presentation.Signals;
 using LastSeed.Presentation.UI.Popups;
 using Zenject;
 
@@ -22,7 +23,7 @@ namespace LastSeed.Bootstrap.Installers
             Container.DeclareSignal<WeaponAttackCycleStartedSignal>();
             Container.DeclareSignal<ShowPopupRequestedSignal>();
 
-            Container.Bind<WeaponRuntimeStatsSignalPublisher>().AsSingle();
+            Container.BindInterfacesAndSelfTo<WeaponRuntimeStatsSignalPublisher>().AsSingle();
         }
     }
 }

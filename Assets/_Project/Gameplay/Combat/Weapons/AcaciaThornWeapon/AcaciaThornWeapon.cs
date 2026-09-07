@@ -14,7 +14,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     private Transform _firePoint;
     private float _currentCooldown;
     private bool _initialized;
-    private WeaponRuntimeStatsSignalPublisher _runtimeStatsPublisher;
+    private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
     private IConfigurablePooledSpawnService<
         AcaciaThornProjectilePoolSetup,
         AcaciaThornProjectileSpawnRequest> _pool;
@@ -25,7 +25,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
     [Inject]
     public void Construct(
-        WeaponRuntimeStatsSignalPublisher runtimeStatsPublisher,
+        IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
         IConfigurablePooledSpawnService<
             AcaciaThornProjectilePoolSetup,
             AcaciaThornProjectileSpawnRequest> pool)

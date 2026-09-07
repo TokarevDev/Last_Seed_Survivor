@@ -24,7 +24,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
 
     private WeaponRuntimeState _runtimeState;
     private SignalBus _signalBus;
-    private WeaponRuntimeStatsSignalPublisher _runtimeStatsPublisher;
+    private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
 
     public WeaponConfig Config => _config;
     public WeaponRuntimeState RuntimeState => _runtimeState;
@@ -33,7 +33,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     [Inject]
     public void Construct(
         SignalBus signalBus,
-        WeaponRuntimeStatsSignalPublisher runtimeStatsPublisher)
+        IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
     {
         _signalBus = signalBus;
         _runtimeStatsPublisher = runtimeStatsPublisher;
