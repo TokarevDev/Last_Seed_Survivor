@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using LastSeed.Bootstrap.GameplayLoop;
 using LastSeed.Core.Collections;
+using LastSeed.Core.Input;
 using LastSeed.Core.Timing;
 using LastSeed.Gameplay.Combat;
 using LastSeed.Gameplay.Signals;

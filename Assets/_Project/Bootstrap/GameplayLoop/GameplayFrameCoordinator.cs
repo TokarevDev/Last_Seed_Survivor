@@ -1,5 +1,5 @@
 using LastSeed.Gameplay.Input;
-using LastSeed.Infrastructure.Input;
+using LastSeed.Core.Input;
 
 namespace LastSeed.Bootstrap.GameplayLoop
 {

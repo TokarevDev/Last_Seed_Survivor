@@ -1,3 +1,4 @@
+using LastSeed.Core.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;

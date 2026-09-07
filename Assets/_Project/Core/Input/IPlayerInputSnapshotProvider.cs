@@ -1,4 +1,4 @@
-namespace LastSeed.Infrastructure.Input
+namespace LastSeed.Core.Input
 {
     public interface IPlayerInputSnapshotProvider
     {

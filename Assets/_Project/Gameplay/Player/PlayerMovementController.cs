@@ -1,5 +1,5 @@
 using System;
-using LastSeed.Infrastructure.Input;
+using LastSeed.Core.Input;
 
 public sealed class PlayerMovementController
 {

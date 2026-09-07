@@ -1,4 +1,4 @@
-using LastSeed.Infrastructure.Input;
+using LastSeed.Core.Input;
 using UnityEngine;
 using Zenject;
 

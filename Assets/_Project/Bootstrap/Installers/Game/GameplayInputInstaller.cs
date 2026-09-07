@@ -1,3 +1,4 @@
+using LastSeed.Core.Input;
 using LastSeed.Gameplay.Input;
 using LastSeed.Infrastructure.Input;
 using UnityEngine;
