@@ -92,7 +92,7 @@ public sealed class WormReviveAnimationController
             _settings.GameplaySpeed);
         _headDistance = Math.Max(_targetDistance, _headDistance - speed * deltaTime);
         remainingDistance = Math.Max(0f, _headDistance - _targetDistance);
-        float progress = 1f - Clamp01(remainingDistance / _rollbackDistance);
+        float progress = 1f - FloatMath.Clamp01(remainingDistance / _rollbackDistance);
         float visualYOffset = (float)Math.Sin(progress * Math.PI) * _settings.ArcHeight;
         WormScale2 scale = _motionCalculator.CalculateTravelScale(
             progress,
@@ -148,18 +148,13 @@ public sealed class WormReviveAnimationController
     private float AdvancePhaseTime(float deltaTime, float duration)
     {
         _elapsed += deltaTime;
-        return Clamp01(_elapsed / Math.Max(MinimumDuration, duration));
+        return FloatMath.Clamp01(_elapsed / Math.Max(MinimumDuration, duration));
     }
 
     private void EnterPhase(WormReviveAnimationPhase phase)
     {
         _phase = phase;
         _elapsed = 0f;
-    }
-
-    private static float Clamp01(float value)
-    {
-        return Math.Max(0f, Math.Min(1f, value));
     }
 
     private static float LerpUnclamped(float from, float to, float time)

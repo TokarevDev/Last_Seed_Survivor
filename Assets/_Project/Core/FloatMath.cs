@@ -18,6 +18,13 @@ public static class FloatMath
         return Clamp(value, 0f, 1f);
     }
 
+    public static float ClampOrMidpoint(float value, float minimum, float maximum)
+    {
+        return minimum <= maximum
+            ? Clamp(value, minimum, maximum)
+            : (minimum + maximum) * 0.5f;
+    }
+
     public static float Lerp(float from, float to, float time)
     {
         return from + (to - from) * Clamp01(time);

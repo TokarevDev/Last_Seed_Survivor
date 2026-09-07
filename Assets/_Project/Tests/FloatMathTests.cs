@@ -20,6 +20,12 @@ namespace LastSeed.Tests
                 () => FloatMath.Clamp(0f, 2f, 1f));
         }
 
+        [Test]
+        public void ClampOrMidpoint_WithInvertedRange_ReturnsRangeMidpoint()
+        {
+            Assert.That(FloatMath.ClampOrMidpoint(100f, 4f, 2f), Is.EqualTo(3f));
+        }
+
         [TestCase(-1f, 10f)]
         [TestCase(0.5f, 15f)]
         [TestCase(2f, 20f)]

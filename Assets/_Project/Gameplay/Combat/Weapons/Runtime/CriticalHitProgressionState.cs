@@ -51,7 +51,7 @@ public sealed class CriticalHitProgressionState
 
     public void SetDamageMultiplier(float damageMultiplier)
     {
-        DamageMultiplier = Clamp(
+        DamageMultiplier = FloatMath.Clamp(
             damageMultiplier,
             MinimumDamageMultiplier,
             _maxDamageMultiplier);
@@ -71,7 +71,7 @@ public sealed class CriticalHitProgressionState
     public float AddChance(float bonus, float minimumDamageMultiplier = MinimumDamageMultiplier)
     {
         float accepted = Math.Min(Math.Max(0f, bonus), _maxChance - Chance);
-        Chance = Clamp(Chance + Math.Max(0f, accepted), 0f, _maxChance);
+        Chance = FloatMath.Clamp(Chance + Math.Max(0f, accepted), 0f, _maxChance);
         SetDamageMultiplier(Math.Max(DamageMultiplier, minimumDamageMultiplier));
         return accepted;
     }
@@ -92,10 +92,5 @@ public sealed class CriticalHitProgressionState
             DamageMultiplier,
             _maxChance,
             _maxDamageMultiplier);
-    }
-
-    private static float Clamp(float value, float minimum, float maximum)
-    {
-        return Math.Max(minimum, Math.Min(maximum, value));
     }
 }

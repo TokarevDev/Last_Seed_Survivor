@@ -47,7 +47,7 @@ public sealed class WormSectionHpResolver
         dynamicHp = ClampDynamicHp(independentHp, dynamicHp);
 
         float blendedHp = independentHp +
-            (dynamicHp - independentHp) * Clamp01(_config.DynamicHpWeight);
+            (dynamicHp - independentHp) * FloatMath.Clamp01(_config.DynamicHpWeight);
 
         return ClampHp(blendedHp * _config.HpMultiplier * postReviveHpMultiplier);
     }
@@ -78,10 +78,5 @@ public sealed class WormSectionHpResolver
     {
         int roundedHp = (int)Math.Round(hp, MidpointRounding.ToEven);
         return Math.Max(_config.MinHp, Math.Min(_config.MaxHp, roundedHp));
-    }
-
-    private static float Clamp01(float value)
-    {
-        return Math.Max(0f, Math.Min(1f, value));
     }
 }

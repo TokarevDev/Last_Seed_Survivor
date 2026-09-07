@@ -18,7 +18,7 @@ public sealed class WormReviveMotionCalculator
     {
         float distance = Math.Max(MinimumDistance, rollbackDistance);
         float duration = Math.Max(MinimumDuration, throwDuration);
-        float decelerationFraction = Clamp01(decelerationPathFraction);
+        float decelerationFraction = FloatMath.Clamp01(decelerationPathFraction);
         float safeGameplaySpeed = Math.Max(MinimumGameplaySpeed, gameplaySpeed);
 
         if (decelerationFraction <= 0f)
@@ -43,7 +43,7 @@ public sealed class WormReviveMotionCalculator
         float decelerationPathFraction,
         float gameplaySpeed)
     {
-        float decelerationDistance = rollbackDistance * Clamp01(decelerationPathFraction);
+        float decelerationDistance = rollbackDistance * FloatMath.Clamp01(decelerationPathFraction);
 
         if (decelerationDistance <= MinimumDecelerationDistance
             || remainingDistance > decelerationDistance)
@@ -51,10 +51,11 @@ public sealed class WormReviveMotionCalculator
             return cruiseSpeed;
         }
 
-        float slowdownProgress = 1f - Clamp01(remainingDistance / decelerationDistance);
+        float slowdownProgress = 1f - FloatMath.Clamp01(
+            remainingDistance / decelerationDistance);
         float eased = SmootherStep(slowdownProgress);
         float safeGameplaySpeed = Math.Max(MinimumGameplaySpeed, gameplaySpeed);
-        return Lerp(cruiseSpeed, safeGameplaySpeed, eased);
+        return FloatMath.Lerp(cruiseSpeed, safeGameplaySpeed, eased);
     }
 
     public WormScale2 CalculateTravelScale(
@@ -63,7 +64,7 @@ public sealed class WormReviveMotionCalculator
         float squashYScale)
     {
         float settle = EaseOutCubic(normalizedTime);
-        float stretch = (float)Math.Sin(Clamp01(normalizedTime) * Math.PI);
+        float stretch = (float)Math.Sin(FloatMath.Clamp01(normalizedTime) * Math.PI);
 
         return new WormScale2(
             LerpUnclamped(squashXScale, 1f, settle) + stretch * TravelStretchX,
@@ -72,13 +73,13 @@ public sealed class WormReviveMotionCalculator
 
     public float EaseOutCubic(float value)
     {
-        float inverse = 1f - Clamp01(value);
+        float inverse = 1f - FloatMath.Clamp01(value);
         return 1f - inverse * inverse * inverse;
     }
 
     public float EaseOutBack(float value)
     {
-        float time = Clamp01(value) - 1f;
+        float time = FloatMath.Clamp01(value) - 1f;
         return 1f
             + (BackEaseOvershoot + 1f) * time * time * time
             + BackEaseOvershoot * time * time;
@@ -86,18 +87,8 @@ public sealed class WormReviveMotionCalculator
 
     private static float SmootherStep(float value)
     {
-        float time = Clamp01(value);
+        float time = FloatMath.Clamp01(value);
         return time * time * time * (time * (time * 6f - 15f) + 10f);
-    }
-
-    private static float Clamp01(float value)
-    {
-        return Math.Max(0f, Math.Min(1f, value));
-    }
-
-    private static float Lerp(float from, float to, float time)
-    {
-        return from + (to - from) * Clamp01(time);
     }
 
     private static float LerpUnclamped(float from, float to, float time)
