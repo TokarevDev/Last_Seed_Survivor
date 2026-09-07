@@ -55,6 +55,10 @@ public static class RailPathGeometry
         }
 
         AddPointIfSeparated(points, worldPoints[^1], minimumSegmentLength);
+
+        if (points.Count == 1)
+            points.Add(worldPoints[^1]);
+
         return points.ToArray();
     }
 

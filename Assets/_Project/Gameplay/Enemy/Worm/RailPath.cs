@@ -82,12 +82,21 @@ public sealed class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<Numeri
 
         distance = Mathf.Clamp(distance, 0f, _totalLength);
 
+        if (distance >= _totalLength)
+            return _samples[^1];
+
         float fIndex = distance / _sampleStep;
         int index = Mathf.FloorToInt(fIndex);
-        float t = fIndex - index;
 
         if (index >= _samples.Length - 1)
             return _samples[^1];
+
+        float intervalStart = index * _sampleStep;
+        float intervalEnd = Mathf.Min(intervalStart + _sampleStep, _totalLength);
+        float intervalLength = intervalEnd - intervalStart;
+        float t = intervalLength > MinimumSegmentLength
+            ? (distance - intervalStart) / intervalLength
+            : 0f;
 
         return Vector3.Lerp(
             _samples[index],
