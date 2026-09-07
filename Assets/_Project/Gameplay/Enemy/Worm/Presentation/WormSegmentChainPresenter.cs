@@ -1,21 +1,21 @@
 using System;
 using System.Collections.Generic;
 using LastSeed.Core.World;
-using UnityEngine;
 using NumericVector3 = System.Numerics.Vector3;
 
 public sealed class WormSegmentChainPresenter
 {
-    private const float PositionSqrMagnitudeThreshold = 0.000001f;
-    private const float RotationThresholdDegrees = 0.1f;
-
+    private readonly WormSegmentTransformPresenter _transformPresenter;
     private readonly WormSegmentVisualChainPresenter _visualChainPresenter;
     private int _activeStartIndex = -1;
     private int _activeEndIndex = -1;
-    private Vector3 _temporaryEuler;
 
-    public WormSegmentChainPresenter(WormSegmentVisualChainPresenter visualChainPresenter)
+    public WormSegmentChainPresenter(
+        WormSegmentTransformPresenter transformPresenter,
+        WormSegmentVisualChainPresenter visualChainPresenter)
     {
+        _transformPresenter = transformPresenter ??
+            throw new ArgumentNullException(nameof(transformPresenter));
         _visualChainPresenter = visualChainPresenter ??
             throw new ArgumentNullException(nameof(visualChainPresenter));
     }
@@ -71,7 +71,7 @@ public sealed class WormSegmentChainPresenter
                 distance,
                 layout);
 
-            UpdateSegmentPosition(segment, position);
+            _transformPresenter.ApplyPosition(segment, position);
             _visualChainPresenter.RenderHeadFollowChain(
                 segments,
                 rail,
@@ -81,7 +81,7 @@ public sealed class WormSegmentChainPresenter
                 layout);
 
             if (index > start && !segment.HasTailVisualChain)
-                UpdateSegmentRotation(segments, index, segment, position);
+                _transformPresenter.ApplyRotation(segments, index, segment, position);
 
             _visualChainPresenter.RenderTailVisualChain(
                 segments,
@@ -129,7 +129,7 @@ public sealed class WormSegmentChainPresenter
                 rail,
                 distance,
                 layout);
-            UpdateSegmentPosition(segment, position);
+            _transformPresenter.ApplyPosition(segment, position);
             _visualChainPresenter.RenderHeadFollowChain(
                 segments,
                 rail,
@@ -139,7 +139,7 @@ public sealed class WormSegmentChainPresenter
                 layout);
 
             if (index > 0 && !segment.HasTailVisualChain)
-                UpdateSegmentRotation(segments, index, segment, position);
+                _transformPresenter.ApplyRotation(segments, index, segment, position);
 
             _visualChainPresenter.RenderTailVisualChain(
                 segments,
@@ -177,48 +177,6 @@ public sealed class WormSegmentChainPresenter
         }
     }
 
-    private static void UpdateSegmentPosition(WormSegment segment, NumericVector3 position)
-    {
-        Transform segmentTransform = segment.CachedTransform;
-        Vector3 unityPosition = ToUnity(position);
-
-        if ((segmentTransform.position - unityPosition).sqrMagnitude >
-            PositionSqrMagnitudeThreshold)
-        {
-            segmentTransform.position = unityPosition;
-        }
-    }
-
-    private void UpdateSegmentRotation(
-        IReadOnlyList<WormSegment> segments,
-        int index,
-        WormSegment segment,
-        NumericVector3 position)
-    {
-        WormSegment previous = segments[index - 1];
-        if (previous == null)
-            return;
-
-        if (!WormSegmentPoseCalculator.TryCalculateLookAngle(
-                position,
-                ToNumeric(previous.CachedTransform.position),
-                out float angle))
-        {
-            return;
-        }
-
-        Transform visual = segment.VisualRoot;
-        if (visual == null)
-            return;
-
-        Vector3 currentEuler = visual.localEulerAngles;
-        if (Mathf.Abs(Mathf.DeltaAngle(currentEuler.z, angle)) <= RotationThresholdDegrees)
-            return;
-
-        _temporaryEuler.z = angle;
-        visual.localEulerAngles = _temporaryEuler;
-    }
-
     private float GetSegmentDistance(
         IReadOnlyList<WormSegment> segments,
         IReadOnlyDictionary<WormSegment, float> rollbackAnchoredDistances,
@@ -242,15 +200,5 @@ public sealed class WormSegmentChainPresenter
             headFollowDistanceOffset,
             hasRollbackAnchor,
             anchoredDistance);
-    }
-
-    private static NumericVector3 ToNumeric(Vector3 value)
-    {
-        return new NumericVector3(value.x, value.y, value.z);
-    }
-
-    private static Vector3 ToUnity(in NumericVector3 value)
-    {
-        return new Vector3(value.X, value.Y, value.Z);
     }
 }
