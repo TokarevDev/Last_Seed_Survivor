@@ -16,9 +16,8 @@ public sealed class PopupRoot : MonoBehaviour
 
     private readonly Dictionary<string, PopupView> _popupsById = new();
     private readonly OrderedReferenceSet<PopupView> _registeredPopups = new();
-    private readonly UniqueReferenceQueue<PopupView> _queuedPopups = new();
+    private readonly QueuedActivationState<PopupView> _navigation = new();
 
-    private PopupView _activePopup;
     private IGameplayInputLock _gameplayInputLock;
     private SignalBus _signalBus;
     private IDisposable _gameplayInputLockHandle;
@@ -50,7 +49,7 @@ public sealed class PopupRoot : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeFromSignals();
-        _queuedPopups.Clear();
+        _navigation.ClearQueued();
         HideActiveInternal(true, false);
     }
 
@@ -87,21 +86,18 @@ public sealed class PopupRoot : MonoBehaviour
 
         RegisterPopup(popup);
 
-        if (_activePopup == popup && popup.IsVisible)
+        if (ReferenceEquals(_navigation.ActiveItem, popup))
             return;
 
-        if (_activePopup != null)
-        {
-            EnqueuePopup(popup);
-            return;
-        }
+        ActivationRequestResult result = _navigation.Request(popup);
 
-        ShowNow(popup);
+        if (result == ActivationRequestResult.Activated)
+            ShowActivated(popup);
     }
 
     public void HideActive(bool releaseGameplayLock = true)
     {
-        _queuedPopups.Clear();
+        _navigation.ClearQueued();
         HideActiveInternal(releaseGameplayLock, false);
     }
 
@@ -109,21 +105,20 @@ public sealed class PopupRoot : MonoBehaviour
         bool releaseGameplayLock,
         bool showQueuedPopup)
     {
-        PopupView popup = _activePopup;
-
-        if (popup != null)
-        {
-            _activePopup = null;
+        if (_navigation.Deactivate(out PopupView popup))
             popup.Hide();
-        }
 
-        if (_activePopup != null)
+        if (_navigation.ActiveItem != null)
             return;
 
         if (releaseGameplayLock)
         {
-            if (showQueuedPopup && TryShowNextQueuedPopup())
+            if (showQueuedPopup &&
+                _navigation.TryActivateNext(out PopupView queuedPopup))
+            {
+                ShowActivated(queuedPopup);
                 return;
+            }
 
             ReleaseGameplayLock();
         }
@@ -200,18 +195,18 @@ public sealed class PopupRoot : MonoBehaviour
         }
 
         _registeredPopups.Clear();
-        _queuedPopups.Clear();
+        _navigation.ClearQueued();
     }
 
     private void HandlePopupCloseRequested(PopupView popup)
     {
-        if (popup == _activePopup)
+        if (ReferenceEquals(popup, _navigation.ActiveItem))
         {
             HideActiveInternal(true, true);
             return;
         }
 
-        if (_queuedPopups.Remove(popup))
+        if (_navigation.RemoveQueued(popup))
             return;
 
         popup?.Hide();
@@ -222,47 +217,18 @@ public sealed class PopupRoot : MonoBehaviour
         Show(signal.PopupId);
     }
 
-    private void EnqueuePopup(PopupView popup)
+    private void ShowActivated(PopupView popup)
     {
         if (popup == null)
             return;
-
-        _queuedPopups.Enqueue(popup);
-    }
-
-    private bool TryShowNextQueuedPopup()
-    {
-        for (int remaining = _queuedPopups.Count; remaining > 0; remaining--)
-        {
-            if (!_queuedPopups.TryDequeue(out PopupView popup))
-                return false;
-
-            if (popup == null)
-                continue;
-
-            ShowNow(popup);
-            return true;
-        }
-
-        return false;
-    }
-
-    private void ShowNow(PopupView popup)
-    {
-        if (popup == null)
-            return;
-
-        RegisterPopup(popup);
-        _queuedPopups.Remove(popup);
 
         LockGameplay();
-        _activePopup = popup;
-        _activePopup.Show();
+        popup.Show();
     }
 
     private void HideAllPopups()
     {
-        _queuedPopups.Clear();
+        _navigation.Clear();
 
         for (int i = 0; i < _registeredPopups.Count; i++)
         {
