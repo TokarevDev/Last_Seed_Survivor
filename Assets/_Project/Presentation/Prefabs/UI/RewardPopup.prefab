@@ -2239,22 +2239,7 @@ MonoBehaviour:
   _takeAllAttemptsText: {fileID: 672232384537545834}
   _guaranteeText: {fileID: 8984874259882271412}
   _adRerollGuaranteeText: {fileID: 4313469380194124324}
-  _attemptsFormat: 'attempts left: x{0}'
-  _guaranteeFormat: 'guarantee: {0}'
-  _adGuaranteeFormat: 'guarantee: {0}'
-  _singleActionButtonAnchoredX: 350
-  _numberColor:
-    serializedVersion: 2
-    rgba: 4286119785
-  _commonRarityColor:
-    serializedVersion: 2
-    rgba: 4286766175
-  _rareRarityColor:
-    serializedVersion: 2
-    rgba: 4294947920
-  _legendaryRarityColor:
-    serializedVersion: 2
-    rgba: 4282817535
+  _actionPresentationConfig: {fileID: 11400000, guid: b522174601d84b5ca769e919b839123f, type: 2}
 --- !u!225 &910000000000020001
 CanvasGroup:
   m_ObjectHideFlags: 0

@@ -27,23 +27,12 @@ public sealed class RewardPopupView : PopupView
     [SerializeField, Range(0f, 1f)] private float _animationVolume = 1f;
 
     [Header("Action State Text")]
+    [SerializeField] private RewardPopupActionPresentationConfig _actionPresentationConfig;
     [SerializeField] private TMP_Text _rerollAttemptsText;
     [SerializeField] private TMP_Text _adRerollAttemptsText;
     [SerializeField] private TMP_Text _takeAllAttemptsText;
     [SerializeField] private TMP_Text _guaranteeText;
     [SerializeField] private TMP_Text _adRerollGuaranteeText;
-    [SerializeField] private string _attemptsFormat = "attempts left: x{0}";
-    [SerializeField] private string _guaranteeFormat = "guarantee: {0}";
-    [SerializeField] private string _adGuaranteeFormat = "guarantee: {0}";
-
-    [Header("Action Layout")]
-    [SerializeField] private float _singleActionButtonAnchoredX = 350f;
-
-    [Header("Text Colors")]
-    [SerializeField] private Color32 _numberColor = new(105, 255, 120, 255);
-    [SerializeField] private Color32 _commonRarityColor = new(95, 220, 130, 255);
-    [SerializeField] private Color32 _rareRarityColor = new(80, 180, 255, 255);
-    [SerializeField] private Color32 _legendaryRarityColor = new(255, 155, 70, 255);
 
     public event Action<RewardChoiceData> Selected;
     public event Action RerollRequested;
@@ -70,6 +59,9 @@ public sealed class RewardPopupView : PopupView
     {
         if (_animationConfig == null)
             Debug.LogError($"{nameof(RewardPopupView)} requires an animation config.", this);
+
+        if (_actionPresentationConfig == null)
+            Debug.LogError($"{nameof(RewardPopupView)} requires an action presentation config.", this);
     }
 
     private void OnEnable()
@@ -169,6 +161,12 @@ public sealed class RewardPopupView : PopupView
                 $"{nameof(RewardPopupView)} on '{name}' requires an animation config.");
         }
 
+        if (_actionPresentationConfig == null)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(RewardPopupView)} on '{name}' requires an action presentation config.");
+        }
+
         _choiceBinder = new RewardPopupChoiceBinder(
             _buttons,
             _visualCatalog,
@@ -183,15 +181,8 @@ public sealed class RewardPopupView : PopupView
             _takeAllAttemptsText,
             _guaranteeText,
             _adRerollGuaranteeText,
-            new RewardPopupActionControls.TextSettings(
-                _attemptsFormat,
-                _guaranteeFormat,
-                _adGuaranteeFormat,
-                _numberColor,
-                _commonRarityColor,
-                _rareRarityColor,
-                _legendaryRarityColor),
-            _singleActionButtonAnchoredX,
+            _actionPresentationConfig.CreateTextSettings(),
+            _actionPresentationConfig.SingleActionButtonAnchoredX,
             OnRerollClicked,
             OnAdRerollClicked,
             OnTakeAllClicked);

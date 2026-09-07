@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91637a29fb65e11408874662863d3a6c, type: 3}
+  m_Name: RewardPopupActionPresentationConfig_Default
+  m_EditorClassIdentifier: LastSeed.Presentation::RewardPopupActionPresentationConfig
+  _attemptsFormat: 'attempts left: x{0}'
+  _guaranteeFormat: 'guarantee: {0}'
+  _adGuaranteeFormat: 'guarantee: {0}'
+  _singleActionButtonAnchoredX: 350
+  _numberColor:
+    serializedVersion: 2
+    rgba: 4286119785
+  _commonRarityColor:
+    serializedVersion: 2
+    rgba: 4286766175
+  _rareRarityColor:
+    serializedVersion: 2
+    rgba: 4294947920
+  _legendaryRarityColor:
+    serializedVersion: 2
+    rgba: 4282817535
