@@ -6,7 +6,8 @@ public sealed class RewardFlowController : IDisposable
     private const int AdRerollGuaranteedSlots = 1;
 
     private readonly RewardRollService _rollService;
-    private readonly RewardApplyService _applyService;
+    private readonly IRewardChoiceApplier _applyService;
+    private readonly RewardBatchApplyService _batchApplyService;
     private readonly RewardPopupView _popup;
     private readonly PopupRoot _popupRoot;
     private readonly RewardAdOperation _rewardAdOperation;
@@ -20,7 +21,8 @@ public sealed class RewardFlowController : IDisposable
 
     public RewardFlowController(
         RewardRollService rollService,
-        RewardApplyService applyService,
+        IRewardChoiceApplier applyService,
+        RewardBatchApplyService batchApplyService,
         RewardPopupView popup,
         PopupRoot popupRoot,
         RewardAdOperation rewardAdOperation,
@@ -31,7 +33,9 @@ public sealed class RewardFlowController : IDisposable
         RewardPopupStateFactory popupStateFactory)
     {
         _rollService = rollService;
-        _applyService = applyService;
+        _applyService = applyService ?? throw new ArgumentNullException(nameof(applyService));
+        _batchApplyService = batchApplyService ??
+            throw new ArgumentNullException(nameof(batchApplyService));
         _popup = popup;
         _popupRoot = popupRoot;
         _rewardAdOperation = rewardAdOperation
@@ -222,10 +226,7 @@ public sealed class RewardFlowController : IDisposable
         _attempts.ConsumeTakeAll();
         _requestLifecycle.MarkShouldOpenNext();
 
-        for (int i = 0; i < _requestLifecycle.Choices.Count; i++)
-        {
-            _applyService.Apply(_requestLifecycle.Choices[i]);
-        }
+        _batchApplyService.ApplyAll(_requestLifecycle.Choices);
 
         _popup?.Close();
     }

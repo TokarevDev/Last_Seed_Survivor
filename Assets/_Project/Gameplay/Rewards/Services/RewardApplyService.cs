@@ -1,4 +1,4 @@
-public sealed class RewardApplyService
+public sealed class RewardApplyService : IRewardChoiceApplier
 {
     private readonly ProjectileWeapon _weapon;
     private readonly RewardRuntimeContext _context;
