@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using LastSeed.Bootstrap.GameplayLoop;
 using LastSeed.Core.Collections;
+using LastSeed.Core.Timing;
 using LastSeed.Gameplay.Combat;
 using LastSeed.Gameplay.Signals;
 using LastSeed.Infrastructure.Input;
@@ -40,6 +41,7 @@ namespace LastSeed.Tests.PlayMode
             Assert.That(FindInScene<PlayerInputSnapshotProvider>(gameplayScene), Is.Not.Null);
             Assert.That(FindInScene<GameplayUpdateDriver>(gameplayScene), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRandomSource>(), Is.Not.Null);
+            Assert.That(sceneContext.Container.Resolve<ITimeScaleController>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRewardedAdService>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<RewardFlowController>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<RewardSessionController>(), Is.Not.Null);

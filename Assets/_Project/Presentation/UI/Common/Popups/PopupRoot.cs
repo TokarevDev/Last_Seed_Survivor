@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using LastSeed.Core.Collections;
+using LastSeed.Core.Timing;
 using LastSeed.Gameplay.Input;
 using LastSeed.Presentation.UI.Popups;
 using UnityEngine;
@@ -17,17 +18,20 @@ public sealed class PopupRoot : MonoBehaviour
     private readonly QueuedActivationState<PopupView> _navigation = new();
 
     private PopupRegistry _registry;
-    private IGameplayInputLock _gameplayInputLock;
+    private PopupModalLock _modalLock;
     private SignalBus _signalBus;
-    private IDisposable _gameplayInputLockHandle;
-    private float _timeScaleBeforeLock = 1f;
-    private bool _hasTimeScaleLock;
     private bool _isSubscribedToSignals;
 
     [Inject]
-    public void Construct(IGameplayInputLock gameplayInputLock, SignalBus signalBus)
+    public void Construct(
+        IGameplayInputLock gameplayInputLock,
+        ITimeScaleController timeScaleController,
+        SignalBus signalBus)
     {
-        _gameplayInputLock = gameplayInputLock;
+        _modalLock = new PopupModalLock(
+            gameplayInputLock,
+            timeScaleController,
+            _pauseTimeWhileModalVisible);
         _signalBus = signalBus;
         SubscribeToSignals();
     }
@@ -128,14 +132,7 @@ public sealed class PopupRoot : MonoBehaviour
 
     public void ReleaseGameplayLock()
     {
-        _gameplayInputLockHandle?.Dispose();
-        _gameplayInputLockHandle = null;
-
-        if (!_hasTimeScaleLock)
-            return;
-
-        Time.timeScale = _timeScaleBeforeLock;
-        _hasTimeScaleLock = false;
+        _modalLock?.Release();
     }
 
     public void RefreshRegistry()
@@ -220,14 +217,7 @@ public sealed class PopupRoot : MonoBehaviour
 
     private void LockGameplay()
     {
-        _gameplayInputLockHandle ??= _gameplayInputLock.Acquire();
-
-        if (!_pauseTimeWhileModalVisible || _hasTimeScaleLock)
-            return;
-
-        _timeScaleBeforeLock = Time.timeScale;
-        Time.timeScale = 0f;
-        _hasTimeScaleLock = true;
+        _modalLock.Acquire();
     }
 
     private void SubscribeToSignals()

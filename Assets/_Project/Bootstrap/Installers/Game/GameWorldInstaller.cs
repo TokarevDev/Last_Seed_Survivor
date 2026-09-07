@@ -1,3 +1,5 @@
+using LastSeed.Core.Timing;
+using LastSeed.Infrastructure.Timing;
 using UnityEngine;
 using Zenject;
 
@@ -12,6 +14,10 @@ namespace LastSeed.Bootstrap.Installers
         {
             Container.Bind<Camera>().FromInstance(_worldCamera).AsSingle();
             Container.Bind<IRandomSource>().To<UnityRandomSource>().AsSingle();
+            Container
+                .Bind<ITimeScaleController>()
+                .To<UnityTimeScaleController>()
+                .AsSingle();
 
             Container
                 .BindInterfacesAndSelfTo<ScreenBoundsService>()
