@@ -24,6 +24,7 @@ namespace LastSeed.Bootstrap.Installers
             Container.DeclareSignal<ShowPopupRequestedSignal>();
 
             Container.BindInterfacesAndSelfTo<WeaponRuntimeStatsSignalPublisher>().AsSingle();
+            Container.BindInterfacesAndSelfTo<WeaponAttackCycleSignalPublisher>().AsSingle();
         }
     }
 }

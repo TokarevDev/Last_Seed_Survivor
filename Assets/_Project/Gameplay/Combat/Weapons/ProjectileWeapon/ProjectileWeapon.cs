@@ -23,7 +23,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     private readonly CooldownBurstCycle _fireCycle = new();
 
     private WeaponRuntimeState _runtimeState;
-    private SignalBus _signalBus;
+    private IWeaponAttackCyclePublisher _attackCyclePublisher;
     private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
 
     public WeaponConfig Config => _config;
@@ -32,10 +32,10 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
 
     [Inject]
     public void Construct(
-        SignalBus signalBus,
+        IWeaponAttackCyclePublisher attackCyclePublisher,
         IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
     {
-        _signalBus = signalBus;
+        _attackCyclePublisher = attackCyclePublisher;
         _runtimeStatsPublisher = runtimeStatsPublisher;
     }
 
@@ -162,15 +162,15 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     {
         _preparedAttack.Begin();
 
-        if (_signalBus == null)
+        if (_attackCyclePublisher == null)
         {
             ReleasePreparedAttack();
             return;
         }
 
-        _signalBus.Fire(new WeaponAttackCycleStartedSignal(
+        _attackCyclePublisher.Publish(
             _currentShotCooldown,
-            GetBaseShotCooldown()));
+            GetBaseShotCooldown());
     }
 
     private float GetBaseShotCooldown()

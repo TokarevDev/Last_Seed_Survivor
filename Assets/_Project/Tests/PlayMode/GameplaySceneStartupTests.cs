@@ -51,6 +51,12 @@ namespace LastSeed.Tests.PlayMode
             Assert.That(
                 sceneContext.Container.Resolve<IWeaponRuntimeStatsPublisher>(),
                 Is.Not.Null);
+            Assert.That(
+                sceneContext.Container.Resolve<IWeaponAttackCyclePublisher>(),
+                Is.Not.Null);
+            Assert.That(
+                sceneContext.Container.Resolve<WeaponAttackCycleSignalPublisher>(),
+                Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRewardedAdService>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<RewardFlowController>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<RewardSessionController>(), Is.Not.Null);
