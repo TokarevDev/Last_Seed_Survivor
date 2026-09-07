@@ -93,6 +93,39 @@ namespace LastSeed.Tests
             }
         }
 
+        [Test]
+        public void TransformChangedAfterBuild_RebuildsWorldSamplesAndDistances()
+        {
+            GameObject pathObject = new("RailPath");
+
+            try
+            {
+                RailPath path = pathObject.AddComponent<RailPath>();
+                Configure(
+                    path,
+                    RailPathInterpolationMode.Linear,
+                    Vector3.zero,
+                    Vector3.right);
+
+                Assert.That(path.GetPoint(float.MaxValue), Is.EqualTo(Vector3.right));
+
+                pathObject.transform.position = new Vector3(3f, 2f, 0f);
+                pathObject.transform.localScale = new Vector3(2f, 2f, 1f);
+
+                Assert.That(path.TotalLength, Is.EqualTo(2f).Within(Tolerance));
+
+                Vector3 transformedEnd = path.GetPoint(float.MaxValue);
+
+                Assert.That(transformedEnd.x, Is.EqualTo(5f).Within(Tolerance));
+                Assert.That(transformedEnd.y, Is.EqualTo(2f).Within(Tolerance));
+                Assert.That(transformedEnd.z, Is.Zero.Within(Tolerance));
+            }
+            finally
+            {
+                Object.DestroyImmediate(pathObject);
+            }
+        }
+
         private static void Configure(
             RailPath path,
             RailPathInterpolationMode interpolationMode,

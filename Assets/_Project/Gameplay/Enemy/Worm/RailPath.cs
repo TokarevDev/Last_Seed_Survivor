@@ -32,9 +32,18 @@ public sealed class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<Numeri
     private float[] _distances;
     private float[] _controlPointDistances;
     private float _totalLength;
+    private Matrix4x4 _builtLocalToWorldMatrix;
+    private bool _hasBuiltTransform;
 
     public int PointCount => _localPoints != null ? _localPoints.Count : 0;
-    public float TotalLength => _totalLength;
+    public float TotalLength
+    {
+        get
+        {
+            EnsureBuilt();
+            return _totalLength;
+        }
+    }
 
     private void Reset()
     {
@@ -205,7 +214,15 @@ public sealed class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<Numeri
     private bool EnsureBuilt()
     {
         if (_samples != null && _samples.Length > 0)
-            return true;
+        {
+            if (_hasBuiltTransform &&
+                _builtLocalToWorldMatrix == transform.localToWorldMatrix)
+            {
+                return true;
+            }
+
+            Invalidate();
+        }
 
         if (!TryBuildWorldPoints())
             return false;
@@ -218,6 +235,8 @@ public sealed class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<Numeri
         CalculateDistances(pathPoints);
         BuildSamples(pathPoints);
         BuildControlPointDistances();
+        _builtLocalToWorldMatrix = transform.localToWorldMatrix;
+        _hasBuiltTransform = true;
 
         return _samples != null && _samples.Length > 0;
     }
@@ -327,6 +346,8 @@ public sealed class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<Numeri
         _distances = null;
         _controlPointDistances = null;
         _totalLength = 0f;
+        _builtLocalToWorldMatrix = default;
+        _hasBuiltTransform = false;
     }
 
 }
