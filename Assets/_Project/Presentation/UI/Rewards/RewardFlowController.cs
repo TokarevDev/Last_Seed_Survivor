@@ -1,18 +1,13 @@
 using System;
-using System.Collections.Generic;
 
 public sealed class RewardFlowController : IDisposable
 {
-    private const int AdRerollGuaranteedSlots = 1;
-
-    private readonly RewardRollService _rollService;
+    private readonly RewardChoiceRollService _choiceRollService;
     private readonly IRewardChoiceApplier _applyService;
-    private readonly IRewardRuntimeContextProvider _runtimeContextProvider;
     private readonly RewardBatchApplyService _batchApplyService;
     private readonly RewardPopupView _popup;
     private readonly PopupRoot _popupRoot;
     private readonly RewardAdOperation _rewardAdOperation;
-    private readonly IRandomSource _randomSource;
     private readonly RewardAttemptState _attempts;
     private readonly RewardRequestQueue _requestQueue;
     private readonly RewardRequestLifecycle _requestLifecycle;
@@ -21,31 +16,26 @@ public sealed class RewardFlowController : IDisposable
     private bool _isDisposed;
 
     public RewardFlowController(
-        RewardRollService rollService,
+        RewardChoiceRollService choiceRollService,
         IRewardChoiceApplier applyService,
-        IRewardRuntimeContextProvider runtimeContextProvider,
         RewardBatchApplyService batchApplyService,
         RewardPopupView popup,
         PopupRoot popupRoot,
         RewardAdOperation rewardAdOperation,
-        IRandomSource randomSource,
         RewardAttemptState attempts,
         RewardRequestQueue requestQueue,
         RewardRequestLifecycle requestLifecycle,
         RewardPopupStateFactory popupStateFactory)
     {
-        _rollService = rollService;
+        _choiceRollService = choiceRollService ??
+            throw new ArgumentNullException(nameof(choiceRollService));
         _applyService = applyService ?? throw new ArgumentNullException(nameof(applyService));
-        _runtimeContextProvider = runtimeContextProvider ??
-            throw new ArgumentNullException(nameof(runtimeContextProvider));
         _batchApplyService = batchApplyService ??
             throw new ArgumentNullException(nameof(batchApplyService));
         _popup = popup;
         _popupRoot = popupRoot;
         _rewardAdOperation = rewardAdOperation
             ?? throw new ArgumentNullException(nameof(rewardAdOperation));
-        _randomSource = randomSource
-            ?? throw new ArgumentNullException(nameof(randomSource));
         _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
         _requestQueue = requestQueue ?? throw new ArgumentNullException(nameof(requestQueue));
         _requestLifecycle = requestLifecycle
@@ -198,16 +188,7 @@ public sealed class RewardFlowController : IDisposable
 
         _attempts.ConsumeAdReroll();
 
-        RewardRarity adGuaranteeRarity = RewardAdRerollPolicy.RollGuaranteedRarity(
-            _runtimeContextProvider.RuntimeContext,
-            _requestLifecycle.CocoonProfile,
-            _requestLifecycle.RollContext,
-            _randomSource);
-
-        if (!RollCurrentChoices(
-                adGuaranteeRarity,
-                AdRerollGuaranteedSlots,
-                isPaidAssistRoll: true))
+        if (!RollCurrentChoices(isPaidAssistRoll: true))
         {
             _popup?.SetAllButtonsInteractable(true);
             return;
@@ -274,30 +255,18 @@ public sealed class RewardFlowController : IDisposable
         }
     }
 
-    private bool RollCurrentChoices(
-        RewardRarity? forcedGuaranteeRarity = null,
-        int forcedGuaranteeSlotCount = 1,
-        bool isPaidAssistRoll = false)
+    private bool RollCurrentChoices(bool isPaidAssistRoll = false)
     {
-        RewardRollContext rollContext = isPaidAssistRoll
-            ? _requestLifecycle.RollContext.WithPaidAssistRoll()
-            : _requestLifecycle.RollContext;
-
-        RewardRarity guaranteeRarity = forcedGuaranteeRarity
-            ?? _rollService.RollGuaranteeRarity(
-                _runtimeContextProvider.RuntimeContext,
+        RewardChoiceRollResult result = isPaidAssistRoll
+            ? _choiceRollService.RollAdAssisted(
                 _requestLifecycle.CocoonProfile,
-                rollContext);
+                _requestLifecycle.RollContext)
+            : _choiceRollService.RollStandard(
+                _requestLifecycle.CocoonProfile,
+                _requestLifecycle.RollContext);
 
-        List<RewardChoiceData> choices = _rollService.Roll3(
-            _runtimeContextProvider.RuntimeContext,
-            _requestLifecycle.CocoonProfile,
-            guaranteeRarity,
-            forcedGuaranteeSlotCount,
-            rollContext);
-        _requestLifecycle.SetRollResult(guaranteeRarity, choices);
-
-        return choices != null && choices.Count > 0;
+        _requestLifecycle.SetRollResult(result.GuaranteeRarity, result.Choices);
+        return result.HasChoices;
     }
 
     private bool ShowCurrentChoices(bool animateChoiceChanges)

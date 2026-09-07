@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public sealed class RewardRollService
+public sealed class RewardRollService : IRewardChoiceRoller
 {
     private const int MaxChoices = 3;
 
