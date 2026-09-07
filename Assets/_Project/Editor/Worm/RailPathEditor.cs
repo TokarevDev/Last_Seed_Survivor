@@ -19,6 +19,7 @@ public sealed class RailPathEditor : Editor
     private SerializedProperty _cornerRadiusProperty;
     private SerializedProperty _cornerSamplesProperty;
     private SerializedProperty _legacyWaypointsProperty;
+    private RailPathSerializedData _data;
 
     private int _selectedPointIndex = -1;
 
@@ -32,6 +33,7 @@ public sealed class RailPathEditor : Editor
         _cornerRadiusProperty = serializedObject.FindProperty("_cornerRadius");
         _cornerSamplesProperty = serializedObject.FindProperty("_cornerSamples");
         _legacyWaypointsProperty = serializedObject.FindProperty("_waypoints");
+        _data = new RailPathSerializedData(Path, serializedObject);
     }
 
     public override void OnInspectorGUI()
@@ -62,6 +64,7 @@ public sealed class RailPathEditor : Editor
         if (path == null)
             return;
 
+        serializedObject.Update();
         HandleKeyboardDelete(path);
         HandleShiftClickInsert(path);
         DrawPath(path);
@@ -80,10 +83,10 @@ public sealed class RailPathEditor : Editor
             if (GUILayout.Button("Add Point"))
                 AddPointAtEnd(path);
 
-            using (new EditorGUI.DisabledScope(path.PointCount <= 0))
+            using (new EditorGUI.DisabledScope(_data.PointCount <= 0))
             {
                 if (GUILayout.Button("Reverse"))
-                    ApplyPathChange(path, "Reverse Rail Path", path.ReverseEditorPoints);
+                    ApplyPathChange(path, "Reverse Rail Path", _data.ReversePoints);
             }
         }
 
@@ -95,14 +98,14 @@ public sealed class RailPathEditor : Editor
                     RemoveSelectedPoint(path);
             }
 
-            using (new EditorGUI.DisabledScope(path.PointCount <= 0))
+            using (new EditorGUI.DisabledScope(_data.PointCount <= 0))
             {
                 if (GUILayout.Button("Flatten Z"))
-                    ApplyPathChange(path, "Flatten Rail Path Z", path.FlattenEditorLocalZ);
+                    ApplyPathChange(path, "Flatten Rail Path Z", _data.FlattenLocalZ);
             }
         }
 
-        using (new EditorGUI.DisabledScope(path.PointCount <= 0))
+        using (new EditorGUI.DisabledScope(_data.PointCount <= 0))
         {
             if (GUILayout.Button("Clear Points") &&
                 EditorUtility.DisplayDialog(
@@ -112,7 +115,7 @@ public sealed class RailPathEditor : Editor
                     "Cancel"))
             {
                 _selectedPointIndex = -1;
-                ApplyPathChange(path, "Clear Rail Path", path.ClearEditorPoints);
+                ApplyPathChange(path, "Clear Rail Path", _data.ClearPoints);
             }
         }
     }
@@ -121,16 +124,16 @@ public sealed class RailPathEditor : Editor
     {
         RailPath path = Path;
 
-        if (path.LegacyWaypointCount <= 0 && path.ChildTransformCount < 2)
+        if (_data.LegacyWaypointCount <= 0 && _data.ChildTransformCount < 2)
             return;
 
         EditorGUILayout.Space();
         EditorGUILayout.LabelField("Import", EditorStyles.boldLabel);
 
-        if (path.LegacyWaypointCount >= 2)
+        if (_data.LegacyWaypointCount >= 2)
         {
             EditorGUILayout.HelpBox(
-                $"Found {path.LegacyWaypointCount} legacy waypoint references.",
+                $"Found {_data.LegacyWaypointCount} legacy waypoint references.",
                 MessageType.Info);
 
             using (new EditorGUILayout.HorizontalScope())
@@ -139,13 +142,13 @@ public sealed class RailPathEditor : Editor
                     ImportLegacyWaypoints(path);
 
                 if (GUILayout.Button("Clear Legacy References"))
-                    ApplyPathChange(path, "Clear Legacy Rail Path References", path.ClearLegacyWaypoints);
+                    ApplyPathChange(path, "Clear Legacy Rail Path References", _data.ClearLegacyWaypoints);
             }
 
             EditorGUILayout.PropertyField(_legacyWaypointsProperty, includeChildren: true);
         }
 
-        if (path.ChildTransformCount >= 2)
+        if (_data.ChildTransformCount >= 2)
         {
             if (GUILayout.Button("Import Child Transforms"))
                 ImportChildTransforms(path);
@@ -162,10 +165,10 @@ public sealed class RailPathEditor : Editor
 
     private void DrawPath(RailPath path)
     {
-        if (path.PointCount < 2)
+        if (_data.PointCount < 2)
             return;
 
-        Vector3[] points = path.GetEditorPreviewWorldPoints();
+        Vector3[] points = _data.BuildPreviewWorldPoints();
         if (points == null || points.Length < 2)
             return;
 
@@ -175,9 +178,9 @@ public sealed class RailPathEditor : Editor
 
     private void DrawPointHandles(RailPath path)
     {
-        for (int i = 0; i < path.PointCount; i++)
+        for (int i = 0; i < _data.PointCount; i++)
         {
-            Vector3 point = path.GetEditorWorldPoint(i);
+            Vector3 point = _data.GetWorldPoint(i);
             float size = HandleUtility.GetHandleSize(point) *
                          (i == _selectedPointIndex ? SelectedPointHandleSize : PointHandleSize);
 
@@ -189,13 +192,13 @@ public sealed class RailPathEditor : Editor
                 SceneView.RepaintAll();
             }
 
-            Handles.Label(point + Vector3.up * size * 1.5f, GetPointLabel(i, path.PointCount));
+            Handles.Label(point + Vector3.up * size * 1.5f, GetPointLabel(i, _data.PointCount));
         }
 
-        if (_selectedPointIndex < 0 || _selectedPointIndex >= path.PointCount)
+        if (_selectedPointIndex < 0 || _selectedPointIndex >= _data.PointCount)
             return;
 
-        Vector3 selectedPoint = path.GetEditorWorldPoint(_selectedPointIndex);
+        Vector3 selectedPoint = _data.GetWorldPoint(_selectedPointIndex);
 
         EditorGUI.BeginChangeCheck();
         Vector3 newPosition = Handles.PositionHandle(selectedPoint, Quaternion.identity);
@@ -203,7 +206,7 @@ public sealed class RailPathEditor : Editor
             return;
 
         Undo.RecordObject(path, "Move Rail Path Point");
-        path.SetEditorWorldPoint(_selectedPointIndex, newPosition);
+        _data.SetWorldPoint(_selectedPointIndex, newPosition);
         EditorUtility.SetDirty(path);
     }
 
@@ -217,7 +220,7 @@ public sealed class RailPathEditor : Editor
         if (!current.shift || current.type != EventType.MouseDown || current.button != 0)
             return;
 
-        if (path.PointCount < 2)
+        if (_data.PointCount < 2)
             return;
 
         if (!TryGetMouseWorldPosition(path, out Vector3 mouseWorldPosition))
@@ -233,7 +236,7 @@ public sealed class RailPathEditor : Editor
         }
 
         Undo.RecordObject(path, "Insert Rail Path Point");
-        path.InsertEditorWorldPoint(insertIndex, insertPosition);
+        _data.InsertWorldPoint(insertIndex, insertPosition);
         _selectedPointIndex = insertIndex;
         EditorUtility.SetDirty(path);
         current.Use();
@@ -266,10 +269,10 @@ public sealed class RailPathEditor : Editor
 
         float closestScreenDistance = float.MaxValue;
 
-        for (int i = 0; i < path.PointCount - 1; i++)
+        for (int i = 0; i < _data.PointCount - 1; i++)
         {
-            Vector3 start = path.GetEditorWorldPoint(i);
-            Vector3 end = path.GetEditorWorldPoint(i + 1);
+            Vector3 start = _data.GetWorldPoint(i);
+            Vector3 end = _data.GetWorldPoint(i + 1);
 
             float screenDistance = HandleUtility.DistanceToLine(start, end);
             if (screenDistance >= closestScreenDistance)
@@ -315,22 +318,22 @@ public sealed class RailPathEditor : Editor
         Vector3 newPoint = GetNewEndPoint(path);
 
         Undo.RecordObject(path, "Add Rail Path Point");
-        path.AddEditorWorldPoint(newPoint);
-        _selectedPointIndex = path.PointCount - 1;
+        _data.AddWorldPoint(newPoint);
+        _selectedPointIndex = _data.PointCount - 1;
         EditorUtility.SetDirty(path);
     }
 
     private Vector3 GetNewEndPoint(RailPath path)
     {
-        if (path.PointCount <= 0)
+        if (_data.PointCount <= 0)
             return path.transform.position;
 
-        Vector3 last = path.GetEditorWorldPoint(path.PointCount - 1);
+        Vector3 last = _data.GetWorldPoint(_data.PointCount - 1);
 
-        if (path.PointCount == 1)
+        if (_data.PointCount == 1)
             return last + Vector3.up;
 
-        Vector3 previous = path.GetEditorWorldPoint(path.PointCount - 2);
+        Vector3 previous = _data.GetWorldPoint(_data.PointCount - 2);
         Vector3 offset = last - previous;
 
         return offset.sqrMagnitude > 0.0001f
@@ -341,22 +344,22 @@ public sealed class RailPathEditor : Editor
     private void RemoveSelectedPoint(RailPath path)
     {
         Undo.RecordObject(path, "Remove Rail Path Point");
-        path.RemoveEditorPointAt(_selectedPointIndex);
-        _selectedPointIndex = Mathf.Clamp(_selectedPointIndex, -1, path.PointCount - 1);
+        _data.RemovePointAt(_selectedPointIndex);
+        _selectedPointIndex = Mathf.Clamp(_selectedPointIndex, -1, _data.PointCount - 1);
         EditorUtility.SetDirty(path);
     }
 
     private bool CanRemoveSelectedPoint(RailPath path)
     {
         return _selectedPointIndex >= 0 &&
-               _selectedPointIndex < path.PointCount &&
-               path.PointCount > 2;
+               _selectedPointIndex < _data.PointCount &&
+               _data.PointCount > 2;
     }
 
     private void ImportLegacyWaypoints(RailPath path)
     {
         Undo.RecordObject(path, "Import Legacy Rail Path Waypoints");
-        int importedCount = path.ImportLegacyWaypointsToLocalPoints();
+        int importedCount = _data.ImportLegacyWaypoints();
         _selectedPointIndex = importedCount > 0 ? 0 : -1;
         EditorUtility.SetDirty(path);
     }
@@ -364,7 +367,7 @@ public sealed class RailPathEditor : Editor
     private void ImportChildTransforms(RailPath path)
     {
         Undo.RecordObject(path, "Import Rail Path Child Transforms");
-        int importedCount = path.ImportChildTransformsToLocalPoints();
+        int importedCount = _data.ImportChildTransforms();
         _selectedPointIndex = importedCount > 0 ? 0 : -1;
         EditorUtility.SetDirty(path);
     }
@@ -373,7 +376,7 @@ public sealed class RailPathEditor : Editor
     {
         Undo.RecordObject(path, undoName);
         action?.Invoke();
-        _selectedPointIndex = Mathf.Clamp(_selectedPointIndex, -1, path.PointCount - 1);
+        _selectedPointIndex = Mathf.Clamp(_selectedPointIndex, -1, _data.PointCount - 1);
         EditorUtility.SetDirty(path);
     }
 

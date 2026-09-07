@@ -43,7 +43,11 @@ internal sealed class WormBalancePathMetrics
         int pointCount = Mathf.Max(0, railPath.PointCount);
 
         if (pointCount <= 0)
-            pointCount = Mathf.Max(0, railPath.LegacyWaypointCount);
+        {
+            SerializedProperty legacyWaypoints = new SerializedObject(railPath)
+                .FindProperty("_waypoints");
+            pointCount = CountAssignedReferences(legacyWaypoints);
+        }
 
         if (pointCount <= 0)
             pointCount = Mathf.Max(0, railPath.transform.childCount);
@@ -83,6 +87,22 @@ internal sealed class WormBalancePathMetrics
             controlPointProgresses,
             progressBucketCount,
             railPath);
+    }
+
+    private static int CountAssignedReferences(SerializedProperty arrayProperty)
+    {
+        if (arrayProperty == null || !arrayProperty.isArray)
+            return 0;
+
+        int count = 0;
+
+        for (int index = 0; index < arrayProperty.arraySize; index++)
+        {
+            if (arrayProperty.GetArrayElementAtIndex(index).objectReferenceValue != null)
+                count++;
+        }
+
+        return count;
     }
 
     private static bool TryGetControlPointDistance(

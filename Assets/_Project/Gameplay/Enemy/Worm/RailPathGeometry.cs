@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-internal static class RailPathGeometry
+public static class RailPathGeometry
 {
     private const float CornerDistanceFraction = 0.45f;
 

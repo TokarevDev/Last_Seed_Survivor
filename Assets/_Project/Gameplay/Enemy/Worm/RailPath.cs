@@ -11,11 +11,11 @@ public enum RailPathInterpolationMode
 }
 
 [DisallowMultipleComponent]
-public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<NumericVector3>
+public sealed class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<NumericVector3>
 {
     private const float DefaultSampleStep = 0.1f;
     private const float MinSampleStep = 0.01f;
-    private const float MinSegmentLength = 0.0001f;
+    public const float MinimumSegmentLength = 0.0001f;
 
     [SerializeField] private List<Vector3> _localPoints = new();
     [SerializeField][Min(MinSampleStep)] private float _sampleStep = DefaultSampleStep;
@@ -55,7 +55,7 @@ public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSample
             return;
         }
 
-        if (_totalLength <= MinSegmentLength)
+        if (_totalLength <= MinimumSegmentLength)
             Debug.LogError("RailPath total length must be greater than zero.", this);
     }
 
@@ -150,7 +150,7 @@ public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSample
         float clampedDistance = Mathf.Clamp(distance, 0f, _totalLength);
         int passedPointIndex = SortedSearch.FindLastIndexAtMost(
             _controlPointDistances,
-            clampedDistance + MinSegmentLength);
+            clampedDistance + MinimumSegmentLength);
 
         return Mathf.Clamp01(passedPointIndex / (float)(PointCount - 1));
     }
@@ -252,7 +252,7 @@ public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSample
             _interpolationMode,
             _cornerRadius,
             _cornerSamples,
-            MinSegmentLength);
+            MinimumSegmentLength);
     }
 
     private void CalculateDistances(Vector3[] pathPoints)
@@ -267,7 +267,7 @@ public sealed partial class RailPath : MonoBehaviour, IWormRailPath, IPathSample
             _distances,
             _totalLength,
             _sampleStep,
-            MinSegmentLength);
+            MinimumSegmentLength);
     }
 
     private void BuildControlPointDistances()
