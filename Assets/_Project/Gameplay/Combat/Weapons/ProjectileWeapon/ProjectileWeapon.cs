@@ -19,8 +19,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     private readonly List<ShotSpawnData> _shots = new();
     private readonly ProjectileShotPatternBuilder _shotPatternBuilder = new();
     private readonly PreparedActionTimer _preparedAttack = new();
-    private readonly CountdownTimer _weaponCooldown = new();
-    private readonly TimedBurst _salvo = new();
+    private readonly CooldownBurstCycle _fireCycle = new();
 
     private WeaponRuntimeState _runtimeState;
     private SignalBus _signalBus;
@@ -58,9 +57,9 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     {
         if (_pool == null || _firePoint == null || _config == null) return;
 
-        if (_salvo.IsActive)
+        if (_fireCycle.IsBurstActive)
         {
-            TickSalvo(deltaTime);
+            TickFireCycle(deltaTime);
             return;
         }
 
@@ -70,9 +69,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
             return;
         }
 
-        _weaponCooldown.Advance(deltaTime);
-
-        if (_weaponCooldown.IsElapsed)
+        if (_fireCycle.Advance(deltaTime) == CooldownBurstCycleStep.CycleReady)
             StartAttackCycle();
     }
 
@@ -94,8 +91,8 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
             return;
         }
 
-        if (!_preparedAttack.IsActive && !_salvo.IsActive)
-            _weaponCooldown.LimitTo(_currentShotCooldown);
+        if (!_preparedAttack.IsActive)
+            _fireCycle.LimitCooldown(_currentShotCooldown);
     }
 
     public void ForceRebuild()
@@ -107,7 +104,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     public void ClearTransientState()
     {
         _preparedAttack.Reset();
-        _salvo.Reset();
+        _fireCycle.CancelBurst();
     }
 
     public void ResetRuntimeState()
@@ -125,7 +122,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
         else
         {
             ClearTransientState();
-            _weaponCooldown.Reset();
+            _fireCycle.Reset();
         }
 
         PublishRuntimeStatsChanged();
@@ -150,8 +147,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     private void ResetFiringCycle()
     {
         _preparedAttack.Reset();
-        _salvo.Reset();
-        _weaponCooldown.Reset();
+        _fireCycle.Reset();
     }
 
     private void StartAttackCycle()
@@ -191,7 +187,7 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
             return;
 
         _preparedAttack.TryComplete(preparedAttackElapsed, _currentShotCooldown);
-        _salvo.Begin(1 + Mathf.Max(0, _runtimeState.SalvoExtraShots));
+        _fireCycle.BeginBurst(1 + Mathf.Max(0, _runtimeState.SalvoExtraShots));
 
         FireSalvoShot();
     }
@@ -204,28 +200,17 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
             ReleasePreparedAttack(_currentShotCooldown);
     }
 
-    private void TickSalvo(float deltaTime)
+    private void TickFireCycle(float deltaTime)
     {
-        _salvo.Advance(deltaTime);
-
-        if (!_salvo.IsShotReady)
-            return;
-
-        FireSalvoShot();
+        if (_fireCycle.Advance(deltaTime) == CooldownBurstCycleStep.BurstActionReady)
+            FireSalvoShot();
     }
 
     private void FireSalvoShot()
     {
         Fire();
-        _salvo.CommitShot(GetSalvoInterval());
-
-        if (!_salvo.IsActive)
-            StartWeaponCooldown();
-    }
-
-    private void StartWeaponCooldown()
-    {
-        _weaponCooldown.Start(
+        _fireCycle.CommitBurstAction(
+            GetSalvoInterval(),
             _currentShotCooldown - _preparedAttack.LastCompletionDelay);
     }
 

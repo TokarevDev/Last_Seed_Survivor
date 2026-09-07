@@ -15,8 +15,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     private bool _initialized;
     private SignalBus _signalBus;
     private AcaciaThornProjectilePool _pool;
-    private readonly CountdownTimer _cooldown = new();
-    private readonly TimedBurst _salvo = new();
+    private readonly CooldownBurstCycle _fireCycle = new();
 
     public AcaciaThornWeaponConfig Config => _config;
     public AcaciaThornRuntimeState RuntimeState => _runtimeState;
@@ -82,18 +81,16 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
         if (!_initialized || !_runtimeState.IsUnlocked || !_pool.IsInitialized)
             return;
 
-        if (_salvo.IsActive)
+        CooldownBurstCycleStep step = _fireCycle.Advance(deltaTime);
+
+        if (step == CooldownBurstCycleStep.BurstActionReady)
         {
-            TickSalvo(deltaTime);
+            FireSalvoShot();
             return;
         }
 
-        _cooldown.Advance(deltaTime);
-
-        if (!_cooldown.IsElapsed)
-            return;
-
-        StartSalvo();
+        if (step == CooldownBurstCycleStep.CycleReady)
+            StartSalvo();
     }
 
     public void Unlock(int baseDamage)
@@ -103,8 +100,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
         int fallbackBaseDamage = _config != null ? _config.Damage : 1;
         _runtimeState.Unlock(Mathf.Max(fallbackBaseDamage, baseDamage));
-        _cooldown.Reset();
-        _salvo.Reset();
+        _fireCycle.Reset();
         PublishRuntimeStatsChanged();
     }
 
@@ -166,7 +162,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     public void ClearTransientState()
     {
         _pool.ReleaseAllActive();
-        _salvo.Reset();
+        _fireCycle.CancelBurst();
     }
 
     public void ResetRuntimeState()
@@ -197,27 +193,14 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
     private void StartSalvo()
     {
-        _salvo.Begin(1 + Mathf.Max(0, _runtimeState.SalvoExtraShots));
-        FireSalvoShot();
-    }
-
-    private void TickSalvo(float deltaTime)
-    {
-        _salvo.Advance(deltaTime);
-
-        if (!_salvo.IsShotReady)
-            return;
-
+        _fireCycle.BeginBurst(1 + Mathf.Max(0, _runtimeState.SalvoExtraShots));
         FireSalvoShot();
     }
 
     private void FireSalvoShot()
     {
         Fire();
-        _salvo.CommitShot(GetSalvoInterval());
-
-        if (!_salvo.IsActive)
-            _cooldown.Start(_currentCooldown);
+        _fireCycle.CommitBurstAction(GetSalvoInterval(), _currentCooldown);
     }
 
     private void Fire()
@@ -296,9 +279,9 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
             _config.Cooldown / (1f + cappedFireRateBonus));
 
         if (resetTimer)
-            _cooldown.Reset();
+            _fireCycle.Reset();
         else
-            _cooldown.LimitTo(_currentCooldown);
+            _fireCycle.LimitCooldown(_currentCooldown);
     }
 
     private void PublishRuntimeStatsChanged()
@@ -328,7 +311,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
             Unlock(_config != null ? _config.Damage : 1);
 
         Fire();
-        _cooldown.Start(_currentCooldown);
+        _fireCycle.StartCooldown(_currentCooldown);
     }
 #endif
 }
