@@ -24,15 +24,19 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
 
     private WeaponRuntimeState _runtimeState;
     private SignalBus _signalBus;
+    private WeaponRuntimeStatsSignalPublisher _runtimeStatsPublisher;
 
     public WeaponConfig Config => _config;
     public WeaponRuntimeState RuntimeState => _runtimeState;
     public int CurrentProjectileDamage => BuildProjectileDamage();
 
     [Inject]
-    public void Construct(SignalBus signalBus)
+    public void Construct(
+        SignalBus signalBus,
+        WeaponRuntimeStatsSignalPublisher runtimeStatsPublisher)
     {
         _signalBus = signalBus;
+        _runtimeStatsPublisher = runtimeStatsPublisher;
     }
 
     public void Init(
@@ -282,8 +286,6 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
 
     private void PublishRuntimeStatsChanged()
     {
-        _signalBus?.Fire(new WeaponRuntimeStatsChangedSignal(
-            WeaponRuntimeStatsSource.MainProjectile,
-            Time.time));
+        _runtimeStatsPublisher?.Publish(WeaponRuntimeStatsSource.MainProjectile);
     }
 }

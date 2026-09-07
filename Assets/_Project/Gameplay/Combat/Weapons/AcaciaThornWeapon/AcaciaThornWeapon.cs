@@ -14,7 +14,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     private Transform _firePoint;
     private float _currentCooldown;
     private bool _initialized;
-    private SignalBus _signalBus;
+    private WeaponRuntimeStatsSignalPublisher _runtimeStatsPublisher;
     private IConfigurablePooledSpawnService<
         AcaciaThornProjectilePoolSetup,
         AcaciaThornProjectileSpawnRequest> _pool;
@@ -25,12 +25,12 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
     [Inject]
     public void Construct(
-        SignalBus signalBus,
+        WeaponRuntimeStatsSignalPublisher runtimeStatsPublisher,
         IConfigurablePooledSpawnService<
             AcaciaThornProjectilePoolSetup,
             AcaciaThornProjectileSpawnRequest> pool)
     {
-        _signalBus = signalBus;
+        _runtimeStatsPublisher = runtimeStatsPublisher;
         _pool = pool;
     }
 
@@ -293,9 +293,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
     private void PublishRuntimeStatsChanged()
     {
-        _signalBus?.Fire(new WeaponRuntimeStatsChangedSignal(
-            WeaponRuntimeStatsSource.AcaciaThorn,
-            Time.time));
+        _runtimeStatsPublisher?.Publish(WeaponRuntimeStatsSource.AcaciaThorn);
     }
 
 #if UNITY_EDITOR

@@ -18,6 +18,10 @@ namespace LastSeed.Bootstrap.Installers
                 .Bind<ITimeScaleController>()
                 .To<UnityTimeScaleController>()
                 .AsSingle();
+            Container
+                .Bind<IGameTimeProvider>()
+                .To<UnityScaledGameTimeProvider>()
+                .AsSingle();
 
             Container
                 .BindInterfacesAndSelfTo<ScreenBoundsService>()
