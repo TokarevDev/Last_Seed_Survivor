@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using UnityEngine;
+using System;
 
 public static class RewardRarityRoller
 {
@@ -33,7 +33,7 @@ public static class RewardRarityRoller
         if (count == 0)
             return result;
 
-        guaranteedSlotCount = Mathf.Clamp(guaranteedSlotCount, 1, count);
+        guaranteedSlotCount = Math.Clamp(guaranteedSlotCount, 1, count);
 
         for (int i = 0; i < guaranteedSlotCount; i++)
             result[i] = guaranteedRarity;
@@ -77,7 +77,7 @@ public static class RewardRarityRoller
             return;
         }
 
-        int startIndex = Mathf.Clamp(guaranteedSlotCount, 0, slotRarities.Length);
+        int startIndex = Math.Clamp(guaranteedSlotCount, 0, slotRarities.Length);
 
         for (int i = startIndex; i < slotRarities.Length; i++)
         {
@@ -147,7 +147,7 @@ public static class RewardRarityRoller
         if (slots == null)
             return;
 
-        startIndex = Mathf.Clamp(startIndex, 0, slots.Count);
+        startIndex = Math.Clamp(startIndex, 0, slots.Count);
 
         for (int i = startIndex; i < slots.Count; i++)
         {

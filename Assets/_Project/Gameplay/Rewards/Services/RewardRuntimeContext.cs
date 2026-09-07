@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public readonly struct RewardRollContext
 {
@@ -14,8 +13,8 @@ public readonly struct RewardRollContext
         bool hasRevivedThisRun,
         bool isPaidAssistRoll = false)
     {
-        HeadPathProgressNormalized = Mathf.Clamp01(headPathProgressNormalized);
-        WormDestructionProgressNormalized = Mathf.Clamp01(wormDestructionProgressNormalized);
+        HeadPathProgressNormalized = FloatMath.Clamp01(headPathProgressNormalized);
+        WormDestructionProgressNormalized = FloatMath.Clamp01(wormDestructionProgressNormalized);
         HasRevivedThisRun = hasRevivedThisRun;
         IsPaidAssistRoll = isPaidAssistRoll;
     }

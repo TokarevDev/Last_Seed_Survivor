@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 
 public static class RewardAdRerollPolicy
 {
@@ -37,7 +36,7 @@ public static class RewardAdRerollPolicy
         RewardRuntimeContext context,
         RewardRollContext rollContext)
     {
-        float dangerProgress = Mathf.Max(
+        float dangerProgress = Math.Max(
             rollContext.HeadPathProgressNormalized,
             rollContext.WormDestructionProgressNormalized);
 
@@ -58,7 +57,7 @@ public static class RewardAdRerollPolicy
         RewardRollContext rollContext,
         float minHeadPathProgress)
     {
-        return rollContext.HeadPathProgressNormalized >= Mathf.Clamp01(minHeadPathProgress);
+        return rollContext.HeadPathProgressNormalized >= FloatMath.Clamp01(minHeadPathProgress);
     }
 
     private static bool IsLegendaryCocoon(CocoonRewardProfile cocoonProfile)

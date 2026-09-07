@@ -1,4 +1,4 @@
-using UnityEngine;
+using System;
 
 public enum RewardWeaponGroup
 {
@@ -31,20 +31,20 @@ public readonly struct RewardWeaponDpsBias
         float strongerMultiplier)
     {
         _preferredGroup = preferredGroup;
-        _preferredMultiplier = Mathf.Max(0f, preferredMultiplier);
-        _strongerMultiplier = Mathf.Max(0f, strongerMultiplier);
+        _preferredMultiplier = Math.Max(0f, preferredMultiplier);
+        _strongerMultiplier = Math.Max(0f, strongerMultiplier);
     }
 
     public static RewardWeaponDpsBias Create(
         RewardWeaponGroup preferredGroup,
         float normalizedImbalance)
     {
-        float t = Mathf.Clamp01(normalizedImbalance);
+        float t = FloatMath.Clamp01(normalizedImbalance);
 
         return new RewardWeaponDpsBias(
             preferredGroup,
-            Mathf.Lerp(MinPreferredMultiplier, MaxPreferredMultiplier, t),
-            Mathf.Lerp(MaxStrongerMultiplier, MinStrongerMultiplier, t));
+            FloatMath.Lerp(MinPreferredMultiplier, MaxPreferredMultiplier, t),
+            FloatMath.Lerp(MaxStrongerMultiplier, MinStrongerMultiplier, t));
     }
 
     public float GetMultiplier(RewardWeaponGroup group)
@@ -74,14 +74,14 @@ public static class RewardWeaponDpsBiasCalculator
         if (!mainPower.IsValid || !acaciaPower.IsValid)
             return RewardWeaponDpsBias.None;
 
-        float mainDps = Mathf.Max(0f, mainPower.EstimatedDps);
-        float acaciaDps = Mathf.Max(0f, acaciaPower.EstimatedDps);
-        float strongerDps = Mathf.Max(mainDps, acaciaDps);
+        float mainDps = Math.Max(0f, mainPower.EstimatedDps);
+        float acaciaDps = Math.Max(0f, acaciaPower.EstimatedDps);
+        float strongerDps = Math.Max(mainDps, acaciaDps);
 
         if (strongerDps <= 0.01f)
             return RewardWeaponDpsBias.None;
 
-        float imbalance = Mathf.Abs(mainDps - acaciaDps) / strongerDps;
+        float imbalance = Math.Abs(mainDps - acaciaDps) / strongerDps;
 
         if (imbalance < RewardWeaponDpsBias.MinImbalanceToBias)
             return RewardWeaponDpsBias.None;
@@ -89,7 +89,7 @@ public static class RewardWeaponDpsBiasCalculator
         RewardWeaponGroup preferredGroup = mainDps <= acaciaDps
             ? RewardWeaponGroup.MainWeapon
             : RewardWeaponGroup.AcaciaThorn;
-        float normalizedImbalance = Mathf.InverseLerp(
+        float normalizedImbalance = FloatMath.InverseLerp(
             RewardWeaponDpsBias.MinImbalanceToBias,
             1f,
             imbalance);

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using UnityEngine;
+using System;
 
 public enum RewardPickMode
 {
@@ -25,7 +25,7 @@ public static class RewardSelectionPolicy
 
         float multiplier = weaponDpsBias.GetMultiplier(GetWeaponGroup(entry));
         multiplier *= GetAssistDpsWeightMultiplier(entry, rollContext);
-        return Mathf.Max(0.01f, entry.Weight * multiplier);
+        return Math.Max(0.01f, entry.Weight * multiplier);
     }
 
     public static bool IsEligible(
