@@ -113,9 +113,9 @@ public sealed class WeaponAutoAttackAnimator : MonoBehaviour
     {
     }
 
-    private void HandleShootingStateChanged(CombatShootingStateChangedSignal signal)
+    private void HandleShootingStateChanged(bool isShootingEnabled)
     {
-        if (!signal.IsShootingEnabled)
+        if (!isShootingEnabled)
             StopAnimation();
     }
 
@@ -219,7 +219,7 @@ public sealed class WeaponAutoAttackAnimator : MonoBehaviour
         if (_signalBus == null || _isSubscribedToSignals || !isActiveAndEnabled)
             return;
 
-        _signalBus.Subscribe<CombatShootingStateChangedSignal>(HandleShootingStateChanged);
+        _combatSessionState.ShootingEnabledChanged += HandleShootingStateChanged;
         _signalBus.Subscribe<WeaponAttackCycleStartedSignal>(HandleAttackCycleStarted);
         _isSubscribedToSignals = true;
     }
@@ -229,7 +229,7 @@ public sealed class WeaponAutoAttackAnimator : MonoBehaviour
         if (_signalBus == null || !_isSubscribedToSignals)
             return;
 
-        _signalBus.Unsubscribe<CombatShootingStateChangedSignal>(HandleShootingStateChanged);
+        _combatSessionState.ShootingEnabledChanged -= HandleShootingStateChanged;
         _signalBus.Unsubscribe<WeaponAttackCycleStartedSignal>(HandleAttackCycleStarted);
         _isSubscribedToSignals = false;
     }

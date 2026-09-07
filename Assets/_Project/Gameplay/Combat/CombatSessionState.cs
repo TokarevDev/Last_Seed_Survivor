@@ -1,16 +1,10 @@
-using LastSeed.Gameplay.Signals;
-using Zenject;
+using System;
 
 namespace LastSeed.Gameplay.Combat
 {
     public sealed class CombatSessionState : ICombatSessionState
     {
-        private readonly SignalBus _signalBus;
-
-        public CombatSessionState(SignalBus signalBus)
-        {
-            _signalBus = signalBus;
-        }
+        public event Action<bool> ShootingEnabledChanged;
 
         public bool IsShootingEnabled { get; private set; }
 
@@ -20,7 +14,7 @@ namespace LastSeed.Gameplay.Combat
                 return;
 
             IsShootingEnabled = isEnabled;
-            _signalBus.Fire(new CombatShootingStateChangedSignal(isEnabled));
+            ShootingEnabledChanged?.Invoke(isEnabled);
         }
 
         public void Reset()

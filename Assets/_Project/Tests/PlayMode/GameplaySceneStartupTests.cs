@@ -167,18 +167,17 @@ namespace LastSeed.Tests.PlayMode
         private static void AssertCombatSessionSignals(DiContainer sceneContainer)
         {
             ICombatSessionState combatSessionState = sceneContainer.Resolve<ICombatSessionState>();
-            SignalBus signalBus = sceneContainer.Resolve<SignalBus>();
             bool receivedShootingEnabledSignal = false;
-            Action<CombatShootingStateChangedSignal> signalHandler = signal =>
-                receivedShootingEnabledSignal = signal.IsShootingEnabled;
+            Action<bool> signalHandler = isEnabled =>
+                receivedShootingEnabledSignal = isEnabled;
 
-            signalBus.Subscribe(signalHandler);
+            combatSessionState.ShootingEnabledChanged += signalHandler;
             combatSessionState.SetShootingEnabled(true);
 
             Assert.That(combatSessionState.IsShootingEnabled, Is.True);
             Assert.That(receivedShootingEnabledSignal, Is.True);
 
-            signalBus.Unsubscribe(signalHandler);
+            combatSessionState.ShootingEnabledChanged -= signalHandler;
             combatSessionState.Reset();
         }
     }

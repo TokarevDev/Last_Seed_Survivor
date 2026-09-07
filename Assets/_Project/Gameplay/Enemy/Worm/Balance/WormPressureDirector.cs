@@ -1,3 +1,4 @@
+using LastSeed.Gameplay.Combat;
 using LastSeed.Gameplay.Signals;
 using UnityEngine;
 using Zenject;
@@ -15,12 +16,16 @@ public sealed class WormPressureDirector : MonoBehaviour
     private bool _isTracking;
     private bool _hasStartedForCurrentWorm;
     private SignalBus _signalBus;
+    private ICombatSessionState _combatSessionState;
     private bool _isSubscribedToSignals;
 
     [Inject]
-    public void Construct(SignalBus signalBus)
+    public void Construct(
+        SignalBus signalBus,
+        ICombatSessionState combatSessionState)
     {
         _signalBus = signalBus;
+        _combatSessionState = combatSessionState;
         SubscribeToSignals();
     }
 
@@ -59,9 +64,9 @@ public sealed class WormPressureDirector : MonoBehaviour
         UpdatePressure();
     }
 
-    private void HandleShootingStateChanged(CombatShootingStateChangedSignal signal)
+    private void HandleShootingStateChanged(bool isShootingEnabled)
     {
-        if (signal.IsShootingEnabled)
+        if (isShootingEnabled)
         {
             StartTracking();
             return;
@@ -164,10 +169,11 @@ public sealed class WormPressureDirector : MonoBehaviour
 
     private void SubscribeToSignals()
     {
-        if (_signalBus == null || _isSubscribedToSignals || !isActiveAndEnabled)
+        if (_signalBus == null || _combatSessionState == null ||
+            _isSubscribedToSignals || !isActiveAndEnabled)
             return;
 
-        _signalBus.Subscribe<CombatShootingStateChangedSignal>(HandleShootingStateChanged);
+        _combatSessionState.ShootingEnabledChanged += HandleShootingStateChanged;
         _signalBus.Subscribe<WormDiedSignal>(HandleWormDied);
         _signalBus.Subscribe<WormReviveRollbackCompletedSignal>(HandleReviveRollbackCompleted);
         _isSubscribedToSignals = true;
@@ -178,7 +184,7 @@ public sealed class WormPressureDirector : MonoBehaviour
         if (_signalBus == null || !_isSubscribedToSignals)
             return;
 
-        _signalBus.Unsubscribe<CombatShootingStateChangedSignal>(HandleShootingStateChanged);
+        _combatSessionState.ShootingEnabledChanged -= HandleShootingStateChanged;
         _signalBus.Unsubscribe<WormDiedSignal>(HandleWormDied);
         _signalBus.Unsubscribe<WormReviveRollbackCompletedSignal>(HandleReviveRollbackCompleted);
         _isSubscribedToSignals = false;

@@ -10,7 +10,6 @@ namespace LastSeed.Bootstrap.Installers
         {
             SignalBusInstaller.Install(Container);
 
-            Container.DeclareSignal<CombatShootingStateChangedSignal>();
             Container.DeclareSignal<WormDiedSignal>();
             Container.DeclareSignal<WormRewardRequestedSignal>();
             Container.DeclareSignal<WormReviveGrantedSignal>();
