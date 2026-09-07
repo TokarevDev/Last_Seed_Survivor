@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3de7321c30bc56a45816e3ebef578c75, type: 3}
+  m_Name: RewardPopupAnimationConfig_Default
+  m_EditorClassIdentifier: LastSeed.Presentation::RewardPopupAnimationConfig
+  _rootFadeDuration: 0.12
+  _topEnterOffset: 160
+  _topEnterDuration: 0.28
+  _rewardEnterOffset: -230
+  _rewardEnterDuration: 0.32
+  _rewardEnterStagger: 0.045
+  _actionEnterOffset: -90
+  _actionEnterDuration: 0.16
+  _topEnterEase: 9
+  _rewardEnterEase: 9
+  _rewardScaleEase: 27
+  _refreshCardStagger: 0.055
+  _refreshOutDuration: 0.12
+  _refreshInDuration: 0.22
+  _refreshOutEase: 8
+  _refreshInEase: 27
+  _selectionFocusDuration: 0.22
+  _selectionGrowDuration: 0.16
+  _selectionExitDuration: 0.22
+  _selectionScaleMultiplier: 1.05
+  _selectionExitScaleMultiplier: 0.96
+  _selectionExitOffset: -230
+  _unselectedExitDuration: 0.22
+  _unselectedExitStagger: 0.045
+  _unselectedExitScaleMultiplier: 0.96
+  _unselectedExitOffset: -230
+  _topExitOffset: 160
+  _actionExitOffset: -90
+  _selectionFocusEase: 27
+  _selectionExitEase: 8
+  _unselectedExitEase: 8

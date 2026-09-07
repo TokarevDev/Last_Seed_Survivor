@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,44 +13,10 @@ public sealed class RewardPopupView : PopupView
     [SerializeField] private Button _adRerollButton;
     [SerializeField] private Button _takeAllButton;
 
-    [Header("Popup Animation")]
+    [Header("Animation")]
+    [SerializeField] private RewardPopupAnimationConfig _animationConfig;
     [SerializeField] private CanvasGroup _canvasGroup;
     [SerializeField] private RectTransform[] _topSlideGroups;
-    [SerializeField] private float _rootFadeDuration = 0.12f;
-    [SerializeField] private float _topEnterOffset = 160f;
-    [SerializeField] private float _topEnterDuration = 0.28f;
-    [SerializeField] private float _rewardEnterOffset = -230f;
-    [SerializeField] private float _rewardEnterDuration = 0.32f;
-    [SerializeField] private float _rewardEnterStagger = 0.045f;
-    [SerializeField] private float _actionEnterOffset = -90f;
-    [SerializeField] private float _actionEnterDuration = 0.16f;
-    [SerializeField] private Ease _topEnterEase = Ease.OutCubic;
-    [SerializeField] private Ease _rewardEnterEase = Ease.OutCubic;
-    [SerializeField] private Ease _rewardScaleEase = Ease.OutBack;
-
-    [Header("Reward Refresh Animation")]
-    [SerializeField] private float _refreshCardStagger = 0.055f;
-    [SerializeField] private float _refreshOutDuration = 0.12f;
-    [SerializeField] private float _refreshInDuration = 0.22f;
-    [SerializeField] private Ease _refreshOutEase = Ease.InCubic;
-    [SerializeField] private Ease _refreshInEase = Ease.OutBack;
-
-    [Header("Selection Dismiss Animation")]
-    [SerializeField] private float _selectionFocusDuration = 0.22f;
-    [SerializeField] private float _selectionGrowDuration = 0.16f;
-    [SerializeField] private float _selectionExitDuration = 0.22f;
-    [SerializeField] private float _selectionScaleMultiplier = 1.05f;
-    [SerializeField] private float _selectionExitScaleMultiplier = 0.96f;
-    [SerializeField] private float _selectionExitOffset = -230f;
-    [SerializeField] private float _unselectedExitDuration = 0.22f;
-    [SerializeField] private float _unselectedExitStagger = 0.045f;
-    [SerializeField] private float _unselectedExitScaleMultiplier = 0.96f;
-    [SerializeField] private float _unselectedExitOffset = -230f;
-    [SerializeField] private float _topExitOffset = 160f;
-    [SerializeField] private float _actionExitOffset = -90f;
-    [SerializeField] private Ease _selectionFocusEase = Ease.OutBack;
-    [SerializeField] private Ease _selectionExitEase = Ease.InCubic;
-    [SerializeField] private Ease _unselectedExitEase = Ease.InCubic;
 
     [Header("Animation Audio")]
     [SerializeField] private AudioSource _animationAudioSource;
@@ -99,6 +64,12 @@ public sealed class RewardPopupView : PopupView
     private void Awake()
     {
         EnsureControllers();
+    }
+
+    private void OnValidate()
+    {
+        if (_animationConfig == null)
+            Debug.LogError($"{nameof(RewardPopupView)} requires an animation config.", this);
     }
 
     private void OnEnable()
@@ -192,6 +163,12 @@ public sealed class RewardPopupView : PopupView
         if (_choiceBinder != null)
             return;
 
+        if (_animationConfig == null)
+        {
+            throw new InvalidOperationException(
+                $"{nameof(RewardPopupView)} on '{name}' requires an animation config.");
+        }
+
         _choiceBinder = new RewardPopupChoiceBinder(
             _buttons,
             _visualCatalog,
@@ -224,7 +201,7 @@ public sealed class RewardPopupView : PopupView
             _topSlideGroups,
             _choiceBinder,
             _actionControls,
-            BuildAnimationSettings(),
+            _animationConfig.CreateSettings(),
             new RewardPopupAudioPlayer(
                 _animationAudioSource,
                 _showWhooshClip,
@@ -237,42 +214,6 @@ public sealed class RewardPopupView : PopupView
         _interactionGate = new RewardPopupInteractionGate(
             CanOpenInteractionGate,
             SetInteractionEnabled);
-    }
-
-    private RewardPopupAnimationSettings BuildAnimationSettings()
-    {
-        return new RewardPopupAnimationSettings(
-            _rootFadeDuration,
-            _topEnterOffset,
-            _topEnterDuration,
-            _rewardEnterOffset,
-            _rewardEnterDuration,
-            _rewardEnterStagger,
-            _actionEnterOffset,
-            _actionEnterDuration,
-            _topEnterEase,
-            _rewardEnterEase,
-            _rewardScaleEase,
-            _refreshCardStagger,
-            _refreshOutDuration,
-            _refreshInDuration,
-            _refreshOutEase,
-            _refreshInEase,
-            _selectionFocusDuration,
-            _selectionGrowDuration,
-            _selectionExitDuration,
-            _selectionScaleMultiplier,
-            _selectionExitScaleMultiplier,
-            _selectionExitOffset,
-            _unselectedExitDuration,
-            _unselectedExitStagger,
-            _unselectedExitScaleMultiplier,
-            _unselectedExitOffset,
-            _topExitOffset,
-            _actionExitOffset,
-            _selectionFocusEase,
-            _selectionExitEase,
-            _unselectedExitEase);
     }
 
     private bool CanOpenInteractionGate()
