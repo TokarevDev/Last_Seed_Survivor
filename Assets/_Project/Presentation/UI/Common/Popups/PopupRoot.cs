@@ -14,10 +14,9 @@ public sealed class PopupRoot : MonoBehaviour
     [SerializeField] private bool _hidePopupsOnAwake = true;
     [SerializeField] private bool _pauseTimeWhileModalVisible = true;
 
-    private readonly Dictionary<string, PopupView> _popupsById = new();
-    private readonly OrderedReferenceSet<PopupView> _registeredPopups = new();
     private readonly QueuedActivationState<PopupView> _navigation = new();
 
+    private PopupRegistry _registry;
     private IGameplayInputLock _gameplayInputLock;
     private SignalBus _signalBus;
     private IDisposable _gameplayInputLockHandle;
@@ -35,6 +34,7 @@ public sealed class PopupRoot : MonoBehaviour
 
     private void Awake()
     {
+        EnsureRegistry();
         RefreshRegistry();
 
         if (_hidePopupsOnAwake)
@@ -55,7 +55,7 @@ public sealed class PopupRoot : MonoBehaviour
 
     private void OnDestroy()
     {
-        UnregisterPopups();
+        _registry?.Clear();
         ReleaseGameplayLock();
     }
 
@@ -64,11 +64,13 @@ public sealed class PopupRoot : MonoBehaviour
         if (string.IsNullOrEmpty(popupId))
             return false;
 
-        if (!_popupsById.TryGetValue(popupId, out PopupView popup))
+        EnsureRegistry();
+
+        if (!_registry.TryGet(popupId, out PopupView popup))
         {
             RefreshRegistry();
 
-            if (!_popupsById.TryGetValue(popupId, out popup))
+            if (!_registry.TryGet(popupId, out popup))
             {
                 Debug.LogWarning($"PopupRoot: popup '{popupId}' is not registered.", this);
                 return false;
@@ -138,8 +140,9 @@ public sealed class PopupRoot : MonoBehaviour
 
     public void RefreshRegistry()
     {
-        UnregisterPopups();
-        _popupsById.Clear();
+        EnsureRegistry();
+        _registry.Clear();
+        _navigation.ClearQueued();
 
         if (_popups != null)
         {
@@ -165,37 +168,13 @@ public sealed class PopupRoot : MonoBehaviour
         if (popup == null)
             return;
 
-        if (!_registeredPopups.Add(popup))
-            return;
+        EnsureRegistry();
+        PopupRegistrationResult result = _registry.Register(popup);
 
-        popup.CloseRequested += HandlePopupCloseRequested;
-
-        string popupId = popup.PopupId;
-
-        if (string.IsNullOrEmpty(popupId))
-            return;
-
-        if (_popupsById.ContainsKey(popupId))
+        if (result == PopupRegistrationResult.DuplicateId)
         {
-            Debug.LogWarning($"PopupRoot: duplicate popup id '{popupId}'.", popup);
-            return;
+            Debug.LogWarning($"PopupRoot: duplicate popup id '{popup.PopupId}'.", popup);
         }
-
-        _popupsById.Add(popupId, popup);
-    }
-
-    private void UnregisterPopups()
-    {
-        for (int i = 0; i < _registeredPopups.Count; i++)
-        {
-            PopupView popup = _registeredPopups.Items[i];
-
-            if (popup != null)
-                popup.CloseRequested -= HandlePopupCloseRequested;
-        }
-
-        _registeredPopups.Clear();
-        _navigation.ClearQueued();
     }
 
     private void HandlePopupCloseRequested(PopupView popup)
@@ -230,9 +209,9 @@ public sealed class PopupRoot : MonoBehaviour
     {
         _navigation.Clear();
 
-        for (int i = 0; i < _registeredPopups.Count; i++)
+        for (int i = 0; i < _registry.Count; i++)
         {
-            PopupView popup = _registeredPopups.Items[i];
+            PopupView popup = _registry.Items[i];
 
             if (popup != null)
                 popup.Hide();
@@ -258,6 +237,11 @@ public sealed class PopupRoot : MonoBehaviour
 
         _signalBus.Subscribe<ShowPopupRequestedSignal>(HandleShowRequested);
         _isSubscribedToSignals = true;
+    }
+
+    private void EnsureRegistry()
+    {
+        _registry ??= new PopupRegistry(HandlePopupCloseRequested);
     }
 
     private void UnsubscribeFromSignals()
