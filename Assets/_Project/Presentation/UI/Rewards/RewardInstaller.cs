@@ -42,6 +42,7 @@ public sealed class RewardInstaller : MonoInstaller
         Container.Bind<RewardAttemptState>().AsSingle();
         Container.Bind<RewardRequestQueue>().AsSingle();
         Container.Bind<RewardRequestLifecycle>().AsSingle();
+        Container.Bind<RewardRequestCoordinator>().AsSingle();
         Container.Bind<RewardPopupStateFactory>().AsSingle();
         Container.Bind<RewardAdOperation>().AsSingle();
         Container.BindInterfacesAndSelfTo<RewardRollService>().AsSingle();

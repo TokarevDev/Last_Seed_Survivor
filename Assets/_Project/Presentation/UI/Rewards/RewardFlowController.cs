@@ -9,7 +9,7 @@ public sealed class RewardFlowController : IDisposable
     private readonly PopupRoot _popupRoot;
     private readonly RewardAdOperation _rewardAdOperation;
     private readonly RewardAttemptState _attempts;
-    private readonly RewardRequestQueue _requestQueue;
+    private readonly RewardRequestCoordinator _requestCoordinator;
     private readonly RewardRequestLifecycle _requestLifecycle;
     private readonly RewardPopupStateFactory _popupStateFactory;
 
@@ -23,7 +23,7 @@ public sealed class RewardFlowController : IDisposable
         PopupRoot popupRoot,
         RewardAdOperation rewardAdOperation,
         RewardAttemptState attempts,
-        RewardRequestQueue requestQueue,
+        RewardRequestCoordinator requestCoordinator,
         RewardRequestLifecycle requestLifecycle,
         RewardPopupStateFactory popupStateFactory)
     {
@@ -37,7 +37,8 @@ public sealed class RewardFlowController : IDisposable
         _rewardAdOperation = rewardAdOperation
             ?? throw new ArgumentNullException(nameof(rewardAdOperation));
         _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
-        _requestQueue = requestQueue ?? throw new ArgumentNullException(nameof(requestQueue));
+        _requestCoordinator = requestCoordinator ??
+            throw new ArgumentNullException(nameof(requestCoordinator));
         _requestLifecycle = requestLifecycle
             ?? throw new ArgumentNullException(nameof(requestLifecycle));
         _popupStateFactory = popupStateFactory
@@ -71,8 +72,7 @@ public sealed class RewardFlowController : IDisposable
         }
 
         _rewardAdOperation.Cancel();
-        _requestQueue.Clear();
-        _requestLifecycle.Reset();
+        _requestCoordinator.Reset();
         _isDisposed = true;
     }
 
@@ -85,18 +85,14 @@ public sealed class RewardFlowController : IDisposable
 
         RewardOpenRequest request = new(cocoonProfile, rollContext);
 
-        if (_requestLifecycle.IsActive)
-        {
-            _requestQueue.Enqueue(request);
+        if (_requestCoordinator.Submit(request) == RewardRequestSubmission.Queued)
             return true;
-        }
 
-        return StartOpenRequest(request);
+        return StartActiveRequest();
     }
 
-    private bool StartOpenRequest(RewardOpenRequest request)
+    private bool StartActiveRequest()
     {
-        _requestLifecycle.Begin(request);
         _rewardAdOperation.Cancel();
 
         if (!RollCurrentChoices())
@@ -116,8 +112,7 @@ public sealed class RewardFlowController : IDisposable
 
     public void ResetSession()
     {
-        _requestQueue.Clear();
-        _requestLifecycle.Reset();
+        _requestCoordinator.Reset();
         _attempts.Reset();
         _rewardAdOperation.Cancel();
     }
@@ -228,28 +223,28 @@ public sealed class RewardFlowController : IDisposable
             return;
         }
 
-        _requestQueue.Clear();
+        _requestCoordinator.ClearPending();
     }
 
     private bool CompleteCurrentPopupRequest()
     {
         _rewardAdOperation.Cancel();
-        return _requestLifecycle.Complete();
+        return _requestCoordinator.CompleteActive();
     }
 
     private void TryOpenNextPendingRequest()
     {
-        int pendingRequestCount = _requestQueue.Count;
+        int pendingRequestCount = _requestCoordinator.PendingCount;
 
         for (int index = 0; index < pendingRequestCount; index++)
         {
             if (_isDisposed || _requestLifecycle.IsActive ||
-                !_requestQueue.TryDequeue(out RewardOpenRequest request))
+                !_requestCoordinator.TryBeginNext(out _))
             {
                 return;
             }
 
-            if (StartOpenRequest(request))
+            if (StartActiveRequest())
                 return;
         }
     }
