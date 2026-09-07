@@ -48,7 +48,6 @@ namespace LastSeed.Tests
         private sealed class FakeChoiceApplier : IRewardChoiceApplier
         {
             public List<RewardChoiceData> Applied { get; } = new();
-            public RewardRuntimeContext RuntimeContext => null;
 
             public void Apply(RewardChoiceData choice)
             {

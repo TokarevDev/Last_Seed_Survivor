@@ -7,6 +7,7 @@ public sealed class RewardFlowController : IDisposable
 
     private readonly RewardRollService _rollService;
     private readonly IRewardChoiceApplier _applyService;
+    private readonly IRewardRuntimeContextProvider _runtimeContextProvider;
     private readonly RewardBatchApplyService _batchApplyService;
     private readonly RewardPopupView _popup;
     private readonly PopupRoot _popupRoot;
@@ -22,6 +23,7 @@ public sealed class RewardFlowController : IDisposable
     public RewardFlowController(
         RewardRollService rollService,
         IRewardChoiceApplier applyService,
+        IRewardRuntimeContextProvider runtimeContextProvider,
         RewardBatchApplyService batchApplyService,
         RewardPopupView popup,
         PopupRoot popupRoot,
@@ -34,6 +36,8 @@ public sealed class RewardFlowController : IDisposable
     {
         _rollService = rollService;
         _applyService = applyService ?? throw new ArgumentNullException(nameof(applyService));
+        _runtimeContextProvider = runtimeContextProvider ??
+            throw new ArgumentNullException(nameof(runtimeContextProvider));
         _batchApplyService = batchApplyService ??
             throw new ArgumentNullException(nameof(batchApplyService));
         _popup = popup;
@@ -195,7 +199,7 @@ public sealed class RewardFlowController : IDisposable
         _attempts.ConsumeAdReroll();
 
         RewardRarity adGuaranteeRarity = RewardAdRerollPolicy.RollGuaranteedRarity(
-            _applyService?.RuntimeContext,
+            _runtimeContextProvider.RuntimeContext,
             _requestLifecycle.CocoonProfile,
             _requestLifecycle.RollContext,
             _randomSource);
@@ -281,12 +285,12 @@ public sealed class RewardFlowController : IDisposable
 
         RewardRarity guaranteeRarity = forcedGuaranteeRarity
             ?? _rollService.RollGuaranteeRarity(
-                _applyService.RuntimeContext,
+                _runtimeContextProvider.RuntimeContext,
                 _requestLifecycle.CocoonProfile,
                 rollContext);
 
         List<RewardChoiceData> choices = _rollService.Roll3(
-            _applyService.RuntimeContext,
+            _runtimeContextProvider.RuntimeContext,
             _requestLifecycle.CocoonProfile,
             guaranteeRarity,
             forcedGuaranteeSlotCount,
