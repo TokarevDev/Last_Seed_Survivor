@@ -1,4 +1,5 @@
 using LastSeed.Core.Collections;
+using LastSeed.Bootstrap.Gameplay;
 using UnityEngine;
 using Zenject;
 
@@ -81,6 +82,7 @@ namespace LastSeed.Bootstrap.Installers
                 _upgradeRebalanceInterval,
                 _minimumRebalanceInterval));
             Container.Bind<WormAdaptiveHpController>().AsSingle();
+            Container.BindInterfacesTo<WormRuntimeInitializer>().AsSingle();
         }
     }
 }

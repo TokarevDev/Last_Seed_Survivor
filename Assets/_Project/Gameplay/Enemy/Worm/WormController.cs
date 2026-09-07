@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using LastSeed.Core.Collections;
 using UnityEngine;
-using Zenject;
 
 public sealed class WormController : MonoBehaviour, IWormPathProgressProvider
 {
@@ -26,8 +25,7 @@ public sealed class WormController : MonoBehaviour, IWormPathProgressProvider
     public bool IsCombatBurstActive =>
         _combatBurstController != null && _combatBurstController.IsActive;
 
-    [Inject]
-    public void Construct(
+    public void Configure(
         WormCombatBurstController combatBurstController,
         WormFrameSimulation frameSimulation,
         WormRailTargetResolver railTargetResolver,

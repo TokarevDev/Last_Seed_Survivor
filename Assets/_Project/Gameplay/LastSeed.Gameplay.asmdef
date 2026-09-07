@@ -5,8 +5,7 @@
     "LastSeed.Core",
     "UniTask",
     "LastSeed.DOTween.Modules",
-    "Unity.TextMeshPro",
-    "Zenject"
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

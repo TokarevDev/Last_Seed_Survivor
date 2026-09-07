@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using LastSeed.Gameplay.Signals;
 using UnityEngine;
-using Zenject;
 
 [DisallowMultipleComponent]
 public sealed class WormCombatController : MonoBehaviour
@@ -18,8 +17,7 @@ public sealed class WormCombatController : MonoBehaviour
     private bool _isWormDead;
     private IWormCombatEventPublisher _eventPublisher;
 
-    [Inject]
-    public void Construct(IWormCombatEventPublisher eventPublisher)
+    public void Configure(IWormCombatEventPublisher eventPublisher)
     {
         _eventPublisher = eventPublisher ??
             throw new ArgumentNullException(nameof(eventPublisher));
