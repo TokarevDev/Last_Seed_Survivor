@@ -13,7 +13,7 @@ public sealed class WormSpawnLifecycle
     private readonly WormController _wormController;
     private readonly WormCombatController _wormCombat;
     private readonly WormSectionHpPresenter _hpPresenter;
-    private readonly WormFaceBurstPresenter _faceBurstPresenter;
+    private readonly IWormFaceBurstPresentation _faceBurstPresenter;
     private readonly List<WormSegment> _activeSegments = new();
     private readonly List<WormSection> _activeSections = new();
 
@@ -27,7 +27,7 @@ public sealed class WormSpawnLifecycle
         WormController wormController,
         WormCombatController wormCombat,
         WormSectionHpPresenter hpPresenter,
-        WormFaceBurstPresenter faceBurstPresenter)
+        IWormFaceBurstPresentation faceBurstPresenter)
     {
         _segmentPool = segmentPool ?? throw new ArgumentNullException(nameof(segmentPool));
         _wormFactory = wormFactory ?? throw new ArgumentNullException(nameof(wormFactory));

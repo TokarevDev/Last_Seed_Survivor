@@ -2,10 +2,13 @@ using System;
 using LastSeed.Gameplay.Signals;
 using Zenject;
 
-public sealed class WormFaceBurstPresenter : IInitializable, IDisposable
+public sealed class WormFaceBurstPresenter :
+    IWormFaceBurstPresentation,
+    IInitializable,
+    IDisposable
 {
     private readonly SignalBus _signalBus;
-    private WormFaceVisualController _faceVisual;
+    private IWormFaceBurstView _faceVisual;
     private bool _isBurstActive;
 
     public WormFaceBurstPresenter(SignalBus signalBus)
@@ -24,7 +27,7 @@ public sealed class WormFaceBurstPresenter : IInitializable, IDisposable
         Unbind();
     }
 
-    public void Bind(WormFaceVisualController faceVisual)
+    public void Bind(IWormFaceBurstView faceVisual)
     {
         _faceVisual = faceVisual;
         _faceVisual?.SetBoostActive(_isBurstActive);
