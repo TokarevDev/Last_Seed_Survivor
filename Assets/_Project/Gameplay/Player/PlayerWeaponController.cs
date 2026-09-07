@@ -1,5 +1,7 @@
 using System;
+using LastSeed.Core.Pooling;
 using LastSeed.Gameplay.Combat;
+using LastSeed.Gameplay.Signals;
 
 public sealed class PlayerWeaponController
 {
@@ -8,6 +10,11 @@ public sealed class PlayerWeaponController
     private readonly PoolRegistry _poolRegistry;
     private readonly PlayerWeaponLoadout _loadout;
     private readonly ICombatSessionState _combatSessionState;
+    private readonly IWeaponAttackCyclePublisher _attackCyclePublisher;
+    private readonly IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
+    private readonly IConfigurablePooledSpawnService<
+        AcaciaThornProjectilePoolSetup,
+        AcaciaThornProjectileSpawnRequest> _acaciaThornPool;
     private bool _initialized;
 
     public PlayerWeaponController(
@@ -15,7 +22,12 @@ public sealed class PlayerWeaponController
         AcaciaThornWeapon acaciaThornWeapon,
         PoolRegistry poolRegistry,
         PlayerWeaponLoadout loadout,
-        ICombatSessionState combatSessionState)
+        ICombatSessionState combatSessionState,
+        IWeaponAttackCyclePublisher attackCyclePublisher,
+        IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
+        IConfigurablePooledSpawnService<
+            AcaciaThornProjectilePoolSetup,
+            AcaciaThornProjectileSpawnRequest> acaciaThornPool)
     {
         _mainWeapon = mainWeapon ?? throw new ArgumentNullException(nameof(mainWeapon));
         _acaciaThornWeapon = acaciaThornWeapon ??
@@ -23,6 +35,12 @@ public sealed class PlayerWeaponController
         _poolRegistry = poolRegistry ?? throw new ArgumentNullException(nameof(poolRegistry));
         _loadout = loadout ?? throw new ArgumentNullException(nameof(loadout));
         _combatSessionState = combatSessionState ?? throw new ArgumentNullException(nameof(combatSessionState));
+        _attackCyclePublisher = attackCyclePublisher ??
+            throw new ArgumentNullException(nameof(attackCyclePublisher));
+        _runtimeStatsPublisher = runtimeStatsPublisher ??
+            throw new ArgumentNullException(nameof(runtimeStatsPublisher));
+        _acaciaThornPool = acaciaThornPool ??
+            throw new ArgumentNullException(nameof(acaciaThornPool));
     }
 
     public WeaponConfig StartConfig => _loadout.StartConfig;
@@ -42,9 +60,18 @@ public sealed class PlayerWeaponController
         if (pool == null)
             throw new InvalidOperationException("Player start weapon projectile pool could not be created.");
 
-        _mainWeapon.Init(pool, _loadout.FirePoint);
+        _mainWeapon.Init(
+            pool,
+            _loadout.FirePoint,
+            _attackCyclePublisher,
+            _runtimeStatsPublisher);
         _mainWeapon.ApplyConfig(config);
-        _acaciaThornWeapon.Init(_loadout.FirePoint, screenBounds, _poolRegistry.transform);
+        _acaciaThornWeapon.Init(
+            _loadout.FirePoint,
+            screenBounds,
+            _poolRegistry.transform,
+            _runtimeStatsPublisher,
+            _acaciaThornPool);
         _initialized = true;
     }
 

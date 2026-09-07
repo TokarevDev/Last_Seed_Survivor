@@ -1,12 +1,12 @@
+using System;
 using System.Collections.Generic;
 using LastSeed.Core.Pooling;
 using LastSeed.Core.Timing;
 using LastSeed.Gameplay.Signals;
 using UnityEngine;
-using Zenject;
 
 [DisallowMultipleComponent]
-public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
+public sealed class ProjectileWeapon : MonoBehaviour
 {
     [Header("Debug / Safety")]
     [SerializeField][Min(1)] private int _maxShots = 200;
@@ -30,21 +30,20 @@ public sealed class ProjectileWeapon : MonoBehaviour, IWeapon
     public WeaponRuntimeState RuntimeState => _runtimeState;
     public int CurrentProjectileDamage => BuildProjectileDamage();
 
-    [Inject]
-    public void Construct(
+    public void Init(
+        IPooledSpawnService<ProjectileSpawnRequest> pool,
+        Transform firePoint,
         IWeaponAttackCyclePublisher attackCyclePublisher,
         IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
     {
-        _attackCyclePublisher = attackCyclePublisher;
-        _runtimeStatsPublisher = runtimeStatsPublisher;
-    }
-
-    public void Init(
-        IPooledSpawnService<ProjectileSpawnRequest> pool,
-        Transform firePoint)
-    {
-        _pool = pool;
-        _firePoint = firePoint;
+        _pool = pool ?? throw new ArgumentNullException(nameof(pool));
+        _firePoint = firePoint != null
+            ? firePoint
+            : throw new ArgumentNullException(nameof(firePoint));
+        _attackCyclePublisher = attackCyclePublisher ??
+            throw new ArgumentNullException(nameof(attackCyclePublisher));
+        _runtimeStatsPublisher = runtimeStatsPublisher ??
+            throw new ArgumentNullException(nameof(runtimeStatsPublisher));
     }
 
     public void ApplyConfig(WeaponConfig config)

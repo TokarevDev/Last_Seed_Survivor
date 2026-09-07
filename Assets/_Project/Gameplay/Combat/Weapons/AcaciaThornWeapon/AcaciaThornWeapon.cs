@@ -2,7 +2,6 @@ using LastSeed.Core.Timing;
 using LastSeed.Core.Pooling;
 using LastSeed.Gameplay.Signals;
 using UnityEngine;
-using Zenject;
 
 [DisallowMultipleComponent]
 public sealed class AcaciaThornWeapon : MonoBehaviour
@@ -23,24 +22,20 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     public AcaciaThornWeaponConfig Config => _config;
     public AcaciaThornRuntimeState RuntimeState => _runtimeState;
 
-    [Inject]
-    public void Construct(
+    public void Init(
+        Transform firePoint,
+        IScreenBounds screenBounds,
+        Transform projectileParent,
         IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
         IConfigurablePooledSpawnService<
             AcaciaThornProjectilePoolSetup,
             AcaciaThornProjectileSpawnRequest> pool)
     {
-        _runtimeStatsPublisher = runtimeStatsPublisher;
-        _pool = pool;
-    }
-
-    public void Init(
-        Transform firePoint,
-        IScreenBounds screenBounds,
-        Transform projectileParent)
-    {
         if (_initialized)
             return;
+
+        _runtimeStatsPublisher = runtimeStatsPublisher;
+        _pool = pool;
 
         if (_config == null)
         {
@@ -57,6 +52,12 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
         if (_pool == null)
         {
             Debug.LogError("AcaciaThornWeapon: projectile pool is missing.", this);
+            return;
+        }
+
+        if (_runtimeStatsPublisher == null)
+        {
+            Debug.LogError("AcaciaThornWeapon: runtime stats publisher is missing.", this);
             return;
         }
 
