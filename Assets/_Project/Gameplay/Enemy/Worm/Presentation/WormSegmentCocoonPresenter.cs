@@ -10,7 +10,7 @@ public sealed class WormSegmentCocoonPresenter
     private readonly GameObject _visual;
     private readonly Transform _visualTransform;
     private readonly SpriteRenderer _renderer;
-    private readonly CocoonVisualController _visualController;
+    private readonly WormCocoonVisual _visualController;
     private readonly float _shakeInterval;
     private readonly float _shakeAngle;
 
@@ -31,7 +31,7 @@ public sealed class WormSegmentCocoonPresenter
             ? visual.GetComponentInChildren<SpriteRenderer>(true)
             : null;
         _visualController = visual != null
-            ? visual.GetComponentInChildren<CocoonVisualController>(true)
+            ? visual.GetComponentInChildren<WormCocoonVisual>(true)
             : null;
         _shakeInterval = Mathf.Max(0f, shakeInterval);
         _shakeAngle = Mathf.Max(0f, shakeAngle);

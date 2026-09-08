@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public sealed class CocoonVisualController : MonoBehaviour
+public sealed class CocoonVisualController : WormCocoonVisual
 {
     private static readonly int BaseTintId = Shader.PropertyToID("_BaseTint");
     private static readonly int WormAccentColorId = Shader.PropertyToID("_WormAccentColor");
@@ -60,7 +60,7 @@ public sealed class CocoonVisualController : MonoBehaviour
         SetLegendaryEffectsActive(false);
     }
 
-    public void Apply(CocoonRewardProfile profile)
+    public override void Apply(CocoonRewardProfile profile)
     {
         bool useLegendaryVisual = profile != null && profile.UsesLegendaryCocoonVisual;
 
@@ -72,13 +72,13 @@ public sealed class CocoonVisualController : MonoBehaviour
         SetLegendaryEffectsActive(useLegendaryVisual);
     }
 
-    public void ResetVisual()
+    public override void ResetVisual()
     {
         ApplyNormalVisual();
         SetLegendaryEffectsActive(false);
     }
 
-    public void SetEffectSorting(int sortingLayerId, int sortingOrder)
+    public override void SetEffectSorting(int sortingLayerId, int sortingOrder)
     {
         _hasEffectSorting = true;
         _effectSortingLayerId = sortingLayerId;
