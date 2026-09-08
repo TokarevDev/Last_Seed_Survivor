@@ -72,7 +72,7 @@ namespace LastSeed.Bootstrap.Installers
             Container.Bind<WormSegmentChainPresenter>().AsSingle();
             Container.Bind<WormReviveMotionCalculator>().AsSingle();
             Container.Bind<WormReviveAnimationController>().AsSingle();
-            Container.Bind<WormReviveVisualScaler>().AsSingle();
+            Container.BindInterfacesAndSelfTo<WormReviveVisualScaler>().AsSingle();
             Container.Bind<WormReviveSequence>().AsSingle();
             Container.Bind<OrderedReferenceSet<WormSegment>>().AsSingle();
             Container.BindInterfacesAndSelfTo<WormFaceBurstPresenter>()

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 public sealed class WormReviveSequence
 {
     private readonly WormReviveAnimationController _animationController;
-    private readonly WormReviveVisualScaler _visualScaler;
+    private readonly IWormReviveVisualScaler _visualScaler;
 
     private IReadOnlyList<WormSegment> _segments;
     private Action _completion;
@@ -12,7 +12,7 @@ public sealed class WormReviveSequence
 
     public WormReviveSequence(
         WormReviveAnimationController animationController,
-        WormReviveVisualScaler visualScaler)
+        IWormReviveVisualScaler visualScaler)
     {
         _animationController = animationController
             ?? throw new ArgumentNullException(nameof(animationController));
