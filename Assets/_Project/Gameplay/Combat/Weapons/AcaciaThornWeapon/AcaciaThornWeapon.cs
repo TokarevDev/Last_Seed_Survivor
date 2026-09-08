@@ -1,3 +1,4 @@
+using System;
 using LastSeed.Core.Timing;
 using LastSeed.Core.Pooling;
 using LastSeed.Gameplay.Signals;
@@ -14,9 +15,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     private float _currentCooldown;
     private bool _initialized;
     private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
-    private IConfigurablePooledSpawnService<
-        AcaciaThornProjectilePoolSetup,
-        AcaciaThornProjectileSpawnRequest> _pool;
+    private IPooledSpawnService<AcaciaThornProjectileSpawnRequest> _pool;
     private readonly CooldownBurstCycle _fireCycle = new();
 
     public AcaciaThornWeaponConfig Config => _config;
@@ -24,59 +23,30 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
     public void Init(
         Transform firePoint,
-        IScreenBounds screenBounds,
-        Transform projectileParent,
         IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
-        IConfigurablePooledSpawnService<
-            AcaciaThornProjectilePoolSetup,
-            AcaciaThornProjectileSpawnRequest> pool)
+        IPooledSpawnService<AcaciaThornProjectileSpawnRequest> pool)
     {
         if (_initialized)
             return;
 
-        _runtimeStatsPublisher = runtimeStatsPublisher;
-        _pool = pool;
-
         if (_config == null)
-        {
-            Debug.LogError("AcaciaThornWeapon: config is missing.", this);
-            return;
-        }
+            throw new InvalidOperationException("Acacia Thorn weapon config is missing.");
 
-        if (_config.ProjectilePrefab == null)
-        {
-            Debug.LogError("AcaciaThornWeapon: projectile prefab is missing.", this);
-            return;
-        }
+        if (pool == null)
+            throw new ArgumentNullException(nameof(pool));
 
-        if (_pool == null)
-        {
-            Debug.LogError("AcaciaThornWeapon: projectile pool is missing.", this);
-            return;
-        }
-
-        if (_runtimeStatsPublisher == null)
-        {
-            Debug.LogError("AcaciaThornWeapon: runtime stats publisher is missing.", this);
-            return;
-        }
+        if (!pool.IsInitialized)
+            throw new InvalidOperationException("Acacia Thorn projectile pool is not initialized.");
 
         if (firePoint == null)
-        {
-            Debug.LogError("AcaciaThornWeapon: fire point is missing.", this);
-            return;
-        }
+            throw new ArgumentNullException(nameof(firePoint));
 
+        _runtimeStatsPublisher = runtimeStatsPublisher ??
+            throw new ArgumentNullException(nameof(runtimeStatsPublisher));
+        _pool = pool;
         _firePoint = firePoint;
         ApplyRuntimeLimits();
         _runtimeState.SetBaseDamage(_config.Damage);
-
-        AcaciaThornProjectilePoolSetup poolSetup = new(
-            _config.ProjectilePrefab,
-            projectileParent != null ? projectileParent : transform,
-            screenBounds,
-            _config.PrewarmCount);
-        _pool.Initialize(in poolSetup);
 
         RebuildCooldown(resetTimer: true);
         _initialized = true;

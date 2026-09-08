@@ -1,5 +1,4 @@
 using System;
-using LastSeed.Core.Pooling;
 using LastSeed.Gameplay.Combat;
 using LastSeed.Gameplay.Signals;
 
@@ -12,9 +11,6 @@ public sealed class PlayerWeaponController
     private readonly ICombatSessionState _combatSessionState;
     private readonly IWeaponAttackCyclePublisher _attackCyclePublisher;
     private readonly IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
-    private readonly IConfigurablePooledSpawnService<
-        AcaciaThornProjectilePoolSetup,
-        AcaciaThornProjectileSpawnRequest> _acaciaThornPool;
     private bool _initialized;
 
     public PlayerWeaponController(
@@ -24,10 +20,7 @@ public sealed class PlayerWeaponController
         PlayerWeaponLoadout loadout,
         ICombatSessionState combatSessionState,
         IWeaponAttackCyclePublisher attackCyclePublisher,
-        IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
-        IConfigurablePooledSpawnService<
-            AcaciaThornProjectilePoolSetup,
-            AcaciaThornProjectileSpawnRequest> acaciaThornPool)
+        IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
     {
         _mainWeapon = mainWeapon ?? throw new ArgumentNullException(nameof(mainWeapon));
         _acaciaThornWeapon = acaciaThornWeapon ??
@@ -39,13 +32,11 @@ public sealed class PlayerWeaponController
             throw new ArgumentNullException(nameof(attackCyclePublisher));
         _runtimeStatsPublisher = runtimeStatsPublisher ??
             throw new ArgumentNullException(nameof(runtimeStatsPublisher));
-        _acaciaThornPool = acaciaThornPool ??
-            throw new ArgumentNullException(nameof(acaciaThornPool));
     }
 
     public WeaponConfig StartConfig => _loadout.StartConfig;
 
-    public void Initialize(IScreenBounds screenBounds)
+    public void Initialize()
     {
         if (_initialized)
             return;
@@ -66,12 +57,6 @@ public sealed class PlayerWeaponController
             _attackCyclePublisher,
             _runtimeStatsPublisher);
         _mainWeapon.ApplyConfig(config);
-        _acaciaThornWeapon.Init(
-            _loadout.FirePoint,
-            screenBounds,
-            _poolRegistry.transform,
-            _runtimeStatsPublisher,
-            _acaciaThornPool);
         _initialized = true;
     }
 

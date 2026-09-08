@@ -1,4 +1,5 @@
 using System;
+using LastSeed.Bootstrap.Gameplay;
 using UnityEngine;
 using Zenject;
 
@@ -26,6 +27,7 @@ namespace LastSeed.Bootstrap.Installers
             Container.BindInstance(new PlayerWeaponLoadout(_firePoint, _startWeaponConfig)).AsSingle();
             Container.Bind<PlayerMovementController>().AsSingle();
             Container.Bind<PlayerWeaponController>().AsSingle();
+            Container.Bind<AcaciaThornRuntimeInitializer>().AsSingle();
         }
 
         private void ValidateReferences()

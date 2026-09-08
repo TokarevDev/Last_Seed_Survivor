@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using LastSeed.Bootstrap.Gameplay;
 using LastSeed.Bootstrap.GameplayLoop;
 using LastSeed.Core.Collections;
 using LastSeed.Core.Input;
@@ -84,6 +85,7 @@ namespace LastSeed.Tests.PlayMode
         {
             Assert.That(sceneContainer.Resolve<PlayerMovementController>(), Is.Not.Null);
             Assert.That(sceneContainer.Resolve<PlayerWeaponController>(), Is.Not.Null);
+            Assert.That(sceneContainer.Resolve<AcaciaThornRuntimeInitializer>(), Is.Not.Null);
             Assert.That(sceneContainer.Resolve<ProjectileWeapon>(), Is.Not.Null);
         }
 
