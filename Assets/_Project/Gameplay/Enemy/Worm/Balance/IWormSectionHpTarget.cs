@@ -1,12 +1,16 @@
-public interface IWormSectionHpTarget
+namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    int Index { get; set; }
-    int HpOrder { get; }
-    int MaxHp { get; }
-    bool IsDestroyed { get; }
-    bool HasTakenDamage { get; }
-    bool HasVisibleAliveSegment { get; }
+    public interface IWormSectionHpTarget
+    {
+        int Index { get; set; }
+        int HpOrder { get; }
+        int MaxHp { get; }
+        bool IsDestroyed { get; }
+        bool HasTakenDamage { get; }
+        bool HasVisibleAliveSegment { get; }
 
-    void InitializeHp(int hp);
-    void ResetHp(int hp);
+        void InitializeHp(int hp);
+        void ResetHp(int hp);
+    }
+
 }

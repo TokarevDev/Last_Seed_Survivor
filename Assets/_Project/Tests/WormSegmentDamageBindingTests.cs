@@ -1,7 +1,10 @@
 using NUnit.Framework;
 using UnityEngine;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Combat;
+
+namespace Game.Tests
 {
     public sealed class WormSegmentDamageBindingTests
     {

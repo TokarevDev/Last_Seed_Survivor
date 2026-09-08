@@ -1,13 +1,20 @@
-using System.Collections.Generic;
 
-public interface IWormReviveVisualScaler
+using Game.Gameplay.Enemy.Worm;
+
+namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    void Capture(IReadOnlyList<WormSegment> segments);
+    using System.Collections.Generic;
 
-    void Apply(
-        IReadOnlyList<WormSegment> segments,
-        float xMultiplier,
-        float yMultiplier);
+    public interface IWormReviveVisualScaler
+    {
+        void Capture(IReadOnlyList<WormSegment> segments);
 
-    void RestoreAndClear(IReadOnlyList<WormSegment> segments);
+        void Apply(
+            IReadOnlyList<WormSegment> segments,
+            float xMultiplier,
+            float yMultiplier);
+
+        void RestoreAndClear(IReadOnlyList<WormSegment> segments);
+    }
+
 }

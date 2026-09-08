@@ -1,13 +1,20 @@
-using UnityEngine;
 
-public struct ShotSpawnData
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+
+namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern
 {
-    public Vector3 Position;
-    public Quaternion Rotation;
+    using UnityEngine;
 
-    public ShotSpawnData(Vector3 position, Quaternion rotation)
+    public struct ShotSpawnData
     {
-        Position = position;
-        Rotation = rotation;
+        public Vector3 Position;
+        public Quaternion Rotation;
+
+        public ShotSpawnData(Vector3 position, Quaternion rotation)
+        {
+            Position = position;
+            Rotation = rotation;
+        }
     }
+
 }

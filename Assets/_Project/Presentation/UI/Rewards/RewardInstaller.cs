@@ -1,87 +1,98 @@
-using System;
-using UnityEngine;
-using UnityEngine.Serialization;
-using Zenject;
 
-[DisallowMultipleComponent]
-public sealed class RewardInstaller : MonoInstaller
+using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Rewards.Runtime;
+using Game.Gameplay.Rewards.Services;
+using Game.Infrastructure.Advertising;
+using Game.Presentation.UI.Common.Popups;
+
+namespace Game.Presentation.UI.Rewards
 {
-    [Header("Refs")]
-    [SerializeField] private RewardDatabase _database;
-    [SerializeField] private RewardPopupView _popup;
-    [SerializeField] private PopupRoot _popupRoot;
-    [FormerlySerializedAs("_takeAllRewardedAdService")]
-    [SerializeField] private RewardedAdService _rewardedAdService;
+    using System;
+    using UnityEngine;
+    using UnityEngine.Serialization;
+    using Zenject;
 
-    [Header("Session Attempts")]
-    [FormerlySerializedAs("_freeRerollAttemptsPerPopup")]
-    [SerializeField, Min(0)] private int _freeRerollAttemptsPerSession = 2;
-    [FormerlySerializedAs("_adRerollAttemptsPerPopup")]
-    [SerializeField, Min(0)] private int _adRerollAttemptsPerSession = 1;
-    [FormerlySerializedAs("_takeAllAttemptsPerPopup")]
-    [SerializeField, Min(0)] private int _takeAllAttemptsPerSession = 1;
+    [DisallowMultipleComponent]
+    public sealed class RewardInstaller : MonoInstaller
+    {
+        [Header("Refs")]
+        [SerializeField] private RewardDatabase _database;
+        [SerializeField] private RewardPopupView _popup;
+        [SerializeField] private PopupRoot _popupRoot;
+        [FormerlySerializedAs("_takeAllRewardedAdService")]
+        [SerializeField] private RewardedAdService _rewardedAdService;
+
+        [Header("Session Attempts")]
+        [FormerlySerializedAs("_freeRerollAttemptsPerPopup")]
+        [SerializeField, Min(0)] private int _freeRerollAttemptsPerSession = 2;
+        [FormerlySerializedAs("_adRerollAttemptsPerPopup")]
+        [SerializeField, Min(0)] private int _adRerollAttemptsPerSession = 1;
+        [FormerlySerializedAs("_takeAllAttemptsPerPopup")]
+        [SerializeField, Min(0)] private int _takeAllAttemptsPerSession = 1;
 
 #if UNITY_EDITOR
-    public int EditorFreeRerollAttemptsPerSession => _freeRerollAttemptsPerSession;
-    public int EditorAdRerollAttemptsPerSession => _adRerollAttemptsPerSession;
-    public int EditorTakeAllAttemptsPerSession => _takeAllAttemptsPerSession;
+        public int EditorFreeRerollAttemptsPerSession => _freeRerollAttemptsPerSession;
+        public int EditorAdRerollAttemptsPerSession => _adRerollAttemptsPerSession;
+        public int EditorTakeAllAttemptsPerSession => _takeAllAttemptsPerSession;
 #endif
 
-    public override void InstallBindings()
-    {
-        ValidateRequiredReferences();
-
-        Container.BindInstance(_database).AsSingle();
-        Container.BindInstance(_popup).AsSingle();
-        Container.BindInstance(_popupRoot).AsSingle();
-        BindRewardedAdService();
-        Container.BindInstance(new RewardFlowSettings(
-            _freeRerollAttemptsPerSession,
-            _adRerollAttemptsPerSession,
-            _takeAllAttemptsPerSession));
-        Container.Bind<RewardAttemptState>().AsSingle();
-        Container.Bind<RewardRequestQueue>().AsSingle();
-        Container.Bind<RewardRequestLifecycle>().AsSingle();
-        Container.Bind<RewardRequestCoordinator>().AsSingle();
-        Container.Bind<RewardPopupStateFactory>().AsSingle();
-        Container.Bind<RewardPopupGateway>().AsSingle();
-        Container.Bind<RewardAdOperation>().AsSingle();
-        Container.BindInterfacesAndSelfTo<RewardRollService>().AsSingle();
-        Container.BindInterfacesAndSelfTo<RewardApplyService>().AsSingle();
-        Container.BindInterfacesAndSelfTo<RewardChoiceRollService>().AsSingle();
-        Container.Bind<RewardBatchApplyService>().AsSingle();
-        Container.Bind<RewardGrantedActionService>().AsSingle();
-        Container.BindInterfacesAndSelfTo<RewardFlowController>().AsSingle();
-        Container.BindInterfacesAndSelfTo<RewardSessionController>()
-            .AsSingle()
-            .NonLazy();
-    }
-
-    private void BindRewardedAdService()
-    {
-        if (_rewardedAdService != null)
+        public override void InstallBindings()
         {
-            Container.Bind<IRewardedAdService>()
-                .FromInstance(_rewardedAdService)
-                .AsSingle();
-            return;
+            ValidateRequiredReferences();
+
+            Container.BindInstance(_database).AsSingle();
+            Container.BindInstance(_popup).AsSingle();
+            Container.BindInstance(_popupRoot).AsSingle();
+            BindRewardedAdService();
+            Container.BindInstance(new RewardFlowSettings(
+                _freeRerollAttemptsPerSession,
+                _adRerollAttemptsPerSession,
+                _takeAllAttemptsPerSession));
+            Container.Bind<RewardAttemptState>().AsSingle();
+            Container.Bind<RewardRequestQueue>().AsSingle();
+            Container.Bind<RewardRequestLifecycle>().AsSingle();
+            Container.Bind<RewardRequestCoordinator>().AsSingle();
+            Container.Bind<RewardPopupStateFactory>().AsSingle();
+            Container.Bind<RewardPopupGateway>().AsSingle();
+            Container.Bind<RewardAdOperation>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RewardRollService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RewardApplyService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RewardChoiceRollService>().AsSingle();
+            Container.Bind<RewardBatchApplyService>().AsSingle();
+            Container.Bind<RewardGrantedActionService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RewardFlowController>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RewardSessionController>()
+                .AsSingle()
+                .NonLazy();
         }
 
-        Container.Bind<IRewardedAdService>()
-            .To<DisabledRewardedAdService>()
-            .AsSingle();
+        private void BindRewardedAdService()
+        {
+            if (_rewardedAdService != null)
+            {
+                Container.Bind<IRewardedAdService>()
+                    .FromInstance(_rewardedAdService)
+                    .AsSingle();
+                return;
+            }
+
+            Container.Bind<IRewardedAdService>()
+                .To<DisabledRewardedAdService>()
+                .AsSingle();
+        }
+
+        private void ValidateRequiredReferences()
+        {
+            if (_database == null)
+                throw new InvalidOperationException("Reward database is not configured.");
+
+            if (_popup == null)
+                throw new InvalidOperationException("Reward popup is not configured.");
+
+            if (_popupRoot == null)
+                throw new InvalidOperationException("Reward popup root is not configured.");
+
+        }
     }
 
-    private void ValidateRequiredReferences()
-    {
-        if (_database == null)
-            throw new InvalidOperationException("Reward database is not configured.");
-
-        if (_popup == null)
-            throw new InvalidOperationException("Reward popup is not configured.");
-
-        if (_popupRoot == null)
-            throw new InvalidOperationException("Reward popup root is not configured.");
-
-    }
 }

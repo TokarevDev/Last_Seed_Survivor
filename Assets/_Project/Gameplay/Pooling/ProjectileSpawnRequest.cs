@@ -1,21 +1,29 @@
-using UnityEngine;
 
-public readonly struct ProjectileSpawnRequest
+using Game.Gameplay.Combat.Projectiles;
+using Game.Gameplay.Combat.Projectiles.Configs;
+
+namespace Game.Gameplay.Pooling
 {
-    public ProjectileSpawnRequest(
-        ProjectileConfig config,
-        ProjectileRuntimeStats stats,
-        Vector3 position,
-        Quaternion rotation)
+    using UnityEngine;
+
+    public readonly struct ProjectileSpawnRequest
     {
-        Config = config;
-        Stats = stats;
-        Position = position;
-        Rotation = rotation;
+        public ProjectileSpawnRequest(
+            ProjectileConfig config,
+            ProjectileRuntimeStats stats,
+            Vector3 position,
+            Quaternion rotation)
+        {
+            Config = config;
+            Stats = stats;
+            Position = position;
+            Rotation = rotation;
+        }
+
+        public ProjectileConfig Config { get; }
+        public ProjectileRuntimeStats Stats { get; }
+        public Vector3 Position { get; }
+        public Quaternion Rotation { get; }
     }
 
-    public ProjectileConfig Config { get; }
-    public ProjectileRuntimeStats Stats { get; }
-    public Vector3 Position { get; }
-    public Quaternion Rotation { get; }
 }

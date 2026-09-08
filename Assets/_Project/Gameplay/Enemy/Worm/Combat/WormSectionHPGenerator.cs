@@ -1,14 +1,18 @@
-public static class WormSectionHPGenerator
+namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    private const int FallbackBaseHp = 1;
-
-    public static int GetHP(int sectionIndex)
+    public static class WormSectionHPGenerator
     {
-        return GetHP(sectionIndex, 1);
+        private const int FallbackBaseHp = 1;
+
+        public static int GetHP(int sectionIndex)
+        {
+            return GetHP(sectionIndex, 1);
+        }
+
+        public static int GetHP(int sectionIndex, int levelNumber)
+        {
+            return FallbackBaseHp;
+        }
     }
 
-    public static int GetHP(int sectionIndex, int levelNumber)
-    {
-        return FallbackBaseHp;
-    }
 }

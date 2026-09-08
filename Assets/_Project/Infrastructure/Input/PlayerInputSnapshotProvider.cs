@@ -1,9 +1,10 @@
-using LastSeed.Core.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Serialization;
 
-namespace LastSeed.Infrastructure.Input
+using Game.Core.Input;
+
+namespace Game.Infrastructure.Input
 {
     [DisallowMultipleComponent]
     public sealed class PlayerInputSnapshotProvider : MonoBehaviour, IPlayerInputSnapshotProvider

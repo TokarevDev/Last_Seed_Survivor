@@ -1,8 +1,9 @@
-using LastSeed.Bootstrap.Gameplay;
-using LastSeed.Bootstrap.GameplayLoop;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Bootstrap.GameplayLoop;
+using Game.Bootstrap.Scenes.Game;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class GameplayLoopInstaller : MonoInstaller
     {

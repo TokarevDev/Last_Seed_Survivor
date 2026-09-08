@@ -1,38 +1,47 @@
-using UnityEngine;
 
-[DisallowMultipleComponent]
-public sealed class WormSegmentDamageReceiver : MonoBehaviour, IDamageable<DamageHit>
+using Game.Core.Combat;
+using Game.Gameplay.Combat;
+using Game.Gameplay.Enemy.Worm;
+
+namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    private WormCombatController _combat;
-    private WormSegment _segment;
+    using UnityEngine;
 
-    public void Initialize(WormCombatController combat, WormSegment segment)
+    [DisallowMultipleComponent]
+    public sealed class WormSegmentDamageReceiver : MonoBehaviour, IDamageable<DamageHit>
     {
-        _combat = combat;
-        _segment = segment;
+        private WormCombatController _combat;
+        private WormSegment _segment;
+
+        public void Initialize(WormCombatController combat, WormSegment segment)
+        {
+            _combat = combat;
+            _segment = segment;
+        }
+
+        public WormSegment GetSegment()
+        {
+            return _segment;
+        }
+
+        public WormSection GetDamageSection()
+        {
+            if (_combat == null)
+                return null;
+
+            return _combat.ResolveDamageSection(_segment);
+        }
+
+        public void TakeDamage(in DamageHit hit)
+        {
+            if (_combat == null || _segment == null)
+                return;
+
+            if (!_segment.IsAlive)
+                return;
+
+            _combat.RegisterHit(_segment, hit);
+        }
     }
 
-    public WormSegment GetSegment()
-    {
-        return _segment;
-    }
-
-    public WormSection GetDamageSection()
-    {
-        if (_combat == null)
-            return null;
-
-        return _combat.ResolveDamageSection(_segment);
-    }
-
-    public void TakeDamage(in DamageHit hit)
-    {
-        if (_combat == null || _segment == null)
-            return;
-
-        if (!_segment.IsAlive)
-            return;
-
-        _combat.RegisterHit(_segment, hit);
-    }
 }

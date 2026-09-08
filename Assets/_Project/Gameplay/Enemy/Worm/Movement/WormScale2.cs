@@ -1,11 +1,15 @@
-public readonly struct WormScale2
+namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    public WormScale2(float x, float y)
+    public readonly struct WormScale2
     {
-        X = x;
-        Y = y;
+        public WormScale2(float x, float y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public float X { get; }
+        public float Y { get; }
     }
 
-    public float X { get; }
-    public float Y { get; }
 }

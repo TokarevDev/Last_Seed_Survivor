@@ -1,25 +1,30 @@
-using System;
-using LastSeed.Gameplay.Signals;
-using Zenject;
+using Game.Gameplay.Signals;
 
-public sealed class WormCombatBurstSignalPublisher
+namespace Game.Presentation.Worm
 {
-    private readonly SignalBus _signalBus;
-    private bool _hasPublishedState;
-    private bool _lastPublishedState;
+    using System;
+    using Zenject;
 
-    public WormCombatBurstSignalPublisher(SignalBus signalBus)
+    public sealed class WormCombatBurstSignalPublisher
     {
-        _signalBus = signalBus ?? throw new ArgumentNullException(nameof(signalBus));
+        private readonly SignalBus _signalBus;
+        private bool _hasPublishedState;
+        private bool _lastPublishedState;
+
+        public WormCombatBurstSignalPublisher(SignalBus signalBus)
+        {
+            _signalBus = signalBus ?? throw new ArgumentNullException(nameof(signalBus));
+        }
+
+        public void PublishIfChanged(bool isActive)
+        {
+            if (_hasPublishedState && _lastPublishedState == isActive)
+                return;
+
+            _hasPublishedState = true;
+            _lastPublishedState = isActive;
+            _signalBus.Fire(new WormCombatBurstStateChangedSignal(isActive));
+        }
     }
 
-    public void PublishIfChanged(bool isActive)
-    {
-        if (_hasPublishedState && _lastPublishedState == isActive)
-            return;
-
-        _hasPublishedState = true;
-        _lastPublishedState = isActive;
-        _signalBus.Fire(new WormCombatBurstStateChangedSignal(isActive));
-    }
 }

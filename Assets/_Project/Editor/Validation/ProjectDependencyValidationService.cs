@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Zenject.Internal;
 
-namespace LastSeed.Editor.Validation
+namespace Game.Editor.Validation
 {
     public static class ProjectDependencyValidationService
     {

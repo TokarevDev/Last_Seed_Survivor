@@ -1,6 +1,9 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.World;
+using Game.Gameplay.Player;
+
+namespace Game.Tests
 {
     public sealed class PlayerMovementModelTests
     {

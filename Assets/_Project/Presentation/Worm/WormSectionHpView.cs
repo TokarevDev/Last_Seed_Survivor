@@ -1,100 +1,105 @@
-using TMPro;
-using UnityEngine;
 
-public sealed class WormSectionHpView : MonoBehaviour
+namespace Game.Presentation.Worm
 {
-    private const int HpTextBufferSize = 16;
+    using TMPro;
+    using UnityEngine;
 
-    [SerializeField] private TMP_Text _text;
-    [SerializeField] private Transform _visualRoot;
-
-    [SerializeField] private float _minScale = 0.9f;
-    [SerializeField] private float _maxScale = 1f;
-
-    private Transform _target;
-    private bool _isVisible = true;
-    private readonly char[] _hpTextBuffer = new char[HpTextBufferSize];
-
-    private void Awake()
+    public sealed class WormSectionHpView : MonoBehaviour
     {
-        if (_text == null)
+        private const int HpTextBufferSize = 16;
+
+        [SerializeField] private TMP_Text _text;
+        [SerializeField] private Transform _visualRoot;
+
+        [SerializeField] private float _minScale = 0.9f;
+        [SerializeField] private float _maxScale = 1f;
+
+        private Transform _target;
+        private bool _isVisible = true;
+        private readonly char[] _hpTextBuffer = new char[HpTextBufferSize];
+
+        private void Awake()
         {
-            Debug.LogError("WormSectionHpView: TMP_Text is not assigned.", this);
-            return;
+            if (_text == null)
+            {
+                Debug.LogError("WormSectionHpView: TMP_Text is not assigned.", this);
+                return;
+            }
+
+            if (!_text.TryGetComponent(out MeshRenderer meshRenderer))
+            {
+                Debug.LogError("MeshRenderer not found on TMP_Text", this);
+                return;
+            }
+
+            meshRenderer.sortingLayerName = "UI";
+            meshRenderer.sortingOrder = 2600;
         }
 
-        if (!_text.TryGetComponent(out MeshRenderer meshRenderer))
+        private void LateUpdate()
         {
-            Debug.LogError("MeshRenderer not found on TMP_Text", this);
-            return;
+            if (_target == null)
+            {
+                SetVisible(false);
+                return;
+            }
+
+            if (!_target.gameObject.activeInHierarchy)
+            {
+                SetVisible(false);
+                return;
+            }
+
+            SetVisible(true);
+
+            transform.position = _target.position;
         }
 
-        meshRenderer.sortingLayerName = "UI";
-        meshRenderer.sortingOrder = 2600;
-    }
-
-    private void LateUpdate()
-    {
-        if (_target == null)
+        private void OnValidate()
         {
+            if (_text == null)
+                Debug.LogError("WormSectionHpView: TMP_Text is not assigned.", this);
+        }
+
+        public void Bind(Transform target, int currentHp)
+        {
+            _target = target;
+            SetVisible(true);
+            SetValue(currentHp);
+        }
+
+        public void Unbind()
+        {
+            _target = null;
             SetVisible(false);
-            return;
         }
 
-        if (!_target.gameObject.activeInHierarchy)
+        public void SetValue(int current)
         {
-            SetVisible(false);
-            return;
+            if (WormHpFormatter.TryFormat(current, _hpTextBuffer, out int length))
+                _text.SetCharArray(_hpTextBuffer, 0, length);
+            else
+                _text.text = WormHpFormatter.Format(current);
+
+            float t = Mathf.InverseLerp(0, 10000, current);
+            float scale = Mathf.Lerp(_maxScale, _minScale, t);
+
+            if (_visualRoot != null)
+                _visualRoot.localScale = Vector3.one * scale;
         }
 
-        SetVisible(true);
+        private void SetVisible(bool visible)
+        {
+            if (_isVisible == visible)
+                return;
 
-        transform.position = _target.position;
+            _isVisible = visible;
+
+            if (_visualRoot != null)
+                _visualRoot.gameObject.SetActive(visible);
+            else if (_text != null)
+                _text.enabled = visible;
+        }
     }
 
-    private void OnValidate()
-    {
-        if (_text == null)
-            Debug.LogError("WormSectionHpView: TMP_Text is not assigned.", this);
-    }
-
-    public void Bind(Transform target, int currentHp)
-    {
-        _target = target;
-        SetVisible(true);
-        SetValue(currentHp);
-    }
-
-    public void Unbind()
-    {
-        _target = null;
-        SetVisible(false);
-    }
-
-    public void SetValue(int current)
-    {
-        if (WormHpFormatter.TryFormat(current, _hpTextBuffer, out int length))
-            _text.SetCharArray(_hpTextBuffer, 0, length);
-        else
-            _text.text = WormHpFormatter.Format(current);
-
-        float t = Mathf.InverseLerp(0, 10000, current);
-        float scale = Mathf.Lerp(_maxScale, _minScale, t);
-
-        if (_visualRoot != null)
-            _visualRoot.localScale = Vector3.one * scale;
-    }
-
-    private void SetVisible(bool visible)
-    {
-        if (_isVisible == visible)
-            return;
-
-        _isVisible = visible;
-
-        if (_visualRoot != null)
-            _visualRoot.gameObject.SetActive(visible);
-        else if (_text != null)
-            _text.enabled = visible;
-    }
 }

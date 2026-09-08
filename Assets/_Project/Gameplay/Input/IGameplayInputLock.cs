@@ -1,6 +1,6 @@
 using System;
 
-namespace LastSeed.Gameplay.Input
+namespace Game.Gameplay.Input
 {
     public interface IGameplayInputLock
     {

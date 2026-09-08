@@ -1,8 +1,9 @@
 using System;
-using LastSeed.Core.Pooling;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.Pooling;
+
+namespace Game.Tests
 {
     public sealed class ObjectPoolTests
     {

@@ -969,7 +969,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67ebdfbaf0b24a11853eec32db5ac630, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SceneFadeOverlay
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.SceneFadeOverlay
   _targetImage: {fileID: 730615255}
   _fadeDuration: 2
   _fadeEase: 4
@@ -1250,7 +1250,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 664d9ce52da44c44998003abbb54c314, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BootstrapLoadingView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Loading.BootstrapLoadingView
   _loadingProgressImage: {fileID: 381409513}
   _loadingDuration: 4
   _useProgressSteps: 1

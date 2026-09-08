@@ -1,181 +1,190 @@
-using UnityEngine;
 
-public enum WormSegmentType
+using Game.Gameplay.Enemy.Worm.Combat;
+using Game.Gameplay.Enemy.Worm.Presentation;
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Enemy.Worm
 {
-    None,
-    Head,
-    Body,
-    Tail
-}
+    using UnityEngine;
 
-public sealed class WormSegment : MonoBehaviour
-{
-    [field: SerializeField] public WormSegmentType Type { get; private set; }
-    [field: SerializeField] public Transform VisualRoot { get; private set; }
-
-    [Header("Cocoon Overlay (Visual Only)")]
-    [SerializeField] private GameObject _cocoonVisual;
-
-    [Header("Cocoon Shake")]
-    [SerializeField, Min(0f)] private float _cocoonShakeInterval = 3f;
-    [SerializeField, Min(0f)] private float _cocoonShakeAngle = 10f;
-
-    private WormSegmentCocoonPresenter _cocoonPresenter;
-    private WormSegmentDamageBinding _damageBinding;
-    private WormSegmentPooledViewLifecycle _pooledViewLifecycle;
-    private WormSegmentVisualRig _visualRig;
-
-    public Transform CachedTransform { get; private set; }
-    public IWormFaceBurstView FaceVisual { get; private set; }
-    public WormSection Section { get; internal set; }
-    public int Index { get; set; }
-
-    public bool HasCocoon => _cocoonPresenter?.IsVisible == true;
-    public bool IsAlive => _pooledViewLifecycle?.IsAlive ?? true;
-    public bool HasTailVisualChain => _visualRig?.HasTailVisualChain == true;
-    public int TailVisualPartCount => _visualRig?.TailVisualPartCount ?? 0;
-    public bool HasHeadFollowChain => _visualRig?.HasHeadFollowChain == true;
-    public int HeadFollowPartCount => _visualRig?.HeadFollowPartCount ?? 0;
-
-    private void Awake()
+    public enum WormSegmentType
     {
-        CachedTransform = transform;
-        TryGetComponent(out Collider2D cachedCollider);
-
-        if (Type == WormSegmentType.Head)
-            FaceVisual = GetComponentInChildren<WormFaceBurstView>(true);
-
-        SpriteRenderer anchorRenderer = VisualRoot != null
-            ? VisualRoot.GetComponentInChildren<SpriteRenderer>()
-            : null;
-
-        _cocoonPresenter = new WormSegmentCocoonPresenter(
-            CachedTransform,
-            _cocoonVisual,
-            _cocoonShakeInterval,
-            _cocoonShakeAngle);
-        _damageBinding = new WormSegmentDamageBinding(gameObject, this);
-        _pooledViewLifecycle = new WormSegmentPooledViewLifecycle(
-            gameObject,
-            VisualRoot,
-            cachedCollider);
-
-        _visualRig = new WormSegmentVisualRig(
-            Type,
-            CachedTransform,
-            VisualRoot,
-            _cocoonPresenter.VisualTransform,
-            anchorRenderer);
+        None,
+        Head,
+        Body,
+        Tail
     }
 
-    private void OnEnable()
+    public sealed class WormSegment : MonoBehaviour
     {
-        _cocoonPresenter?.OnOwnerEnabled();
-    }
+        [field: SerializeField] public WormSegmentType Type { get; private set; }
+        [field: SerializeField] public Transform VisualRoot { get; private set; }
 
-    private void OnDisable()
-    {
-        _cocoonPresenter?.OnOwnerDisabled();
-    }
+        [Header("Cocoon Overlay (Visual Only)")]
+        [SerializeField] private GameObject _cocoonVisual;
 
-    private void OnDestroy()
-    {
-        _cocoonPresenter?.OnOwnerDisabled();
-    }
+        [Header("Cocoon Shake")]
+        [SerializeField, Min(0f)] private float _cocoonShakeInterval = 3f;
+        [SerializeField, Min(0f)] private float _cocoonShakeAngle = 10f;
 
-    public void SetSortingOrder(int order)
-    {
-        _visualRig?.SetSortingOrder(order);
-        _cocoonPresenter?.SetSortingOrder(order);
-    }
+        private WormSegmentCocoonPresenter _cocoonPresenter;
+        private WormSegmentDamageBinding _damageBinding;
+        private WormSegmentPooledViewLifecycle _pooledViewLifecycle;
+        private WormSegmentVisualRig _visualRig;
 
-    public void ResetTailVisualRootRotation()
-    {
-        _visualRig?.ResetTailVisualRootRotation();
-    }
+        public Transform CachedTransform { get; private set; }
+        public IWormFaceBurstView FaceVisual { get; private set; }
+        public WormSection Section { get; internal set; }
+        public int Index { get; set; }
 
-    public void SetTailVisualPartPose(int index, Vector3 position, float angle)
-    {
-        _visualRig?.SetTailVisualPartPose(index, position, angle);
-    }
+        public bool HasCocoon => _cocoonPresenter?.IsVisible == true;
+        public bool IsAlive => _pooledViewLifecycle?.IsAlive ?? true;
+        public bool HasTailVisualChain => _visualRig?.HasTailVisualChain == true;
+        public int TailVisualPartCount => _visualRig?.TailVisualPartCount ?? 0;
+        public bool HasHeadFollowChain => _visualRig?.HasHeadFollowChain == true;
+        public int HeadFollowPartCount => _visualRig?.HeadFollowPartCount ?? 0;
 
-    public void SetHeadFollowPartPose(int index, Vector3 position, float angle)
-    {
-        _visualRig?.SetHeadFollowPartPose(index, position, angle);
-    }
+        private void Awake()
+        {
+            CachedTransform = transform;
+            TryGetComponent(out Collider2D cachedCollider);
 
-    public void SetHeadFollowChainVisible(bool visible)
-    {
-        _visualRig?.SetHeadFollowChainVisible(visible);
-    }
+            if (Type == WormSegmentType.Head)
+                FaceVisual = GetComponentInChildren<WormFaceBurstView>(true);
 
-    public bool TryGetLastHeadFollowPartPosition(out Vector3 position)
-    {
-        if (_visualRig != null)
-            return _visualRig.TryGetLastHeadFollowPartPosition(out position);
+            SpriteRenderer anchorRenderer = VisualRoot != null
+                ? VisualRoot.GetComponentInChildren<SpriteRenderer>()
+                : null;
 
-        position = default;
-        return false;
-    }
+            _cocoonPresenter = new WormSegmentCocoonPresenter(
+                CachedTransform,
+                _cocoonVisual,
+                _cocoonShakeInterval,
+                _cocoonShakeAngle);
+            _damageBinding = new WormSegmentDamageBinding(gameObject, this);
+            _pooledViewLifecycle = new WormSegmentPooledViewLifecycle(
+                gameObject,
+                VisualRoot,
+                cachedCollider);
 
-    public void EnableCocoon()
-    {
-        EnableCocoon(null);
-    }
+            _visualRig = new WormSegmentVisualRig(
+                Type,
+                CachedTransform,
+                VisualRoot,
+                _cocoonPresenter.VisualTransform,
+                anchorRenderer);
+        }
 
-    public void EnableCocoon(CocoonRewardProfile rewardProfile)
-    {
-        if (Type != WormSegmentType.Body)
-            return;
+        private void OnEnable()
+        {
+            _cocoonPresenter?.OnOwnerEnabled();
+        }
 
-        _cocoonPresenter?.Show(rewardProfile, isActiveAndEnabled);
-    }
+        private void OnDisable()
+        {
+            _cocoonPresenter?.OnOwnerDisabled();
+        }
 
-    public void DisableCocoon()
-    {
-        _cocoonPresenter?.Hide();
-    }
+        private void OnDestroy()
+        {
+            _cocoonPresenter?.OnOwnerDisabled();
+        }
 
-    public void Activate()
-    {
-        _pooledViewLifecycle.Activate();
-        DisableCocoon();
-        Section = null;
-    }
+        public void SetSortingOrder(int order)
+        {
+            _visualRig?.SetSortingOrder(order);
+            _cocoonPresenter?.SetSortingOrder(order);
+        }
 
-    public void PrepareForWorm()
-    {
-        Section = null;
-        DisableCocoon();
-        _pooledViewLifecycle.PrepareForPool();
-    }
+        public void ResetTailVisualRootRotation()
+        {
+            _visualRig?.ResetTailVisualRootRotation();
+        }
 
-    public void InitializePresentation(IWormCocoonShakeClock cocoonShakeClock)
-    {
-        _cocoonPresenter.BindShakeClock(
-            cocoonShakeClock,
-            isActiveAndEnabled);
-    }
+        public void SetTailVisualPartPose(int index, Vector3 position, float angle)
+        {
+            _visualRig?.SetTailVisualPartPose(index, position, angle);
+        }
 
-    public void UpdateCocoonPresentation()
-    {
-        _cocoonPresenter?.UpdateOrientation();
-    }
+        public void SetHeadFollowPartPose(int index, Vector3 position, float angle)
+        {
+            _visualRig?.SetHeadFollowPartPose(index, position, angle);
+        }
 
-    public void BindDamageReceivers(WormCombatController combat)
-    {
-        _damageBinding.Bind(combat);
-    }
+        public void SetHeadFollowChainVisible(bool visible)
+        {
+            _visualRig?.SetHeadFollowChainVisible(visible);
+        }
 
-    public void SetRuntimeVisible(bool visible)
-    {
-        _pooledViewLifecycle.SetRuntimeVisible(visible);
-    }
+        public bool TryGetLastHeadFollowPartPosition(out Vector3 position)
+        {
+            if (_visualRig != null)
+                return _visualRig.TryGetLastHeadFollowPartPosition(out position);
 
-    public void KillVisualAndCollision()
-    {
-        DisableCocoon();
-        _pooledViewLifecycle.Kill();
+            position = default;
+            return false;
+        }
+
+        public void EnableCocoon()
+        {
+            EnableCocoon(null);
+        }
+
+        public void EnableCocoon(CocoonRewardProfile rewardProfile)
+        {
+            if (Type != WormSegmentType.Body)
+                return;
+
+            _cocoonPresenter?.Show(rewardProfile, isActiveAndEnabled);
+        }
+
+        public void DisableCocoon()
+        {
+            _cocoonPresenter?.Hide();
+        }
+
+        public void Activate()
+        {
+            _pooledViewLifecycle.Activate();
+            DisableCocoon();
+            Section = null;
+        }
+
+        public void PrepareForWorm()
+        {
+            Section = null;
+            DisableCocoon();
+            _pooledViewLifecycle.PrepareForPool();
+        }
+
+        public void InitializePresentation(IWormCocoonShakeClock cocoonShakeClock)
+        {
+            _cocoonPresenter.BindShakeClock(
+                cocoonShakeClock,
+                isActiveAndEnabled);
+        }
+
+        public void UpdateCocoonPresentation()
+        {
+            _cocoonPresenter?.UpdateOrientation();
+        }
+
+        public void BindDamageReceivers(WormCombatController combat)
+        {
+            _damageBinding.Bind(combat);
+        }
+
+        public void SetRuntimeVisible(bool visible)
+        {
+            _pooledViewLifecycle.SetRuntimeVisible(visible);
+        }
+
+        public void KillVisualAndCollision()
+        {
+            DisableCocoon();
+            _pooledViewLifecycle.Kill();
+        }
+
     }
 
 }

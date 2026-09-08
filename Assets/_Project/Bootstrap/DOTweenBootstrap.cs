@@ -1,11 +1,14 @@
-using DG.Tweening;
-using UnityEngine;
-
-public static class DOTweenBootstrap
+namespace Game.Bootstrap
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-    private static void Init()
+    using DG.Tweening;
+    using UnityEngine;
+
+    public static class DOTweenBootstrap
     {
-        DOTween.SetTweensCapacity(500, 100);
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Init()
+        {
+            DOTween.SetTweensCapacity(500, 100);
+        }
     }
 }

@@ -139,7 +139,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d1904cb7d09ac64997cf4ea1db1beb5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSegment
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.WormSegment
   <Type>k__BackingField: 3
   <VisualRoot>k__BackingField: {fileID: 3933236830443005778}
   _cocoonVisual: {fileID: 0}
@@ -156,7 +156,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e2486f12e2890634d93f8976e3052a4a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSegmentDamageReceiver
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.Combat.WormSegmentDamageReceiver
 --- !u!58 &4595330180588862429
 CircleCollider2D:
   m_ObjectHideFlags: 0

@@ -2,7 +2,10 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-namespace LastSeed.Tests
+using Game.Editor.Worm;
+using Game.Gameplay.Enemy.Worm;
+
+namespace Game.Tests
 {
     public sealed class RailPathSerializedDataTests
     {

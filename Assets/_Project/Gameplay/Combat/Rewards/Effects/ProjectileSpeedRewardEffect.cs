@@ -1,20 +1,27 @@
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Rewards/Effects/Projectile Speed")]
-public sealed class ProjectileSpeedRewardEffect : RewardEffect
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    [SerializeField][Min(0f)] private float _bonus = 0.5f;
+    using UnityEngine;
 
-    public override bool CanApply(WeaponRuntimeState state)
+    [CreateAssetMenu(menuName = "Game/Rewards/Effects/Projectile Speed")]
+    public sealed class ProjectileSpeedRewardEffect : RewardEffect
     {
-        return state != null && state.CanApplyProjectileSpeedBonus(_bonus);
+        [SerializeField][Min(0f)] private float _bonus = 0.5f;
+
+        public override bool CanApply(WeaponRuntimeState state)
+        {
+            return state != null && state.CanApplyProjectileSpeedBonus(_bonus);
+        }
+
+        public override void Apply(WeaponRuntimeState state)
+        {
+            if (state == null)
+                return;
+
+            state.AddProjectileSpeedBonus(_bonus);
+        }
     }
 
-    public override void Apply(WeaponRuntimeState state)
-    {
-        if (state == null)
-            return;
-
-        state.AddProjectileSpeedBonus(_bonus);
-    }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 
-namespace LastSeed.Core.Collections
+using Game.Core.Pooling;
+
+namespace Game.Core.Collections
 {
     public sealed class OrderedReferenceSet<T>
         where T : class

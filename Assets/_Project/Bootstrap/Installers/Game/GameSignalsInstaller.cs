@@ -1,9 +1,10 @@
-using LastSeed.Gameplay.Signals;
-using LastSeed.Presentation.Signals;
-using LastSeed.Presentation.UI.Popups;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Gameplay.Signals;
+using Game.Presentation.Signals;
+using Game.Presentation.UI.Common.Popups;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class GameSignalsInstaller : MonoInstaller
     {

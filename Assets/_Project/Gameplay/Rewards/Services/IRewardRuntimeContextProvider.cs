@@ -1,4 +1,8 @@
-public interface IRewardRuntimeContextProvider
+namespace Game.Gameplay.Rewards.Services
 {
-    RewardRuntimeContext RuntimeContext { get; }
+    public interface IRewardRuntimeContextProvider
+    {
+        RewardRuntimeContext RuntimeContext { get; }
+    }
+
 }

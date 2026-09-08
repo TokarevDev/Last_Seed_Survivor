@@ -1,30 +1,54 @@
-using System.Collections.Generic;
-using UnityEngine;
 
-public static class WormSectionBuilder
+using Game.Core.Random;
+using Game.Gameplay.Enemy.Worm.Balance;
+using Game.Gameplay.Enemy.Worm.Combat;
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Enemy.Worm
 {
-    public static List<WormSection> BuildSections(
-        List<WormSegment> segments,
-        IRandomSource randomSource,
-        IReadOnlyList<CocoonRewardProfile> cocoonProfiles = null)
+    using System.Collections.Generic;
+    using UnityEngine;
+
+    public static class WormSectionBuilder
     {
-        List<WormSection> sections = new();
-        List<WormSegment> buffer = new();
-
-        int sectionIndex = 0;
-        int sectionsWithoutCocoon = 0;
-        int totalSections = CountGameplaySections(segments);
-
-        for (int i = 0; i < segments.Count; i++)
+        public static List<WormSection> BuildSections(
+            List<WormSegment> segments,
+            IRandomSource randomSource,
+            IReadOnlyList<CocoonRewardProfile> cocoonProfiles = null)
         {
-            WormSegment seg = segments[i];
+            List<WormSection> sections = new();
+            List<WormSegment> buffer = new();
 
-            if (seg.Type is WormSegmentType.Head or WormSegmentType.Tail)
-                continue;
+            int sectionIndex = 0;
+            int sectionsWithoutCocoon = 0;
+            int totalSections = CountGameplaySections(segments);
 
-            buffer.Add(seg);
+            for (int i = 0; i < segments.Count; i++)
+            {
+                WormSegment seg = segments[i];
 
-            if (buffer.Count == WormCocoonRules.SectionSize)
+                if (seg.Type is WormSegmentType.Head or WormSegmentType.Tail)
+                    continue;
+
+                buffer.Add(seg);
+
+                if (buffer.Count == WormCocoonRules.SectionSize)
+                {
+                    CreateSection(
+                        buffer,
+                        sections,
+                        sectionIndex,
+                        totalSections,
+                        cocoonProfiles,
+                        randomSource,
+                        ref sectionsWithoutCocoon);
+
+                    buffer.Clear();
+                    sectionIndex++;
+                }
+            }
+
+            if (buffer.Count > 0)
             {
                 CreateSection(
                     buffer,
@@ -34,142 +58,128 @@ public static class WormSectionBuilder
                     cocoonProfiles,
                     randomSource,
                     ref sectionsWithoutCocoon);
-
-                buffer.Clear();
-                sectionIndex++;
             }
+
+            return sections;
         }
 
-        if (buffer.Count > 0)
+        private static void CreateSection(
+            List<WormSegment> buffer,
+            List<WormSection> sections,
+            int sectionIndex,
+            int totalSections,
+            IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+            IRandomSource randomSource,
+            ref int sectionsWithoutCocoon)
         {
-            CreateSection(
+            WormSection section = new();
+
+            for (int i = 0; i < buffer.Count; i++)
+            {
+                section.AddSegment(buffer[i]);
+            }
+
+            TryPlaceCocoon(
                 buffer,
-                sections,
+                section,
                 sectionIndex,
                 totalSections,
                 cocoonProfiles,
                 randomSource,
                 ref sectionsWithoutCocoon);
+
+            sections.Add(section);
         }
 
-        return sections;
-    }
-
-    private static void CreateSection(
-        List<WormSegment> buffer,
-        List<WormSection> sections,
-        int sectionIndex,
-        int totalSections,
-        IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        IRandomSource randomSource,
-        ref int sectionsWithoutCocoon)
-    {
-        WormSection section = new();
-
-        for (int i = 0; i < buffer.Count; i++)
+        private static void TryPlaceCocoon(
+            List<WormSegment> buffer,
+            WormSection section,
+            int sectionIndex,
+            int totalSections,
+            IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+            IRandomSource randomSource,
+            ref int sectionsWithoutCocoon)
         {
-            section.AddSegment(buffer[i]);
+            if (buffer.Count == 0)
+                return;
+
+            if (!WormCocoonRules.TryGetCocoonSegmentIndex(buffer.Count, out int cocoonSegmentIndex))
+            {
+                sectionsWithoutCocoon++;
+                return;
+            }
+
+            WormSegment cocoonSegment = buffer[cocoonSegmentIndex];
+            float sectionProgress = GetSectionProgress(sectionIndex, totalSections);
+            bool spawnCocoon = ShouldPlaceCocoon(
+                sectionIndex,
+                totalSections,
+                sectionProgress,
+                sectionsWithoutCocoon);
+
+            if (!spawnCocoon)
+            {
+                sectionsWithoutCocoon++;
+                return;
+            }
+
+            sectionsWithoutCocoon = 0;
+
+            CocoonRewardProfile profile = RollCocoonProfile(
+                cocoonProfiles,
+                sectionProgress,
+                randomSource);
+            cocoonSegment.EnableCocoon(profile);
+
+            section.SetCocoon(profile);
         }
 
-        TryPlaceCocoon(
-            buffer,
-            section,
-            sectionIndex,
-            totalSections,
-            cocoonProfiles,
-            randomSource,
-            ref sectionsWithoutCocoon);
-
-        sections.Add(section);
-    }
-
-    private static void TryPlaceCocoon(
-        List<WormSegment> buffer,
-        WormSection section,
-        int sectionIndex,
-        int totalSections,
-        IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        IRandomSource randomSource,
-        ref int sectionsWithoutCocoon)
-    {
-        if (buffer.Count == 0)
-            return;
-
-        if (!WormCocoonRules.TryGetCocoonSegmentIndex(buffer.Count, out int cocoonSegmentIndex))
+        private static bool ShouldPlaceCocoon(
+            int sectionIndex,
+            int totalSections,
+            float sectionProgress,
+            int sectionsWithoutCocoon)
         {
-            sectionsWithoutCocoon++;
-            return;
+            return WormCocoonRules.ShouldPlaceCocoon(
+                sectionIndex,
+                totalSections,
+                sectionProgress,
+                sectionsWithoutCocoon);
         }
 
-        WormSegment cocoonSegment = buffer[cocoonSegmentIndex];
-        float sectionProgress = GetSectionProgress(sectionIndex, totalSections);
-        bool spawnCocoon = ShouldPlaceCocoon(
-            sectionIndex,
-            totalSections,
-            sectionProgress,
-            sectionsWithoutCocoon);
-
-        if (!spawnCocoon)
+        private static CocoonRewardProfile RollCocoonProfile(
+            IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+            float sectionProgress,
+            IRandomSource randomSource)
         {
-            sectionsWithoutCocoon++;
-            return;
+            return WormCocoonRules.RollCocoonProfile(
+                cocoonProfiles,
+                sectionProgress,
+                randomSource);
         }
 
-        sectionsWithoutCocoon = 0;
-
-        CocoonRewardProfile profile = RollCocoonProfile(
-            cocoonProfiles,
-            sectionProgress,
-            randomSource);
-        cocoonSegment.EnableCocoon(profile);
-
-        section.SetCocoon(profile);
-    }
-
-    private static bool ShouldPlaceCocoon(
-        int sectionIndex,
-        int totalSections,
-        float sectionProgress,
-        int sectionsWithoutCocoon)
-    {
-        return WormCocoonRules.ShouldPlaceCocoon(
-            sectionIndex,
-            totalSections,
-            sectionProgress,
-            sectionsWithoutCocoon);
-    }
-
-    private static CocoonRewardProfile RollCocoonProfile(
-        IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        float sectionProgress,
-        IRandomSource randomSource)
-    {
-        return WormCocoonRules.RollCocoonProfile(
-            cocoonProfiles,
-            sectionProgress,
-            randomSource);
-    }
-
-    private static int CountGameplaySections(List<WormSegment> segments)
-    {
-        if (segments == null || segments.Count == 0)
-            return 0;
-
-        int gameplaySegmentCount = 0;
-
-        for (int i = 0; i < segments.Count; i++)
+        private static int CountGameplaySections(List<WormSegment> segments)
         {
-            WormSegment segment = segments[i];
+            if (segments == null || segments.Count == 0)
+                return 0;
 
-            if (segment != null && segment.Type is not (WormSegmentType.Head or WormSegmentType.Tail))
-                gameplaySegmentCount++;
+            int gameplaySegmentCount = 0;
+
+            for (int i = 0; i < segments.Count; i++)
+            {
+                WormSegment segment = segments[i];
+
+                if (segment != null && segment.Type is not (WormSegmentType.Head or WormSegmentType.Tail))
+                    gameplaySegmentCount++;
+            }
+
+            return WormCocoonRules.CountGameplaySections(gameplaySegmentCount);
         }
 
-        return WormCocoonRules.CountGameplaySections(gameplaySegmentCount);
+        private static float GetSectionProgress(int sectionIndex, int totalSections)
+        {
+            return WormCocoonRules.GetSectionProgress(sectionIndex, totalSections);
+        }
     }
 
-    private static float GetSectionProgress(int sectionIndex, int totalSections)
-    {
-        return WormCocoonRules.GetSectionProgress(sectionIndex, totalSections);
-    }
 }

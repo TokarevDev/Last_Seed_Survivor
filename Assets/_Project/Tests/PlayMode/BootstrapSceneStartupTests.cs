@@ -1,12 +1,13 @@
 using System.Collections;
-using LastSeed.Infrastructure.Navigation;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Zenject;
 
-namespace LastSeed.Tests.PlayMode
+using Game.Infrastructure.Navigation;
+
+namespace Game.Tests.PlayMode
 {
     public sealed class BootstrapSceneStartupTests
     {

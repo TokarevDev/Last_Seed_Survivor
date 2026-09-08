@@ -1,31 +1,39 @@
-public readonly struct WormFrameContext
+
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Presentation;
+
+namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    public WormFrameContext(
-        RailPath rail,
-        WormForwardMotionSettings forwardMotion,
-        WormSegmentChainLayout segmentLayout,
-        float baseSpeed,
-        float rollbackForwardSpeedMultiplier,
-        float rollbackSpeed,
-        float deltaTime,
-        float unscaledDeltaTime)
+    public readonly struct WormFrameContext
     {
-        Rail = rail;
-        ForwardMotion = forwardMotion;
-        SegmentLayout = segmentLayout;
-        BaseSpeed = baseSpeed;
-        RollbackForwardSpeedMultiplier = rollbackForwardSpeedMultiplier;
-        RollbackSpeed = rollbackSpeed;
-        DeltaTime = deltaTime;
-        UnscaledDeltaTime = unscaledDeltaTime;
+        public WormFrameContext(
+            RailPath rail,
+            WormForwardMotionSettings forwardMotion,
+            WormSegmentChainLayout segmentLayout,
+            float baseSpeed,
+            float rollbackForwardSpeedMultiplier,
+            float rollbackSpeed,
+            float deltaTime,
+            float unscaledDeltaTime)
+        {
+            Rail = rail;
+            ForwardMotion = forwardMotion;
+            SegmentLayout = segmentLayout;
+            BaseSpeed = baseSpeed;
+            RollbackForwardSpeedMultiplier = rollbackForwardSpeedMultiplier;
+            RollbackSpeed = rollbackSpeed;
+            DeltaTime = deltaTime;
+            UnscaledDeltaTime = unscaledDeltaTime;
+        }
+
+        public RailPath Rail { get; }
+        public WormForwardMotionSettings ForwardMotion { get; }
+        public WormSegmentChainLayout SegmentLayout { get; }
+        public float BaseSpeed { get; }
+        public float RollbackForwardSpeedMultiplier { get; }
+        public float RollbackSpeed { get; }
+        public float DeltaTime { get; }
+        public float UnscaledDeltaTime { get; }
     }
 
-    public RailPath Rail { get; }
-    public WormForwardMotionSettings ForwardMotion { get; }
-    public WormSegmentChainLayout SegmentLayout { get; }
-    public float BaseSpeed { get; }
-    public float RollbackForwardSpeedMultiplier { get; }
-    public float RollbackSpeed { get; }
-    public float DeltaTime { get; }
-    public float UnscaledDeltaTime { get; }
 }

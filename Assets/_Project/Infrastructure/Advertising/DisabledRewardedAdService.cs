@@ -1,11 +1,15 @@
-using System;
-
-public sealed class DisabledRewardedAdService : IRewardedAdService
+namespace Game.Infrastructure.Advertising
 {
-    public bool IsReady => false;
+    using System;
 
-    public void ShowRewardedAd(Action<bool> onCompleted)
+    public sealed class DisabledRewardedAdService : IRewardedAdService
     {
-        onCompleted?.Invoke(false);
+        public bool IsReady => false;
+
+        public void ShowRewardedAd(Action<bool> onCompleted)
+        {
+            onCompleted?.Invoke(false);
+        }
     }
+
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace LastSeed.Core.Combat
+namespace Game.Core.Combat
 {
     public sealed class Health
     {

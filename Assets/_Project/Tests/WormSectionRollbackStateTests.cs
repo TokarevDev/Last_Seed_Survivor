@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Enemy.Worm.Movement;
+
+namespace Game.Tests
 {
     public sealed class WormSectionRollbackStateTests
     {

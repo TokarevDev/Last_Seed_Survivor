@@ -1,4 +1,8 @@
-public interface IDamageable<TDamage>
+namespace Game.Core.Combat
 {
-    void TakeDamage(in TDamage damage);
+    public interface IDamageable<TDamage>
+    {
+        void TakeDamage(in TDamage damage);
+    }
+
 }

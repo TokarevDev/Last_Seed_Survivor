@@ -225,6 +225,6 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6bf798e8da5b39e4881a3c37a5df26c6, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormDamagePopupView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormDamagePopupView
   _text: {fileID: 7416272702734101614}
   _duration: 0.6

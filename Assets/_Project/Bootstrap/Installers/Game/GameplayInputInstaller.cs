@@ -1,10 +1,10 @@
-using LastSeed.Core.Input;
-using LastSeed.Gameplay.Input;
-using LastSeed.Infrastructure.Input;
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Gameplay.Input;
+using Game.Infrastructure.Input;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class GameplayInputInstaller : MonoInstaller
     {

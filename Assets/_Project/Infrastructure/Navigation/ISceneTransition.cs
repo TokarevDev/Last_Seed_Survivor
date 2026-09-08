@@ -1,7 +1,7 @@
 using System.Threading;
 using Cysharp.Threading.Tasks;
 
-namespace LastSeed.Infrastructure.Navigation
+namespace Game.Infrastructure.Navigation
 {
     public interface ISceneTransition
     {

@@ -1,6 +1,8 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Tests
 {
     public sealed class WeaponShotPatternStateTests
     {

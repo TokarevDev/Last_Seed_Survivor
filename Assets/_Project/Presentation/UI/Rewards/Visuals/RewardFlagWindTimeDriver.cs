@@ -1,22 +1,26 @@
-using UnityEngine;
-
-[DisallowMultipleComponent]
-public sealed class RewardFlagWindTimeDriver : MonoBehaviour
+namespace Game.Presentation.UI.Rewards.Visuals
 {
-    private static readonly int RewardFlagWindTimeId = Shader.PropertyToID("_RewardFlagWindTime");
+    using UnityEngine;
 
-    private void OnEnable()
+    [DisallowMultipleComponent]
+    public sealed class RewardFlagWindTimeDriver : MonoBehaviour
     {
-        UpdateShaderTime();
+        private static readonly int RewardFlagWindTimeId = Shader.PropertyToID("_RewardFlagWindTime");
+
+        private void OnEnable()
+        {
+            UpdateShaderTime();
+        }
+
+        private void LateUpdate()
+        {
+            UpdateShaderTime();
+        }
+
+        private static void UpdateShaderTime()
+        {
+            Shader.SetGlobalFloat(RewardFlagWindTimeId, Time.unscaledTime);
+        }
     }
 
-    private void LateUpdate()
-    {
-        UpdateShaderTime();
-    }
-
-    private static void UpdateShaderTime()
-    {
-        Shader.SetGlobalFloat(RewardFlagWindTimeId, Time.unscaledTime);
-    }
 }

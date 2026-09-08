@@ -1,7 +1,8 @@
-using LastSeed.Core.Timing;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.Timing;
+
+namespace Game.Tests
 {
     public sealed class CountdownTimerTests
     {

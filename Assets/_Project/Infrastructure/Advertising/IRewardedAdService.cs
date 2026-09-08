@@ -1,8 +1,12 @@
-using System;
-
-public interface IRewardedAdService
+namespace Game.Infrastructure.Advertising
 {
-    bool IsReady { get; }
+    using System;
 
-    void ShowRewardedAd(Action<bool> onCompleted);
+    public interface IRewardedAdService
+    {
+        bool IsReady { get; }
+
+        void ShowRewardedAd(Action<bool> onCompleted);
+    }
+
 }

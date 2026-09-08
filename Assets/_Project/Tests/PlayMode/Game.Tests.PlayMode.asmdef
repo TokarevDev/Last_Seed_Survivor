@@ -1,17 +1,15 @@
 {
-  "name": "LastSeed.Tests",
-  "rootNamespace": "LastSeed.Tests",
+  "name": "Game.Tests.PlayMode",
+  "rootNamespace": "Game.Tests.PlayMode",
   "references": [
-    "LastSeed.Core",
-    "LastSeed.Gameplay",
-    "LastSeed.Infrastructure",
-    "LastSeed.Presentation",
-    "LastSeed.Editor",
-    "UniTask"
+    "Game.Core",
+    "Game.Gameplay",
+    "Game.Infrastructure",
+    "Game.Presentation",
+    "Game.Bootstrap",
+    "Zenject"
   ],
-  "includePlatforms": [
-    "Editor"
-  ],
+  "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
   "overrideReferences": false,

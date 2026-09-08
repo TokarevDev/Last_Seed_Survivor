@@ -1,7 +1,7 @@
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.GameplayLoop
+namespace Game.Bootstrap.GameplayLoop
 {
     [DisallowMultipleComponent]
     public sealed class GameplayUpdateDriver : MonoBehaviour

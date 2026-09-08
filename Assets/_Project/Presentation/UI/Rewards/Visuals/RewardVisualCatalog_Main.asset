@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ac4b6568c214e4a9a20bd8d729bb002, type: 3}
   m_Name: RewardVisualCatalog_Main
-  m_EditorClassIdentifier: Assembly-CSharp::RewardVisualCatalog
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.Visuals.RewardVisualCatalog
   _fallbackIconProfile: {fileID: 11400000, guid: 8bda4583e7c348d8b044b3431adb2010, type: 2}
   _rules:
   - _category: 1

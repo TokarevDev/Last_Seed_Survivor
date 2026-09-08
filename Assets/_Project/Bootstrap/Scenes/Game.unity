@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd12eb24bd05f84ca7a80fb7950abaf, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::RewardInstaller
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.RewardInstaller
   _database: {fileID: 11400000, guid: bafb328ff8286024f9f6854a598d8d25, type: 2}
   _popup: {fileID: 656578156}
   _popupRoot: {fileID: 1474514291}
@@ -233,7 +233,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 195711e49e371794aa5cefe1ad087694, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::WormController
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.WormController
   _rail: {fileID: 192453719}
   _movementConfig: {fileID: 11400000, guid: c6ef0e8ca3b44d17a4cdf44fc52db038, type: 2}
 --- !u!114 &91581457
@@ -247,7 +247,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: de842bcb64240634d87970b0d3ff1d4e, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::WormCombatController
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.Combat.WormCombatController
   _wormController: {fileID: 91581456}
 --- !u!114 &91581458
 MonoBehaviour:
@@ -260,7 +260,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 30f272d7b93f4f2bbf624c52ea343c25, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::WormPressureDirector
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormPressureDirector
   _wormController: {fileID: 91581456}
   _wormSpawner: {fileID: 91581455}
   _config: {fileID: 11400000, guid: f4fdc2588a7a4e6bb52610d93c58f5d9, type: 2}
@@ -275,7 +275,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b2c5b62ff9d74c5a982f5cb21b958a69, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Assembly-CSharp::WormReviveFlowController
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Revive.WormReviveFlowController
   _wormController: {fileID: 91581456}
   _wormCombat: {fileID: 91581457}
   _projectilePoolRegistry: {fileID: 550759621}
@@ -301,7 +301,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 244a545b1b224063a0a52dacee3b2791, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ImmediateRewardedAdService
+  m_EditorClassIdentifier: Game.Infrastructure::Game.Infrastructure.Advertising.ImmediateRewardedAdService
   _grantReward: 1
   _allowInPlayerBuilds: 1
 --- !u!114 &91581461
@@ -315,7 +315,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 63fb4d2f0c7341bd92b9f4a83ce121be, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormVictoryPopupController
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Combat.WormVictoryPopupController
   _victoryPopupId: WinPopup
 --- !u!114 &91581462
 MonoBehaviour:
@@ -328,7 +328,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cb622ea918d548c8919d63d4c2936918, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameplayRunRestarter
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.GameplayRunRestarter
   _wormSpawner: {fileID: 91581455}
   _pressureDirector: {fileID: 91581458}
   _engagementController: {fileID: 659970389}
@@ -371,7 +371,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a18229b934c2b1342b44fe1a31ca7509, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.GameWorldInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.GameWorldInstaller
   _worldCamera: {fileID: 519420031}
 --- !u!114 &141515089
 MonoBehaviour:
@@ -440,7 +440,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4ea87ea621b7b4f4fbdf0c26f51777d8, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.GameplayLoopInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.GameplayLoopInstaller
 --- !u!114 &141515092
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,7 +452,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53f1fd366b69fff4f88648c2958074e1, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.GameplayInputInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.GameplayInputInstaller
   _playerInputSnapshotProvider: {fileID: 501089293}
 --- !u!114 &141515093
 MonoBehaviour:
@@ -465,7 +465,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 347ada60645ce2c45b62030e6111d64f, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.ProjectilePoolInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.ProjectilePoolInstaller
   _projectilePoolRegistry: {fileID: 550759621}
 --- !u!114 &141515094
 MonoBehaviour:
@@ -478,7 +478,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3380e1e1f5b7f254e87052df131713af, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.PlayerInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.PlayerInstaller
   _playerMover: {fileID: 501089290}
   _projectileWeapon: {fileID: 501089295}
   _acaciaThornWeapon: {fileID: 501089296}
@@ -495,7 +495,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 73b5e527d43289d4d8e81208414c4986, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.GameSessionInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.GameSessionInstaller
 --- !u!114 &141515097
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -507,7 +507,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af0fc3e478a306542bf5761695683895, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.WormInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.WormInstaller
   _wormSpawner: {fileID: 91581455}
   _wormController: {fileID: 91581456}
   _wormCombatController: {fileID: 91581457}
@@ -534,7 +534,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7401c3494cf5c2648b4f1d4e9465b1de, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.GameSignalsInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.GameSignalsInstaller
 --- !u!1 &192453717
 GameObject:
   m_ObjectHideFlags: 0
@@ -578,7 +578,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6dbbfa34707c4e4d8282cc3a9f977a0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RailPath
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.RailPath
   _localPoints:
   - {x: -6.236545, y: 10.276214, z: 0}
   - {x: -3.9175959, y: 8.336381, z: 0}
@@ -657,7 +657,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb4a14c2e10443729b70668aebd3d3ae, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RevivalPopupView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.Popups.RevivalPopupView
 --- !u!1 &291622616
 GameObject:
   m_ObjectHideFlags: 0
@@ -944,7 +944,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7c2f3bb0411b4b319d58589e8ad6a74d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormProgressPresenter
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormProgressPresenter
   _text: {fileID: 352036266}
   _format: 'Progress: {0}%'
 --- !u!1 &459544096
@@ -1112,7 +1112,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c1cc985e8456b84bb9ad66447242b4f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: LastSeed.Infrastructure::LastSeed.Infrastructure.Input.PlayerInputSnapshotProvider
+  m_EditorClassIdentifier: Game.Infrastructure::Game.Infrastructure.Input.PlayerInputSnapshotProvider
   _enableTouchDrag: 1
 --- !u!114 &501089295
 MonoBehaviour:
@@ -1125,7 +1125,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ef2170b5c89da442a0caa026eb75843, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileWeapon
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Weapons.ProjectileWeapon.ProjectileWeapon
   _maxShots: 200
 --- !u!114 &501089296
 MonoBehaviour:
@@ -1138,7 +1138,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6e5b4a3d2f1478a9b0c1d2e3f4a5b6c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AcaciaThornWeapon
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.AcaciaThornWeapon
   _config: {fileID: 11400000, guid: 8a6c1d4e9b2f4c6a8d0e1f3a5b7c9d02, type: 2}
 --- !u!1 &519420028
 GameObject:
@@ -1488,7 +1488,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8394bd4dc4db1c04483665ea055c5178, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PoolRegistry
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Pooling.PoolRegistry
   _poolPrefab: {fileID: 4839739025572614865, guid: 0d12f2dd7b3cc744aa550fb814ad0c1d, type: 3}
 --- !u!4 &550759622
 Transform:
@@ -1604,7 +1604,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 791cf4cb3b8157749b36f13098253104, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RewardPopupView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.RewardPopupView
 --- !u!1 &659970386
 GameObject:
   m_ObjectHideFlags: 0
@@ -1695,7 +1695,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ab3106b3e6641734ab096279a7e5ecfb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormEngagementController
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormEngagementController
 --- !u!1 &993268171
 GameObject:
   m_ObjectHideFlags: 0
@@ -1783,7 +1783,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67ebdfbaf0b24a11853eec32db5ac630, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SceneFadeOverlay
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.SceneFadeOverlay
   _targetImage: {fileID: 993268173}
   _fadeDuration: 2
   _fadeEase: 4
@@ -1951,7 +1951,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f92bd8a20a1e06a4385876a99c5ae61d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSectionHpPresenter
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormSectionHpPresenter
   _viewPrefab: {fileID: 1697859042261885250, guid: 1fbd087b73062d74a8ce9b21b7d4490d, type: 3}
   _root: {fileID: 1262977639}
 --- !u!4 &1262977639
@@ -2095,7 +2095,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a8f0e0e8713f4c9ba58d0cf60a2fc2f1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponAutoAttackAnimator
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Player.WeaponAutoAttackAnimator
   _animator: {fileID: 1286495985}
   _attackStateName: Weapon
   _baseAnimationDuration: 1.1
@@ -2371,7 +2371,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a7f3d14f50743e8b6e676c4ff3a2c0d, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GameplayBackToLobbyButton
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.GameplayBackToLobbyButton
   _button: {fileID: 1373149270}
 --- !u!1 &1474514289
 GameObject:
@@ -2423,7 +2423,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05dda196a0bd4528a71468fa515577ad, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PopupRoot
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.Popups.PopupRoot
   _popups:
   - {fileID: 271019425}
   - {fileID: 656578156}
@@ -2459,7 +2459,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 813858900e91ff448af6b436c29894e9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormDamagePopupPresenter
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormDamagePopupPresenter
   _popupPrefab: {fileID: 6859803841460623452, guid: 39064a594808ef143b34b501a0ab4629, type: 3}
   _initialPoolSize: 100
   _normalPopupLimit: 4
@@ -2581,7 +2581,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b64a9439f96498fbfe2f0c4cf5ff027, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WinPopupView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.Popups.WinPopupView
 --- !u!1 &2134843958
 GameObject:
   m_ObjectHideFlags: 0
@@ -2687,7 +2687,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d503ad5c88354fbca6c1987c7957056c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerVisualController
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Player.PlayerVisualController
   _flipThreshold: 0.05
 --- !u!95 &2134843962
 Animator:

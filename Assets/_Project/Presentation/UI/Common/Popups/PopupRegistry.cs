@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using LastSeed.Core.Collections;
+using Game.Core.Collections;
 
-namespace LastSeed.Presentation.UI.Popups
+namespace Game.Presentation.UI.Common.Popups
 {
     public enum PopupRegistrationResult
     {

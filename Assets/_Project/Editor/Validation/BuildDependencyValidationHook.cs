@@ -1,7 +1,7 @@
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 
-namespace LastSeed.Editor.Validation
+namespace Game.Editor.Validation
 {
     public sealed class BuildDependencyValidationHook : IPreprocessBuildWithReport
     {

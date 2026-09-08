@@ -1,179 +1,191 @@
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using UnityEngine;
 
-public sealed class WormSpawnLifecycle
+using Game.Core.Random;
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Balance;
+using Game.Gameplay.Enemy.Worm.Combat;
+using Game.Gameplay.Enemy.Worm.Presentation;
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Enemy.Worm.Spawning
 {
-    private readonly WormSegmentPool _segmentPool;
-    private readonly WormFactory _wormFactory;
-    private readonly WormSpawnSettings _settings;
-    private readonly WormAdaptiveHpController _adaptiveHpController;
-    private readonly WormController _wormController;
-    private readonly WormCombatController _wormCombat;
-    private readonly IWormSectionHealthPresentation _hpPresentation;
-    private readonly IWormFaceBurstPresentation _faceBurstPresenter;
-    private readonly IRandomSource _randomSource;
-    private readonly List<WormSegment> _activeSegments = new();
-    private readonly List<WormSection> _activeSections = new();
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using UnityEngine;
 
-    private WormSegment _head;
-
-    public WormSpawnLifecycle(
-        WormSegmentPool segmentPool,
-        WormFactory wormFactory,
-        WormSpawnSettings settings,
-        WormAdaptiveHpController adaptiveHpController,
-        WormController wormController,
-        WormCombatController wormCombat,
-        IWormSectionHealthPresentation hpPresentation,
-        IWormFaceBurstPresentation faceBurstPresenter,
-        IRandomSource randomSource)
+    public sealed class WormSpawnLifecycle
     {
-        _segmentPool = segmentPool ?? throw new ArgumentNullException(nameof(segmentPool));
-        _wormFactory = wormFactory ?? throw new ArgumentNullException(nameof(wormFactory));
-        _settings = settings ?? throw new ArgumentNullException(nameof(settings));
-        _adaptiveHpController = adaptiveHpController ??
-            throw new ArgumentNullException(nameof(adaptiveHpController));
-        _wormController = wormController ?? throw new ArgumentNullException(nameof(wormController));
-        _wormCombat = wormCombat ?? throw new ArgumentNullException(nameof(wormCombat));
-        _hpPresentation = hpPresentation ??
-            throw new ArgumentNullException(nameof(hpPresentation));
-        _faceBurstPresenter = faceBurstPresenter ??
-            throw new ArgumentNullException(nameof(faceBurstPresenter));
-        _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
-    }
+        private readonly WormSegmentPool _segmentPool;
+        private readonly WormFactory _wormFactory;
+        private readonly WormSpawnSettings _settings;
+        private readonly WormAdaptiveHpController _adaptiveHpController;
+        private readonly WormController _wormController;
+        private readonly WormCombatController _wormCombat;
+        private readonly IWormSectionHealthPresentation _hpPresentation;
+        private readonly IWormFaceBurstPresentation _faceBurstPresenter;
+        private readonly IRandomSource _randomSource;
+        private readonly List<WormSegment> _activeSegments = new();
+        private readonly List<WormSection> _activeSections = new();
 
-    public bool IsSpawned { get; private set; }
+        private WormSegment _head;
 
-    public UniTask PrewarmAsync(CancellationToken cancellationToken)
-    {
-        return _segmentPool.PrewarmAsync(
-            _settings.BodyPoolCapacity,
-            _settings.PrewarmBatchSize,
-            cancellationToken);
-    }
-
-    public void Spawn(
-        IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        float currentTime)
-    {
-        if (IsSpawned)
-            return;
-
-        List<WormSegment> segments = null;
-        List<WormSection> sections = null;
-        WormSegment head = null;
-        WormSegment tail = null;
-
-        try
+        public WormSpawnLifecycle(
+            WormSegmentPool segmentPool,
+            WormFactory wormFactory,
+            WormSpawnSettings settings,
+            WormAdaptiveHpController adaptiveHpController,
+            WormController wormController,
+            WormCombatController wormCombat,
+            IWormSectionHealthPresentation hpPresentation,
+            IWormFaceBurstPresentation faceBurstPresenter,
+            IRandomSource randomSource)
         {
-            segments = CreateSegmentViews(out head, out tail);
-            sections = BuildSectionModels(segments, cocoonProfiles, currentTime);
-            BindGameplayAndPresentation(segments, sections, head, tail);
-            CommitSpawn(segments, sections, head);
+            _segmentPool = segmentPool ?? throw new ArgumentNullException(nameof(segmentPool));
+            _wormFactory = wormFactory ?? throw new ArgumentNullException(nameof(wormFactory));
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _adaptiveHpController = adaptiveHpController ??
+                throw new ArgumentNullException(nameof(adaptiveHpController));
+            _wormController = wormController ?? throw new ArgumentNullException(nameof(wormController));
+            _wormCombat = wormCombat ?? throw new ArgumentNullException(nameof(wormCombat));
+            _hpPresentation = hpPresentation ??
+                throw new ArgumentNullException(nameof(hpPresentation));
+            _faceBurstPresenter = faceBurstPresenter ??
+                throw new ArgumentNullException(nameof(faceBurstPresenter));
+            _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
         }
-        catch
+
+        public bool IsSpawned { get; private set; }
+
+        public UniTask PrewarmAsync(CancellationToken cancellationToken)
         {
-            RollbackFailedSpawn(segments, currentTime);
-            throw;
+            return _segmentPool.PrewarmAsync(
+                _settings.BodyPoolCapacity,
+                _settings.PrewarmBatchSize,
+                cancellationToken);
+        }
+
+        public void Spawn(
+            IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+            float currentTime)
+        {
+            if (IsSpawned)
+                return;
+
+            List<WormSegment> segments = null;
+            List<WormSection> sections = null;
+            WormSegment head = null;
+            WormSegment tail = null;
+
+            try
+            {
+                segments = CreateSegmentViews(out head, out tail);
+                sections = BuildSectionModels(segments, cocoonProfiles, currentTime);
+                BindGameplayAndPresentation(segments, sections, head, tail);
+                CommitSpawn(segments, sections, head);
+            }
+            catch
+            {
+                RollbackFailedSpawn(segments, currentTime);
+                throw;
+            }
+        }
+
+        public void Despawn(float currentTime)
+        {
+            UnbindGameplayAndPresentation();
+            ReleaseSegments(_activeSegments);
+            _activeSegments.Clear();
+            _activeSections.Clear();
+            _adaptiveHpController.Reset(currentTime);
+            _head = null;
+            IsSpawned = false;
+        }
+
+        public void RebindFacePresentation()
+        {
+            if (IsSpawned)
+                _faceBurstPresenter.Bind(_head?.FaceVisual);
+        }
+
+        public void UnbindFacePresentation()
+        {
+            _faceBurstPresenter.Unbind();
+        }
+
+        private List<WormSegment> CreateSegmentViews(
+            out WormSegment head,
+            out WormSegment tail)
+        {
+            List<WormPatternEntry> pattern =
+                WormPatternBuilder.BuildPattern(_settings.SectionCount, _randomSource);
+
+            return _wormFactory.CreateSegments(pattern, out head, out tail);
+        }
+
+        private List<WormSection> BuildSectionModels(
+            List<WormSegment> segments,
+            IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+            float currentTime)
+        {
+            List<WormSection> sections =
+                WormSectionBuilder.BuildSections(segments, _randomSource, cocoonProfiles);
+
+            _adaptiveHpController.InitializeSections(sections, currentTime);
+            return sections;
+        }
+
+        private void BindGameplayAndPresentation(
+            List<WormSegment> segments,
+            List<WormSection> sections,
+            WormSegment head,
+            WormSegment tail)
+        {
+            _wormFactory.AttachDamageReceivers(segments, _wormCombat);
+            _wormController.Init(segments);
+            _faceBurstPresenter.Bind(head.FaceVisual);
+            _wormCombat.Init(head, tail, sections);
+            _hpPresentation.BindSections(sections);
+        }
+
+        private void CommitSpawn(
+            List<WormSegment> segments,
+            List<WormSection> sections,
+            WormSegment head)
+        {
+            _activeSegments.AddRange(segments);
+            _activeSections.AddRange(sections);
+            _head = head;
+            IsSpawned = true;
+        }
+
+        private void RollbackFailedSpawn(
+            List<WormSegment> rentedSegments,
+            float currentTime)
+        {
+            UnbindGameplayAndPresentation();
+            ReleaseSegments(rentedSegments);
+            _adaptiveHpController.Reset(currentTime);
+            _head = null;
+            IsSpawned = false;
+        }
+
+        private void UnbindGameplayAndPresentation()
+        {
+            _hpPresentation.Clear();
+            _wormCombat.Clear();
+            _faceBurstPresenter.Unbind();
+            _wormController.ClearWorm();
+        }
+
+        private void ReleaseSegments(IReadOnlyList<WormSegment> segments)
+        {
+            if (segments == null)
+                return;
+
+            for (int index = segments.Count - 1; index >= 0; index--)
+                _segmentPool.Release(segments[index]);
         }
     }
 
-    public void Despawn(float currentTime)
-    {
-        UnbindGameplayAndPresentation();
-        ReleaseSegments(_activeSegments);
-        _activeSegments.Clear();
-        _activeSections.Clear();
-        _adaptiveHpController.Reset(currentTime);
-        _head = null;
-        IsSpawned = false;
-    }
-
-    public void RebindFacePresentation()
-    {
-        if (IsSpawned)
-            _faceBurstPresenter.Bind(_head?.FaceVisual);
-    }
-
-    public void UnbindFacePresentation()
-    {
-        _faceBurstPresenter.Unbind();
-    }
-
-    private List<WormSegment> CreateSegmentViews(
-        out WormSegment head,
-        out WormSegment tail)
-    {
-        List<WormPatternEntry> pattern =
-            WormPatternBuilder.BuildPattern(_settings.SectionCount, _randomSource);
-
-        return _wormFactory.CreateSegments(pattern, out head, out tail);
-    }
-
-    private List<WormSection> BuildSectionModels(
-        List<WormSegment> segments,
-        IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        float currentTime)
-    {
-        List<WormSection> sections =
-            WormSectionBuilder.BuildSections(segments, _randomSource, cocoonProfiles);
-
-        _adaptiveHpController.InitializeSections(sections, currentTime);
-        return sections;
-    }
-
-    private void BindGameplayAndPresentation(
-        List<WormSegment> segments,
-        List<WormSection> sections,
-        WormSegment head,
-        WormSegment tail)
-    {
-        _wormFactory.AttachDamageReceivers(segments, _wormCombat);
-        _wormController.Init(segments);
-        _faceBurstPresenter.Bind(head.FaceVisual);
-        _wormCombat.Init(head, tail, sections);
-        _hpPresentation.BindSections(sections);
-    }
-
-    private void CommitSpawn(
-        List<WormSegment> segments,
-        List<WormSection> sections,
-        WormSegment head)
-    {
-        _activeSegments.AddRange(segments);
-        _activeSections.AddRange(sections);
-        _head = head;
-        IsSpawned = true;
-    }
-
-    private void RollbackFailedSpawn(
-        List<WormSegment> rentedSegments,
-        float currentTime)
-    {
-        UnbindGameplayAndPresentation();
-        ReleaseSegments(rentedSegments);
-        _adaptiveHpController.Reset(currentTime);
-        _head = null;
-        IsSpawned = false;
-    }
-
-    private void UnbindGameplayAndPresentation()
-    {
-        _hpPresentation.Clear();
-        _wormCombat.Clear();
-        _faceBurstPresenter.Unbind();
-        _wormController.ClearWorm();
-    }
-
-    private void ReleaseSegments(IReadOnlyList<WormSegment> segments)
-    {
-        if (segments == null)
-            return;
-
-        for (int index = segments.Count - 1; index >= 0; index--)
-            _segmentPool.Release(segments[index]);
-    }
 }

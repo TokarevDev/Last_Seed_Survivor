@@ -1,16 +1,20 @@
-public readonly struct DamageInfo
+namespace Game.Core.Combat
 {
-    public readonly int Amount;
-    public readonly DamageKind Kind;
-    public readonly bool IsCritical;
-
-    public DamageInfo(
-        int amount,
-        DamageKind kind = DamageKind.Normal,
-        bool isCritical = false)
+    public readonly struct DamageInfo
     {
-        Amount = amount;
-        Kind = kind;
-        IsCritical = isCritical;
+        public readonly int Amount;
+        public readonly DamageKind Kind;
+        public readonly bool IsCritical;
+
+        public DamageInfo(
+            int amount,
+            DamageKind kind = DamageKind.Normal,
+            bool isCritical = false)
+        {
+            Amount = amount;
+            Kind = kind;
+            IsCritical = isCritical;
+        }
     }
+
 }

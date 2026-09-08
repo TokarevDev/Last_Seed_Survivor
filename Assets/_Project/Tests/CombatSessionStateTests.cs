@@ -1,7 +1,8 @@
-using LastSeed.Gameplay.Combat;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Combat;
+
+namespace Game.Tests
 {
     public sealed class CombatSessionStateTests
     {

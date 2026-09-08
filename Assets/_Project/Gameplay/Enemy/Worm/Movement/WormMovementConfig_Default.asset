@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0ec6a25cb04bf5448ab28550cd1b603f, type: 3}
   m_Name: WormMovementConfig_Default
-  m_EditorClassIdentifier: LastSeed.Gameplay::WormMovementConfig
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.Movement.WormMovementConfig
   _baseSpeed: 1.2
   _catchUpRailPointIndex: 3
   _catchUpSpeed: 3

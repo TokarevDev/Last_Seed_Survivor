@@ -525,7 +525,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8953fd58d2e444a49b1c0c8d0f5fbd97, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RewardButtonView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.RewardButtonView
   _button: {fileID: 241297247517385720}
   _canvasGroup: {fileID: 910000000000020002}
   _targetIcon: {fileID: 910000000000000004}
@@ -920,7 +920,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8953fd58d2e444a49b1c0c8d0f5fbd97, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RewardButtonView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.RewardButtonView
   _button: {fileID: 9050914005550791263}
   _canvasGroup: {fileID: 910000000000020003}
   _targetIcon: {fileID: 626418460445576790}
@@ -2212,7 +2212,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 791cf4cb3b8157749b36f13098253104, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RewardPopupView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.RewardPopupView
   _popupId: RewardPopup
   _root: {fileID: 3733543865146059221}
   _buttons:
@@ -3987,7 +3987,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8953fd58d2e444a49b1c0c8d0f5fbd97, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RewardButtonView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.RewardButtonView
   _button: {fileID: 128030492513837610}
   _canvasGroup: {fileID: 910000000000020004}
   _targetIcon: {fileID: 3749175231226524252}

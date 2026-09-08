@@ -1,7 +1,10 @@
-public interface IScreenBounds
+namespace Game.Core.World
 {
-    float Left { get; }
-    float Right { get; }
-    float Top { get; }
-    float Bottom { get; }
+    public interface IScreenBounds
+    {
+        float Left { get; }
+        float Right { get; }
+        float Top { get; }
+        float Bottom { get; }
+    }
 }

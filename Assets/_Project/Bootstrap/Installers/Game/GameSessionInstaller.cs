@@ -1,7 +1,8 @@
-using LastSeed.Gameplay.Combat;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Gameplay.Combat;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class GameSessionInstaller : MonoInstaller
     {

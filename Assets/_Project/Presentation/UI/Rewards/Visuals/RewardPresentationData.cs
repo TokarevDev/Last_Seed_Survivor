@@ -1,13 +1,17 @@
-public readonly struct RewardPresentationData
+namespace Game.Presentation.UI.Rewards.Visuals
 {
-    public RewardPresentationData(
-        RewardIconProfile iconProfile,
-        RewardPresentationKind kind)
+    public readonly struct RewardPresentationData
     {
-        IconProfile = iconProfile;
-        Kind = kind;
+        public RewardPresentationData(
+            RewardIconProfile iconProfile,
+            RewardPresentationKind kind)
+        {
+            IconProfile = iconProfile;
+            Kind = kind;
+        }
+
+        public RewardIconProfile IconProfile { get; }
+        public RewardPresentationKind Kind { get; }
     }
 
-    public RewardIconProfile IconProfile { get; }
-    public RewardPresentationKind Kind { get; }
 }

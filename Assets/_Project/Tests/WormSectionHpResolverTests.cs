@@ -1,6 +1,8 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Enemy.Worm.Balance;
+
+namespace Game.Tests
 {
     public sealed class WormSectionHpResolverTests
     {

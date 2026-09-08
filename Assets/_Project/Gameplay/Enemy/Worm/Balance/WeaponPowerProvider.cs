@@ -1,18 +1,26 @@
-public sealed class WeaponPowerProvider : IWeaponPowerProvider
+
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+
+namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    private readonly ProjectileWeapon _mainWeapon;
-    private readonly AcaciaThornWeapon _acaciaThornWeapon;
-
-    public WeaponPowerProvider(
-        ProjectileWeapon mainWeapon,
-        AcaciaThornWeapon acaciaThornWeapon)
+    public sealed class WeaponPowerProvider : IWeaponPowerProvider
     {
-        _mainWeapon = mainWeapon;
-        _acaciaThornWeapon = acaciaThornWeapon;
+        private readonly ProjectileWeapon _mainWeapon;
+        private readonly AcaciaThornWeapon _acaciaThornWeapon;
+
+        public WeaponPowerProvider(
+            ProjectileWeapon mainWeapon,
+            AcaciaThornWeapon acaciaThornWeapon)
+        {
+            _mainWeapon = mainWeapon;
+            _acaciaThornWeapon = acaciaThornWeapon;
+        }
+
+        public WeaponPowerSnapshot GetCurrentPower()
+        {
+            return WeaponPowerEstimator.Estimate(_mainWeapon, _acaciaThornWeapon);
+        }
     }
 
-    public WeaponPowerSnapshot GetCurrentPower()
-    {
-        return WeaponPowerEstimator.Estimate(_mainWeapon, _acaciaThornWeapon);
-    }
 }

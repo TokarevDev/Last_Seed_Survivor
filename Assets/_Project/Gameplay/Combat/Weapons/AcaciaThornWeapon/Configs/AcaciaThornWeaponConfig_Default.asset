@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b9d3a4f8e7c94a9c8a6f2d8b4e1c7a31, type: 3}
   m_Name: AcaciaThornWeaponConfig_Default
-  m_EditorClassIdentifier: Assembly-CSharp::AcaciaThornWeaponConfig
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs.AcaciaThornWeaponConfig
   ProjectilePrefab: {fileID: 2859308452093847102, guid: 91a8b7c6d5e44f3a9b0c1d2e3f4a5b6c, type: 3}
   Damage: 6
   Cooldown: 3

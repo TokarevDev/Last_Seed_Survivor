@@ -1,11 +1,15 @@
-public interface IWormFaceBurstPresentation
+namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    void Bind(IWormFaceBurstView faceView);
+    public interface IWormFaceBurstPresentation
+    {
+        void Bind(IWormFaceBurstView faceView);
 
-    void Unbind();
-}
+        void Unbind();
+    }
 
-public interface IWormFaceBurstView
-{
-    void SetBoostActive(bool isActive);
+    public interface IWormFaceBurstView
+    {
+        void SetBoostActive(bool isActive);
+    }
+
 }

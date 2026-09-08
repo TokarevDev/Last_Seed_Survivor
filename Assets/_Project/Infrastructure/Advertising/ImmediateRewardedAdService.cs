@@ -1,41 +1,46 @@
-using System;
-using UnityEngine;
 
-[DisallowMultipleComponent]
-public sealed class ImmediateRewardedAdService : RewardedAdService
+namespace Game.Infrastructure.Advertising
 {
-    [SerializeField] private bool _grantReward = true;
-    [SerializeField] private bool _allowInPlayerBuilds = true;
+    using System;
+    using UnityEngine;
 
-    public override bool IsReady => _grantReward && IsAllowedInCurrentBuild();
-
-    private void Awake()
+    [DisallowMultipleComponent]
+    public sealed class ImmediateRewardedAdService : RewardedAdService
     {
-        if (!IsEditorOrDevelopmentBuild() && _allowInPlayerBuilds)
+        [SerializeField] private bool _grantReward = true;
+        [SerializeField] private bool _allowInPlayerBuilds = true;
+
+        public override bool IsReady => _grantReward && IsAllowedInCurrentBuild();
+
+        private void Awake()
         {
-            Debug.LogWarning(
-                "ImmediateRewardedAdService is granting rewards in a player build. " +
-                "Replace it with a production rewarded ad service before release.",
-                this);
+            if (!IsEditorOrDevelopmentBuild() && _allowInPlayerBuilds)
+            {
+                Debug.LogWarning(
+                    "ImmediateRewardedAdService is granting rewards in a player build. " +
+                    "Replace it with a production rewarded ad service before release.",
+                    this);
+            }
         }
-    }
 
-    public override void ShowRewardedAd(Action<bool> onCompleted)
-    {
-        onCompleted?.Invoke(IsReady);
-    }
+        public override void ShowRewardedAd(Action<bool> onCompleted)
+        {
+            onCompleted?.Invoke(IsReady);
+        }
 
-    private bool IsAllowedInCurrentBuild()
-    {
-        return IsEditorOrDevelopmentBuild() || _allowInPlayerBuilds;
-    }
+        private bool IsAllowedInCurrentBuild()
+        {
+            return IsEditorOrDevelopmentBuild() || _allowInPlayerBuilds;
+        }
 
-    private static bool IsEditorOrDevelopmentBuild()
-    {
+        private static bool IsEditorOrDevelopmentBuild()
+        {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-        return true;
+            return true;
 #else
         return false;
 #endif
+        }
     }
+
 }

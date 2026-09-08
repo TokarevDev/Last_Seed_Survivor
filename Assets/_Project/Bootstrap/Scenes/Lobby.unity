@@ -363,7 +363,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f53a4c2d8f84c2f92d09ccf3681e739, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UiIdleTweenAnimator
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.UiIdleTweenAnimator
   _target: {fileID: 160038858}
   _blinkImages:
   - {fileID: 1485789765}
@@ -962,7 +962,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6b42c7d9a31456fa8f0ea2cbf684e21, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TmpTextMaterialPresetBinder
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.TmpTextMaterialPresetBinder
   _text: {fileID: 511245435}
   _fontAsset: {fileID: 11400000, guid: 1bdbbd43a253d47f99f853e49dce8edc, type: 2}
   _materialPreset: {fileID: 2100000, guid: b4f31de892d44d9298f7a4232d2f0931, type: 2}
@@ -2095,7 +2095,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 67ebdfbaf0b24a11853eec32db5ac630, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SceneFadeOverlay
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.SceneFadeOverlay
   _targetImage: {fileID: 1035952029}
   _fadeDuration: 2
   _fadeEase: 4
@@ -3365,7 +3365,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1f2e3d4c5b6a47d88192a3b4c5d6e7f8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LobbyStartBattleButton
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.LobbyStartBattleButton
   _button: {fileID: 1813928313}
 --- !u!1 &1999261701
 GameObject:
@@ -3625,7 +3625,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9f53a4c2d8f84c2f92d09ccf3681e739, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UiIdleTweenAnimator
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.UiIdleTweenAnimator
   _target: {fileID: 2113768036}
   _blinkImages: []
   _animatePosition: 1

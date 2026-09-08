@@ -11,6 +11,6 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1db05a1e2c2b4f8c8dc199f3324a8a10, type: 3}
   m_Name: RE_CriticalChance_50Percent
-  m_EditorClassIdentifier: Assembly-CSharp::CriticalChanceRewardEffect
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Rewards.Effects.CriticalChanceRewardEffect
   _chanceBonus: 0.5
   _criticalDamageMultiplier: 2

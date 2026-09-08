@@ -11,6 +11,6 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8233ff1ccf908984ba699cdbda292e6c, type: 3}
   m_Name: MOD_Parallel_Plus3
-  m_EditorClassIdentifier: Assembly-CSharp::ParallelModifierData
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers.Parallel.ParallelModifierData
   Count: 3
   Spacing: 0.5

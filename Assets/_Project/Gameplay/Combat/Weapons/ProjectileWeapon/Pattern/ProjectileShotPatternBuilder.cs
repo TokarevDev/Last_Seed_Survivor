@@ -1,52 +1,60 @@
-using System.Collections.Generic;
-using UnityEngine;
 
-public sealed class ProjectileShotPatternBuilder
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern
 {
-    public void Build(
-        Vector3 origin,
-        Quaternion rotation,
-        WeaponRuntimeState runtimeState,
-        List<ShotSpawnData> shots)
+    using System.Collections.Generic;
+    using UnityEngine;
+
+    public sealed class ProjectileShotPatternBuilder
     {
-        if (runtimeState == null || shots == null)
-            return;
-
-        var settings = CollectSettings(runtimeState);
-        var baseShot = new ShotSpawnData(origin, rotation);
-
-        Vector3 right = baseShot.Rotation * Vector3.right;
-
-        for (int i = 0; i < settings.ParallelCount; i++)
+        public void Build(
+            Vector3 origin,
+            Quaternion rotation,
+            WeaponRuntimeState runtimeState,
+            List<ShotSpawnData> shots)
         {
-            Vector3 position = baseShot.Position;
+            if (runtimeState == null || shots == null)
+                return;
 
-            if (i > 0)
+            var settings = CollectSettings(runtimeState);
+            var baseShot = new ShotSpawnData(origin, rotation);
+
+            Vector3 right = baseShot.Rotation * Vector3.right;
+
+            for (int i = 0; i < settings.ParallelCount; i++)
             {
-                float offset = ((i + 1) / 2) * settings.Spacing;
-                position += i % 2 == 1
-                    ? right * offset
-                    : -right * offset;
-            }
+                Vector3 position = baseShot.Position;
 
-            shots.Add(new ShotSpawnData(position, baseShot.Rotation));
+                if (i > 0)
+                {
+                    float offset = ((i + 1) / 2) * settings.Spacing;
+                    position += i % 2 == 1
+                        ? right * offset
+                        : -right * offset;
+                }
+
+                shots.Add(new ShotSpawnData(position, baseShot.Rotation));
+            }
+        }
+
+        private static ShotPatternSettings CollectSettings(WeaponRuntimeState runtimeState)
+        {
+            var settings = new ShotPatternSettings
+            {
+                ParallelCount = runtimeState.ParallelProjectileCount,
+                Spacing = runtimeState.ParallelSpacing
+            };
+
+            return settings;
+        }
+
+        private struct ShotPatternSettings
+        {
+            public int ParallelCount;
+            public float Spacing;
         }
     }
 
-    private static ShotPatternSettings CollectSettings(WeaponRuntimeState runtimeState)
-    {
-        var settings = new ShotPatternSettings
-        {
-            ParallelCount = runtimeState.ParallelProjectileCount,
-            Spacing = runtimeState.ParallelSpacing
-        };
-
-        return settings;
-    }
-
-    private struct ShotPatternSettings
-    {
-        public int ParallelCount;
-        public float Spacing;
-    }
 }

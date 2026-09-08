@@ -1,310 +1,315 @@
-using System;
-using System.Collections.Generic;
-using DG.Tweening;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
 
-public sealed class RevivalPopupView : PopupView
+namespace Game.Presentation.UI.Common.Popups
 {
-    private const string AnimatedContentRootName = "AnimatedContentRoot";
+    using System;
+    using System.Collections.Generic;
+    using DG.Tweening;
+    using TMPro;
+    using UnityEngine;
+    using UnityEngine.UI;
 
-    [SerializeField] private Button _reviveButton;
-    [SerializeField] private Button _giveUpButton;
-    [SerializeField] private RectTransform _animatedContentRoot;
-    [SerializeField] private Slider _remainingSlider;
-    [SerializeField] private TMP_Text _progressText;
-    [SerializeField] private TMP_Text _percentText;
-    [SerializeField] private TMP_Text _attemptsText;
-    [SerializeField] private string _progressFormat = "Only {0}% of the level remains.";
-    [SerializeField] private string _attemptsFormat = "attempts left: x{0}";
-    [SerializeField, Min(0f)] private float _showAnimationDuration = 0.55f;
-    [SerializeField, Range(0.5f, 1f)] private float _showAnimationStartScale = 0.92f;
-
-    public event Action ReviveRequested;
-    public event Action GiveUpRequested;
-
-    private bool _canRevive;
-    private readonly List<RectTransform> _contentChildren = new();
-    private CanvasGroup _contentCanvasGroup;
-    private Image _backgroundImage;
-    private float _backgroundBaseAlpha = 1f;
-    private Vector3 _contentBaseScale = Vector3.one;
-    private bool _hasContentBaseScale;
-    private Sequence _showSequence;
-    private Sequence _closeSequence;
-
-    private void OnEnable()
+    public sealed class RevivalPopupView : PopupView
     {
-        EnsureAnimationRefs();
+        private const string AnimatedContentRootName = "AnimatedContentRoot";
 
-        if (_reviveButton != null)
-            _reviveButton.onClick.AddListener(HandleReviveClicked);
+        [SerializeField] private Button _reviveButton;
+        [SerializeField] private Button _giveUpButton;
+        [SerializeField] private RectTransform _animatedContentRoot;
+        [SerializeField] private Slider _remainingSlider;
+        [SerializeField] private TMP_Text _progressText;
+        [SerializeField] private TMP_Text _percentText;
+        [SerializeField] private TMP_Text _attemptsText;
+        [SerializeField] private string _progressFormat = "Only {0}% of the level remains.";
+        [SerializeField] private string _attemptsFormat = "attempts left: x{0}";
+        [SerializeField, Min(0f)] private float _showAnimationDuration = 0.55f;
+        [SerializeField, Range(0.5f, 1f)] private float _showAnimationStartScale = 0.92f;
 
-        if (_giveUpButton != null)
-            _giveUpButton.onClick.AddListener(HandleGiveUpClicked);
-    }
+        public event Action ReviveRequested;
+        public event Action GiveUpRequested;
 
-    private void OnDisable()
-    {
-        _showSequence?.Kill();
-        _showSequence = null;
+        private bool _canRevive;
+        private readonly List<RectTransform> _contentChildren = new();
+        private CanvasGroup _contentCanvasGroup;
+        private Image _backgroundImage;
+        private float _backgroundBaseAlpha = 1f;
+        private Vector3 _contentBaseScale = Vector3.one;
+        private bool _hasContentBaseScale;
+        private Sequence _showSequence;
+        private Sequence _closeSequence;
 
-        _closeSequence?.Kill();
-        _closeSequence = null;
-
-        if (_reviveButton != null)
-            _reviveButton.onClick.RemoveListener(HandleReviveClicked);
-
-        if (_giveUpButton != null)
-            _giveUpButton.onClick.RemoveListener(HandleGiveUpClicked);
-    }
-
-    protected override void OnShown()
-    {
-        PlayShowAnimation();
-    }
-
-    public void Bind(
-        int attemptsLeft,
-        float currentProgressNormalized,
-        float remainingLevelNormalized,
-        bool canRevive)
-    {
-        int currentPercent = Mathf.RoundToInt(Mathf.Clamp01(currentProgressNormalized) * 100f);
-        int remainingPercent = Mathf.RoundToInt(Mathf.Clamp01(remainingLevelNormalized) * 100f);
-        _canRevive = canRevive && attemptsLeft > 0;
-
-        if (_remainingSlider != null)
-            _remainingSlider.SetValueWithoutNotify(currentPercent / 100f);
-
-        if (_progressText != null)
-            _progressText.SetText(_progressFormat, remainingPercent);
-
-        if (_percentText != null)
-            _percentText.SetText("{0}%", currentPercent);
-
-        if (_attemptsText != null)
-            _attemptsText.SetText(_attemptsFormat, Mathf.Max(0, attemptsLeft));
-
-        SetWaitingForAd(false);
-        ResetAnimationState();
-    }
-
-    public void SetWaitingForAd(bool isWaiting)
-    {
-        if (_reviveButton != null)
-            _reviveButton.interactable = !isWaiting && _canRevive;
-
-        if (_giveUpButton != null)
-            _giveUpButton.interactable = !isWaiting;
-    }
-
-    private void HandleReviveClicked()
-    {
-        if (!_canRevive)
-            return;
-
-        ReviveRequested?.Invoke();
-    }
-
-    private void HandleGiveUpClicked()
-    {
-        GiveUpRequested?.Invoke();
-    }
-
-    public void PlayCloseAnimation(
-        float duration,
-        float targetScale,
-        Action onComplete)
-    {
-        EnsureAnimationRefs();
-        SetWaitingForAd(true);
-        _showSequence?.Kill();
-        _showSequence = null;
-
-        _closeSequence?.Kill();
-
-        float safeDuration = Mathf.Max(0f, duration);
-        float safeScale = Mathf.Clamp(targetScale, 0.5f, 1f);
-
-        if (safeDuration <= 0f)
+        private void OnEnable()
         {
-            onComplete?.Invoke();
-            return;
+            EnsureAnimationRefs();
+
+            if (_reviveButton != null)
+                _reviveButton.onClick.AddListener(HandleReviveClicked);
+
+            if (_giveUpButton != null)
+                _giveUpButton.onClick.AddListener(HandleGiveUpClicked);
         }
 
-        _closeSequence = DOTween.Sequence().SetUpdate(true);
-
-        if (_animatedContentRoot != null)
+        private void OnDisable()
         {
-            _closeSequence.Join(
-                _animatedContentRoot
-                    .DOScale(_contentBaseScale * safeScale, safeDuration)
-                    .SetEase(Ease.InOutSine));
+            _showSequence?.Kill();
+            _showSequence = null;
+
+            _closeSequence?.Kill();
+            _closeSequence = null;
+
+            if (_reviveButton != null)
+                _reviveButton.onClick.RemoveListener(HandleReviveClicked);
+
+            if (_giveUpButton != null)
+                _giveUpButton.onClick.RemoveListener(HandleGiveUpClicked);
         }
 
-        if (_contentCanvasGroup != null)
+        protected override void OnShown()
         {
-            _closeSequence.Join(
-                _contentCanvasGroup
-                    .DOFade(0f, safeDuration)
-                    .SetEase(Ease.InSine));
+            PlayShowAnimation();
         }
 
-        if (_backgroundImage != null && _backgroundBaseAlpha > 0f)
+        public void Bind(
+            int attemptsLeft,
+            float currentProgressNormalized,
+            float remainingLevelNormalized,
+            bool canRevive)
         {
-            _closeSequence.Join(
-                _backgroundImage
-                    .DOFade(0f, safeDuration)
-                    .SetEase(Ease.InSine));
-        }
+            int currentPercent = Mathf.RoundToInt(Mathf.Clamp01(currentProgressNormalized) * 100f);
+            int remainingPercent = Mathf.RoundToInt(Mathf.Clamp01(remainingLevelNormalized) * 100f);
+            _canRevive = canRevive && attemptsLeft > 0;
 
-        _closeSequence.OnComplete(() => onComplete?.Invoke());
-    }
+            if (_remainingSlider != null)
+                _remainingSlider.SetValueWithoutNotify(currentPercent / 100f);
 
-    private void PlayShowAnimation()
-    {
-        EnsureAnimationRefs();
-        _showSequence?.Kill();
-        _closeSequence?.Kill();
-        _closeSequence = null;
+            if (_progressText != null)
+                _progressText.SetText(_progressFormat, remainingPercent);
 
-        float safeDuration = Mathf.Max(0f, _showAnimationDuration);
-        float safeScale = Mathf.Clamp(_showAnimationStartScale, 0.5f, 1f);
+            if (_percentText != null)
+                _percentText.SetText("{0}%", currentPercent);
 
-        if (safeDuration <= 0f)
-        {
+            if (_attemptsText != null)
+                _attemptsText.SetText(_attemptsFormat, Mathf.Max(0, attemptsLeft));
+
+            SetWaitingForAd(false);
             ResetAnimationState();
-            return;
         }
 
-        SetAnimationState(safeScale, 0f, 0f);
-
-        _showSequence = DOTween.Sequence().SetUpdate(true);
-
-        if (_animatedContentRoot != null)
+        public void SetWaitingForAd(bool isWaiting)
         {
-            _showSequence.Join(
-                _animatedContentRoot
-                    .DOScale(_contentBaseScale, safeDuration)
-                    .SetEase(Ease.InOutSine));
+            if (_reviveButton != null)
+                _reviveButton.interactable = !isWaiting && _canRevive;
+
+            if (_giveUpButton != null)
+                _giveUpButton.interactable = !isWaiting;
         }
 
-        if (_contentCanvasGroup != null)
+        private void HandleReviveClicked()
         {
-            _showSequence.Join(
-                _contentCanvasGroup
-                    .DOFade(1f, safeDuration)
-                    .SetEase(Ease.OutSine));
+            if (!_canRevive)
+                return;
+
+            ReviveRequested?.Invoke();
         }
 
-        if (_backgroundImage != null && _backgroundBaseAlpha > 0f)
+        private void HandleGiveUpClicked()
         {
-            _showSequence.Join(
-                _backgroundImage
-                    .DOFade(_backgroundBaseAlpha, safeDuration)
-                    .SetEase(Ease.OutSine));
+            GiveUpRequested?.Invoke();
         }
 
-        _showSequence.OnComplete(() => _showSequence = null);
-    }
-
-    private void EnsureAnimationRefs()
-    {
-        if (_animatedContentRoot == null)
-            _animatedContentRoot = CreateAnimatedContentRoot();
-
-        if (_animatedContentRoot != null)
+        public void PlayCloseAnimation(
+            float duration,
+            float targetScale,
+            Action onComplete)
         {
-            if (!_hasContentBaseScale)
+            EnsureAnimationRefs();
+            SetWaitingForAd(true);
+            _showSequence?.Kill();
+            _showSequence = null;
+
+            _closeSequence?.Kill();
+
+            float safeDuration = Mathf.Max(0f, duration);
+            float safeScale = Mathf.Clamp(targetScale, 0.5f, 1f);
+
+            if (safeDuration <= 0f)
             {
-                _contentBaseScale = _animatedContentRoot.localScale;
-                _hasContentBaseScale = true;
+                onComplete?.Invoke();
+                return;
             }
 
-            if (!_animatedContentRoot.TryGetComponent(out _contentCanvasGroup))
-                _contentCanvasGroup = _animatedContentRoot.gameObject.AddComponent<CanvasGroup>();
+            _closeSequence = DOTween.Sequence().SetUpdate(true);
+
+            if (_animatedContentRoot != null)
+            {
+                _closeSequence.Join(
+                    _animatedContentRoot
+                        .DOScale(_contentBaseScale * safeScale, safeDuration)
+                        .SetEase(Ease.InOutSine));
+            }
+
+            if (_contentCanvasGroup != null)
+            {
+                _closeSequence.Join(
+                    _contentCanvasGroup
+                        .DOFade(0f, safeDuration)
+                        .SetEase(Ease.InSine));
+            }
+
+            if (_backgroundImage != null && _backgroundBaseAlpha > 0f)
+            {
+                _closeSequence.Join(
+                    _backgroundImage
+                        .DOFade(0f, safeDuration)
+                        .SetEase(Ease.InSine));
+            }
+
+            _closeSequence.OnComplete(() => onComplete?.Invoke());
         }
 
-        if (_backgroundImage == null && TryGetComponent(out _backgroundImage))
-            _backgroundBaseAlpha = _backgroundImage.color.a;
-    }
-
-    private void ResetAnimationState()
-    {
-        EnsureAnimationRefs();
-        _showSequence?.Kill();
-        _showSequence = null;
-
-        _closeSequence?.Kill();
-        _closeSequence = null;
-
-        SetAnimationState(1f, 1f, _backgroundBaseAlpha);
-    }
-
-    private void SetAnimationState(
-        float contentScaleMultiplier,
-        float contentAlpha,
-        float backgroundAlpha)
-    {
-        float safeScale = Mathf.Clamp(contentScaleMultiplier, 0.5f, 1f);
-
-        if (_animatedContentRoot != null)
-            _animatedContentRoot.localScale = _contentBaseScale * safeScale;
-
-        if (_contentCanvasGroup != null)
-            _contentCanvasGroup.alpha = Mathf.Clamp01(contentAlpha);
-
-        if (_backgroundImage != null)
+        private void PlayShowAnimation()
         {
-            Color color = _backgroundImage.color;
-            color.a = Mathf.Clamp01(backgroundAlpha);
-            _backgroundImage.color = color;
+            EnsureAnimationRefs();
+            _showSequence?.Kill();
+            _closeSequence?.Kill();
+            _closeSequence = null;
+
+            float safeDuration = Mathf.Max(0f, _showAnimationDuration);
+            float safeScale = Mathf.Clamp(_showAnimationStartScale, 0.5f, 1f);
+
+            if (safeDuration <= 0f)
+            {
+                ResetAnimationState();
+                return;
+            }
+
+            SetAnimationState(safeScale, 0f, 0f);
+
+            _showSequence = DOTween.Sequence().SetUpdate(true);
+
+            if (_animatedContentRoot != null)
+            {
+                _showSequence.Join(
+                    _animatedContentRoot
+                        .DOScale(_contentBaseScale, safeDuration)
+                        .SetEase(Ease.InOutSine));
+            }
+
+            if (_contentCanvasGroup != null)
+            {
+                _showSequence.Join(
+                    _contentCanvasGroup
+                        .DOFade(1f, safeDuration)
+                        .SetEase(Ease.OutSine));
+            }
+
+            if (_backgroundImage != null && _backgroundBaseAlpha > 0f)
+            {
+                _showSequence.Join(
+                    _backgroundImage
+                        .DOFade(_backgroundBaseAlpha, safeDuration)
+                        .SetEase(Ease.OutSine));
+            }
+
+            _showSequence.OnComplete(() => _showSequence = null);
+        }
+
+        private void EnsureAnimationRefs()
+        {
+            if (_animatedContentRoot == null)
+                _animatedContentRoot = CreateAnimatedContentRoot();
+
+            if (_animatedContentRoot != null)
+            {
+                if (!_hasContentBaseScale)
+                {
+                    _contentBaseScale = _animatedContentRoot.localScale;
+                    _hasContentBaseScale = true;
+                }
+
+                if (!_animatedContentRoot.TryGetComponent(out _contentCanvasGroup))
+                    _contentCanvasGroup = _animatedContentRoot.gameObject.AddComponent<CanvasGroup>();
+            }
+
+            if (_backgroundImage == null && TryGetComponent(out _backgroundImage))
+                _backgroundBaseAlpha = _backgroundImage.color.a;
+        }
+
+        private void ResetAnimationState()
+        {
+            EnsureAnimationRefs();
+            _showSequence?.Kill();
+            _showSequence = null;
+
+            _closeSequence?.Kill();
+            _closeSequence = null;
+
+            SetAnimationState(1f, 1f, _backgroundBaseAlpha);
+        }
+
+        private void SetAnimationState(
+            float contentScaleMultiplier,
+            float contentAlpha,
+            float backgroundAlpha)
+        {
+            float safeScale = Mathf.Clamp(contentScaleMultiplier, 0.5f, 1f);
+
+            if (_animatedContentRoot != null)
+                _animatedContentRoot.localScale = _contentBaseScale * safeScale;
+
+            if (_contentCanvasGroup != null)
+                _contentCanvasGroup.alpha = Mathf.Clamp01(contentAlpha);
+
+            if (_backgroundImage != null)
+            {
+                Color color = _backgroundImage.color;
+                color.a = Mathf.Clamp01(backgroundAlpha);
+                _backgroundImage.color = color;
+            }
+        }
+
+        private RectTransform CreateAnimatedContentRoot()
+        {
+            Transform root = transform;
+            int childCount = root.childCount;
+
+            for (int i = 0; i < childCount; i++)
+            {
+                Transform child = root.GetChild(i);
+
+                if (child != null && child.name == AnimatedContentRootName)
+                    return child as RectTransform;
+            }
+
+            if (childCount <= 0)
+                return transform as RectTransform;
+
+            _contentChildren.Clear();
+
+            for (int i = 0; i < childCount; i++)
+            {
+                if (root.GetChild(i) is RectTransform childRect)
+                    _contentChildren.Add(childRect);
+            }
+
+            GameObject contentObject = new(AnimatedContentRootName)
+            {
+                layer = gameObject.layer
+            };
+            RectTransform contentRoot = contentObject.AddComponent<RectTransform>();
+            contentRoot.SetParent(root, false);
+            contentRoot.anchorMin = Vector2.zero;
+            contentRoot.anchorMax = Vector2.one;
+            contentRoot.offsetMin = Vector2.zero;
+            contentRoot.offsetMax = Vector2.zero;
+            contentRoot.pivot = new Vector2(0.5f, 0.5f);
+            contentRoot.localScale = Vector3.one;
+            contentRoot.SetAsLastSibling();
+
+            for (int i = 0; i < _contentChildren.Count; i++)
+                _contentChildren[i].SetParent(contentRoot, false);
+
+            return contentRoot;
         }
     }
 
-    private RectTransform CreateAnimatedContentRoot()
-    {
-        Transform root = transform;
-        int childCount = root.childCount;
-
-        for (int i = 0; i < childCount; i++)
-        {
-            Transform child = root.GetChild(i);
-
-            if (child != null && child.name == AnimatedContentRootName)
-                return child as RectTransform;
-        }
-
-        if (childCount <= 0)
-            return transform as RectTransform;
-
-        _contentChildren.Clear();
-
-        for (int i = 0; i < childCount; i++)
-        {
-            if (root.GetChild(i) is RectTransform childRect)
-                _contentChildren.Add(childRect);
-        }
-
-        GameObject contentObject = new(AnimatedContentRootName)
-        {
-            layer = gameObject.layer
-        };
-        RectTransform contentRoot = contentObject.AddComponent<RectTransform>();
-        contentRoot.SetParent(root, false);
-        contentRoot.anchorMin = Vector2.zero;
-        contentRoot.anchorMax = Vector2.one;
-        contentRoot.offsetMin = Vector2.zero;
-        contentRoot.offsetMax = Vector2.zero;
-        contentRoot.pivot = new Vector2(0.5f, 0.5f);
-        contentRoot.localScale = Vector3.one;
-        contentRoot.SetAsLastSibling();
-
-        for (int i = 0; i < _contentChildren.Count; i++)
-            _contentChildren[i].SetParent(contentRoot, false);
-
-        return contentRoot;
-    }
 }

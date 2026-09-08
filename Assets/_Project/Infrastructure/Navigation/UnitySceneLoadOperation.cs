@@ -3,7 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace LastSeed.Infrastructure.Navigation
+namespace Game.Infrastructure.Navigation
 {
     public sealed class UnitySceneLoadOperation : ISceneLoadOperation
     {

@@ -1,5 +1,9 @@
-public enum RewardRequestSubmission
+namespace Game.Gameplay.Rewards.Runtime
 {
-    Begun,
-    Queued
+    public enum RewardRequestSubmission
+    {
+        Begun,
+        Queued
+    }
+
 }

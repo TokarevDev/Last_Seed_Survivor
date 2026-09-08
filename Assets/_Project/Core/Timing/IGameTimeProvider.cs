@@ -1,4 +1,4 @@
-namespace LastSeed.Core.Timing
+namespace Game.Core.Timing
 {
     public interface IGameTimeProvider
     {

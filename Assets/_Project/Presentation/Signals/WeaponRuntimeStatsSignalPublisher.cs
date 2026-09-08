@@ -1,11 +1,11 @@
 using System;
-using LastSeed.Core.Timing;
 using Zenject;
 
-namespace LastSeed.Presentation.Signals
-{
-    using LastSeed.Gameplay.Signals;
+using Game.Core.Timing;
+using Game.Gameplay.Signals;
 
+namespace Game.Presentation.Signals
+{
     public sealed class WeaponRuntimeStatsSignalPublisher : IWeaponRuntimeStatsPublisher
     {
         private readonly SignalBus _signalBus;

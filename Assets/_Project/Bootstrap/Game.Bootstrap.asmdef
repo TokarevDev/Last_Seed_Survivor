@@ -1,11 +1,11 @@
 {
-  "name": "LastSeed.Bootstrap",
-  "rootNamespace": "LastSeed.Bootstrap",
+  "name": "Game.Bootstrap",
+  "rootNamespace": "Game.Bootstrap",
   "references": [
-    "LastSeed.Core",
-    "LastSeed.Gameplay",
-    "LastSeed.Infrastructure",
-    "LastSeed.Presentation",
+    "Game.Core",
+    "Game.Gameplay",
+    "Game.Infrastructure",
+    "Game.Presentation",
     "UniTask",
     "Zenject"
   ],

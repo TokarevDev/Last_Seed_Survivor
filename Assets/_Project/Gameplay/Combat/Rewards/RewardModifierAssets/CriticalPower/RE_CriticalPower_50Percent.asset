@@ -11,5 +11,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6fd2e3d9a8c14f34ab9f0d6c0e9e4b22, type: 3}
   m_Name: RE_CriticalPower_50Percent
-  m_EditorClassIdentifier: Assembly-CSharp::CriticalPowerRewardEffect
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Rewards.Effects.CriticalPowerRewardEffect
   _criticalDamageBonus: 0.5

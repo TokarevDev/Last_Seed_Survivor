@@ -1,6 +1,8 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Rewards.Runtime;
+
+namespace Game.Tests
 {
     public sealed class RewardAttemptStateTests
     {

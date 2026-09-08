@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9e4fed19a2ea62a46baee5e188881071, type: 3}
   m_Name: ProjectileConfig_Default
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileConfig
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Projectiles.Configs.ProjectileConfig
   _prefab: {fileID: 2670405450700643368, guid: ef0624812c83aa340be2601952b9f7f3, type: 3}
   _damage: 3
   _penetration: 0

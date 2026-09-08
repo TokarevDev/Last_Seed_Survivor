@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e41cae359be24e8ea6d699152871dcc7, type: 3}
   m_Name: RE_SalvoEffect
-  m_EditorClassIdentifier: Assembly-CSharp::SalvoFireRewardEffect
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Rewards.Effects.SalvoFireRewardEffect
   _extraShots: 1
   _shotInterval: 0.2
   _extendsSalvoLimit: 0

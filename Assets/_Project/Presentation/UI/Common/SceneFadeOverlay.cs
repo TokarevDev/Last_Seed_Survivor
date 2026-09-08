@@ -2,7 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Project.App.Presentation
+namespace Game.Presentation.UI.Common
 {
     [DisallowMultipleComponent]
     public sealed class SceneFadeOverlay : MonoBehaviour

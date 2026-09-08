@@ -1,6 +1,9 @@
 using UnityEngine;
 
-namespace LastSeed.Gameplay.Signals
+using Game.Core.Combat;
+using Game.Gameplay.Combat;
+
+namespace Game.Gameplay.Signals
 {
     public readonly struct DamageViewRequest
     {

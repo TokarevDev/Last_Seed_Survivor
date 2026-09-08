@@ -1,8 +1,15 @@
 using System;
-using LastSeed.Core.Pooling;
-using LastSeed.Gameplay.Signals;
 
-namespace LastSeed.Bootstrap.Gameplay
+using Game.Core.Pooling;
+using Game.Core.Random;
+using Game.Core.World;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
+using Game.Gameplay.Player;
+using Game.Gameplay.Pooling;
+using Game.Gameplay.Signals;
+
+namespace Game.Bootstrap.Scenes.Game
 {
     public sealed class AcaciaThornRuntimeInitializer
     {

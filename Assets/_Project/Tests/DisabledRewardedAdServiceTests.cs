@@ -1,6 +1,8 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Infrastructure.Advertising;
+
+namespace Game.Tests
 {
     public sealed class DisabledRewardedAdServiceTests
     {

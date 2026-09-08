@@ -1,16 +1,20 @@
-public readonly struct WormForwardMotionResult
+namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    public WormForwardMotionResult(
-        float headDistance,
-        bool isCatchingUp,
-        bool completedPath)
+    public readonly struct WormForwardMotionResult
     {
-        HeadDistance = headDistance;
-        IsCatchingUp = isCatchingUp;
-        CompletedPath = completedPath;
+        public WormForwardMotionResult(
+            float headDistance,
+            bool isCatchingUp,
+            bool completedPath)
+        {
+            HeadDistance = headDistance;
+            IsCatchingUp = isCatchingUp;
+            CompletedPath = completedPath;
+        }
+
+        public float HeadDistance { get; }
+        public bool IsCatchingUp { get; }
+        public bool CompletedPath { get; }
     }
 
-    public float HeadDistance { get; }
-    public bool IsCatchingUp { get; }
-    public bool CompletedPath { get; }
 }

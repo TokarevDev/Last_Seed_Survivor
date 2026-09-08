@@ -1,6 +1,10 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.Combat;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Tests
 {
     public sealed class WeaponDamageClampTests
     {

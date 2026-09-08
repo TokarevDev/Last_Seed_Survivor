@@ -11,5 +11,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 238ca1e3fc26a694784c2a6306f82c9a, type: 3}
   m_Name: RE_FireRate_20Percent
-  m_EditorClassIdentifier: Assembly-CSharp::FireRateRewardEffect
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Rewards.Effects.FireRateRewardEffect
   _bonus: 0.2

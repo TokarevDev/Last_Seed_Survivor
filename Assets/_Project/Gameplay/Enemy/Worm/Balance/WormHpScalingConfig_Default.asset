@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb27f47e9f9a454e8dbac4e51af9a503, type: 3}
   m_Name: WormHpScalingConfig_Default
-  m_EditorClassIdentifier: Assembly-CSharp::WormHpScalingConfig
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.Balance.WormHpScalingConfig
   _enabled: 1
   _baseSectionHp: 4
   _baseHpStartMultiplier: 1

@@ -1,52 +1,63 @@
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Rewards/Effects/Add Modifier")]
-public sealed class AddModifierRewardEffect : RewardEffect
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers.Parallel;
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+
+namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    [SerializeField] private ShotModifierData _modifier;
-    [SerializeField] private bool _extendsParallelLimit;
-    [SerializeField][Min(1)] private int _maxParallelProjectilesAfterApply = WeaponRuntimeState.DefaultMaxParallelProjectiles;
+    using UnityEngine;
 
-    public override bool CanApply(WeaponRuntimeState state)
+    [CreateAssetMenu(menuName = "Game/Rewards/Effects/Add Modifier")]
+    public sealed class AddModifierRewardEffect : RewardEffect
     {
-        if (state == null)
-            return false;
+        [SerializeField] private ShotModifierData _modifier;
+        [SerializeField] private bool _extendsParallelLimit;
+        [SerializeField][Min(1)] private int _maxParallelProjectilesAfterApply = WeaponRuntimeState.DefaultMaxParallelProjectiles;
 
-        if (_extendsParallelLimit && TryGetParallelBonus(out int bonusProjectiles))
+        public override bool CanApply(WeaponRuntimeState state)
         {
-            return state.CanApplyParallelProjectiles(
-                bonusProjectiles,
-                _maxParallelProjectilesAfterApply);
+            if (state == null)
+                return false;
+
+            if (_extendsParallelLimit && TryGetParallelBonus(out int bonusProjectiles))
+            {
+                return state.CanApplyParallelProjectiles(
+                    bonusProjectiles,
+                    _maxParallelProjectilesAfterApply);
+            }
+
+            return state.CanAddShotModifier(_modifier);
         }
 
-        return state.CanAddShotModifier(_modifier);
-    }
-
-    public override void Apply(WeaponRuntimeState state)
-    {
-        if (state == null)
-            return;
-
-        if (_extendsParallelLimit && _modifier is ParallelModifierData)
-            state.ExpandParallelProjectileLimit(_maxParallelProjectilesAfterApply);
-
-        if (!state.AddShotModifier(_modifier))
+        public override void Apply(WeaponRuntimeState state)
         {
-            Debug.LogWarning("Modifier is null in AddModifierRewardEffect");
+            if (state == null)
+                return;
+
+            if (_extendsParallelLimit && _modifier is ParallelModifierData)
+                state.ExpandParallelProjectileLimit(_maxParallelProjectilesAfterApply);
+
+            if (!state.AddShotModifier(_modifier))
+            {
+                Debug.LogWarning("Modifier is null in AddModifierRewardEffect");
+            }
+        }
+
+        private bool TryGetParallelBonus(out int bonusProjectiles)
+        {
+            bonusProjectiles = 0;
+
+            ParallelModifierData parallel = _modifier as ParallelModifierData;
+
+            if (parallel == null)
+                return false;
+
+            bonusProjectiles = Mathf.Max(0, parallel.Count - 1);
+
+            return bonusProjectiles > 0;
         }
     }
 
-    private bool TryGetParallelBonus(out int bonusProjectiles)
-    {
-        bonusProjectiles = 0;
-
-        ParallelModifierData parallel = _modifier as ParallelModifierData;
-
-        if (parallel == null)
-            return false;
-
-        bonusProjectiles = Mathf.Max(0, parallel.Count - 1);
-
-        return bonusProjectiles > 0;
-    }
 }

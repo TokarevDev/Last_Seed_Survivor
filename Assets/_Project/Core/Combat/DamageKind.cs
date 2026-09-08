@@ -1,6 +1,9 @@
-public enum DamageKind
+namespace Game.Core.Combat
 {
-    Normal = 0,
-    Critical = 1,
-    DamageOverTime = 2
+    public enum DamageKind
+    {
+        Normal = 0,
+        Critical = 1,
+        DamageOverTime = 2
+    }
 }

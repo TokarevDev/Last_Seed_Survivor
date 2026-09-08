@@ -1,18 +1,22 @@
-using System;
-
-public sealed class WormAdaptiveHpSettings
+namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    public WormAdaptiveHpSettings(
-        int levelNumber,
-        int upgradeRebalanceInterval,
-        float minimumRebalanceInterval)
+    using System;
+
+    public sealed class WormAdaptiveHpSettings
     {
-        LevelNumber = Math.Max(1, levelNumber);
-        UpgradeRebalanceInterval = Math.Max(1, upgradeRebalanceInterval);
-        MinimumRebalanceInterval = Math.Max(0f, minimumRebalanceInterval);
+        public WormAdaptiveHpSettings(
+            int levelNumber,
+            int upgradeRebalanceInterval,
+            float minimumRebalanceInterval)
+        {
+            LevelNumber = Math.Max(1, levelNumber);
+            UpgradeRebalanceInterval = Math.Max(1, upgradeRebalanceInterval);
+            MinimumRebalanceInterval = Math.Max(0f, minimumRebalanceInterval);
+        }
+
+        public int LevelNumber { get; }
+        public int UpgradeRebalanceInterval { get; }
+        public float MinimumRebalanceInterval { get; }
     }
 
-    public int LevelNumber { get; }
-    public int UpgradeRebalanceInterval { get; }
-    public float MinimumRebalanceInterval { get; }
 }

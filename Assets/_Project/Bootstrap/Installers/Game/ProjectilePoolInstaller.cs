@@ -1,7 +1,10 @@
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Pooling;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class ProjectilePoolInstaller : MonoInstaller
     {

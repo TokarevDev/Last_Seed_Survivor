@@ -1,4 +1,4 @@
-namespace LastSeed.Infrastructure.Navigation
+namespace Game.Infrastructure.Navigation
 {
     public enum GameSceneId
     {

@@ -1,9 +1,13 @@
-using LastSeed.Core.Timing;
-using LastSeed.Infrastructure.Timing;
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Core.Random;
+using Game.Core.Timing;
+using Game.Gameplay.World;
+using Game.Infrastructure.Random;
+using Game.Infrastructure.Timing;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class GameWorldInstaller : MonoInstaller
     {

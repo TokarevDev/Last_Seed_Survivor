@@ -1,7 +1,11 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Rewards.Runtime;
+using Game.Gameplay.Rewards.Services;
+
+namespace Game.Tests
 {
     public sealed class RewardGrantedActionServiceTests
     {

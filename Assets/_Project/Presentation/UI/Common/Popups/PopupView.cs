@@ -1,72 +1,76 @@
-using System;
-using UnityEngine;
-
-[DisallowMultipleComponent]
-public class PopupView : MonoBehaviour
+namespace Game.Presentation.UI.Common.Popups
 {
-    [SerializeField] private string _popupId;
-    [SerializeField] private GameObject _root;
+    using System;
+    using UnityEngine;
 
-    public string PopupId => string.IsNullOrEmpty(_popupId) ? GetType().Name : _popupId;
-    public bool IsVisible => ResolveRoot().activeSelf;
-
-    public event Action<PopupView> CloseRequested;
-    public event Action<PopupView> Hidden;
-
-    public void Show()
+    [DisallowMultipleComponent]
+    public class PopupView : MonoBehaviour
     {
-        SetVisible(true);
-    }
+        [SerializeField] private string _popupId;
+        [SerializeField] private GameObject _root;
 
-    public void Hide()
-    {
-        SetVisible(false);
-    }
+        public string PopupId => string.IsNullOrEmpty(_popupId) ? GetType().Name : _popupId;
+        public bool IsVisible => ResolveRoot().activeSelf;
 
-    public void RequestClose()
-    {
-        CloseRequested?.Invoke(this);
-    }
+        public event Action<PopupView> CloseRequested;
+        public event Action<PopupView> Hidden;
 
-    protected virtual void Reset()
-    {
-        _root = gameObject;
-        _popupId = GetType().Name;
-    }
-
-    protected virtual void OnShown()
-    {
-    }
-
-    protected virtual void OnHidden()
-    {
-    }
-
-    private void SetVisible(bool visible)
-    {
-        GameObject root = ResolveRoot();
-
-        if (root.activeSelf == visible)
-            return;
-
-        root.SetActive(visible);
-
-        if (visible)
+        public void Show()
         {
-            OnShown();
+            SetVisible(true);
         }
-        else
-        {
-            OnHidden();
-            Hidden?.Invoke(this);
-        }
-    }
 
-    private GameObject ResolveRoot()
-    {
-        if (_root == null)
+        public void Hide()
+        {
+            SetVisible(false);
+        }
+
+        public void RequestClose()
+        {
+            CloseRequested?.Invoke(this);
+        }
+
+        protected virtual void Reset()
+        {
             _root = gameObject;
+            _popupId = GetType().Name;
+        }
 
-        return _root;
+        protected virtual void OnShown()
+        {
+        }
+
+        protected virtual void OnHidden()
+        {
+        }
+
+        private void SetVisible(bool visible)
+        {
+            GameObject root = ResolveRoot();
+
+            if (root.activeSelf == visible)
+                return;
+
+            root.SetActive(visible);
+
+            if (visible)
+            {
+                OnShown();
+            }
+            else
+            {
+                OnHidden();
+                Hidden?.Invoke(this);
+            }
+        }
+
+        private GameObject ResolveRoot()
+        {
+            if (_root == null)
+                _root = gameObject;
+
+            return _root;
+        }
     }
+
 }

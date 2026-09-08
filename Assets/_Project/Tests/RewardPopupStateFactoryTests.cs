@@ -1,6 +1,11 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Rewards.Runtime;
+using Game.Gameplay.Rewards.Services;
+using Game.Presentation.UI.Rewards;
+
+namespace Game.Tests
 {
     public sealed class RewardPopupStateFactoryTests
     {

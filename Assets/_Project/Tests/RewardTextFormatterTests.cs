@@ -1,7 +1,10 @@
 using NUnit.Framework;
 using UnityEngine;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Rewards.Data;
+using Game.Presentation.UI.Rewards;
+
+namespace Game.Tests
 {
     public sealed class RewardTextFormatterTests
     {

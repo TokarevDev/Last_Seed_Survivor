@@ -1,76 +1,165 @@
-using System.Collections.Generic;
 
-public static class RewardWeightedPicker
+using Game.Core.Random;
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    public static bool TryTakeFromRarity(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        RewardRarity rarity,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        RewardPickMode mode,
-        out RewardModifierEntry selected,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias = default,
-        bool requireAssistDpsReward = false)
+    using System.Collections.Generic;
+
+    public static class RewardWeightedPicker
     {
-        selected = null;
-
-        if (pools == null || !pools.TryGetValue(rarity, out List<RewardModifierEntry> pool))
-            return false;
-
-        return TryTakeFromPool(
-            pool,
-            usedCategories,
-            usedCategoryRarities,
-            mode,
-            out selected,
-            rollContext,
-            randomSource,
-            weaponDpsBias,
-            requireAssistDpsReward);
-    }
-
-    public static bool TryTakeFromAllRarities(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        RewardPickMode mode,
-        out RewardModifierEntry selected,
-        bool allowLegendary,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias = default)
-    {
-        selected = null;
-
-        if (pools == null || pools.Count == 0)
-            return false;
-
-        float totalWeight = GetTotalWeight(
-            pools,
-            usedCategories,
-            usedCategoryRarities,
-            mode,
-            allowLegendary,
-            rollContext,
-            weaponDpsBias);
-
-        if (totalWeight <= 0f)
-            return false;
-
-        float roll = randomSource.NextUnitFloat() * totalWeight;
-        float currentWeight = 0f;
-
-        foreach (KeyValuePair<RewardRarity, List<RewardModifierEntry>> rarityPool in pools)
+        public static bool TryTakeFromRarity(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            RewardRarity rarity,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            RewardPickMode mode,
+            out RewardModifierEntry selected,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias = default,
+            bool requireAssistDpsReward = false)
         {
-            if (!allowLegendary && rarityPool.Key == RewardRarity.Legendary)
-                continue;
+            selected = null;
 
-            List<RewardModifierEntry> pool = rarityPool.Value;
+            if (pools == null || !pools.TryGetValue(rarity, out List<RewardModifierEntry> pool))
+                return false;
 
-            if (pool == null)
-                continue;
+            return TryTakeFromPool(
+                pool,
+                usedCategories,
+                usedCategoryRarities,
+                mode,
+                out selected,
+                rollContext,
+                randomSource,
+                weaponDpsBias,
+                requireAssistDpsReward);
+        }
+
+        public static bool TryTakeFromAllRarities(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            RewardPickMode mode,
+            out RewardModifierEntry selected,
+            bool allowLegendary,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias = default)
+        {
+            selected = null;
+
+            if (pools == null || pools.Count == 0)
+                return false;
+
+            float totalWeight = GetTotalWeight(
+                pools,
+                usedCategories,
+                usedCategoryRarities,
+                mode,
+                allowLegendary,
+                rollContext,
+                weaponDpsBias);
+
+            if (totalWeight <= 0f)
+                return false;
+
+            float roll = randomSource.NextUnitFloat() * totalWeight;
+            float currentWeight = 0f;
+
+            foreach (KeyValuePair<RewardRarity, List<RewardModifierEntry>> rarityPool in pools)
+            {
+                if (!allowLegendary && rarityPool.Key == RewardRarity.Legendary)
+                    continue;
+
+                List<RewardModifierEntry> pool = rarityPool.Value;
+
+                if (pool == null)
+                    continue;
+
+                for (int i = 0; i < pool.Count; i++)
+                {
+                    RewardModifierEntry entry = pool[i];
+
+                    if (!RewardSelectionPolicy.IsEligible(
+                            entry,
+                            usedCategories,
+                            usedCategoryRarities,
+                            mode,
+                            RewardWeaponGroup.None))
+                    {
+                        continue;
+                    }
+
+                    currentWeight += RewardSelectionPolicy.GetEffectiveWeight(
+                        entry,
+                        rollContext,
+                        weaponDpsBias);
+
+                    if (roll > currentWeight)
+                        continue;
+
+                    selected = entry;
+                    pool.RemoveAt(i);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool TryTakeFromPool(
+            List<RewardModifierEntry> pool,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            RewardPickMode mode,
+            out RewardModifierEntry selected,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias,
+            bool requireAssistDpsReward)
+        {
+            selected = null;
+
+            if (pool == null || pool.Count == 0)
+                return false;
+
+            bool preferAssistDpsRewards = !requireAssistDpsReward
+                && RewardSelectionPolicy.ShouldPreferAssistDpsRewards(
+                    pool,
+                    usedCategories,
+                    usedCategoryRarities,
+                    mode,
+                    RewardWeaponGroup.None,
+                    rollContext);
+            bool requireDpsReward = requireAssistDpsReward || preferAssistDpsRewards;
+            float totalWeight = 0f;
+
+            for (int i = 0; i < pool.Count; i++)
+            {
+                RewardModifierEntry entry = pool[i];
+
+                if (RewardSelectionPolicy.IsEligible(
+                        entry,
+                        usedCategories,
+                        usedCategoryRarities,
+                        mode,
+                        RewardWeaponGroup.None,
+                        requireDpsReward))
+                {
+                    totalWeight += RewardSelectionPolicy.GetEffectiveWeight(
+                        entry,
+                        rollContext,
+                        weaponDpsBias);
+                }
+            }
+
+            if (totalWeight <= 0f)
+                return false;
+
+            float roll = randomSource.NextUnitFloat() * totalWeight;
+            float currentWeight = 0f;
 
             for (int i = 0; i < pool.Count; i++)
             {
@@ -81,7 +170,8 @@ public static class RewardWeightedPicker
                         usedCategories,
                         usedCategoryRarities,
                         mode,
-                        RewardWeaponGroup.None))
+                        RewardWeaponGroup.None,
+                        requireDpsReward))
                 {
                     continue;
                 }
@@ -98,134 +188,52 @@ public static class RewardWeightedPicker
                 pool.RemoveAt(i);
                 return true;
             }
-        }
 
-        return false;
-    }
-
-    private static bool TryTakeFromPool(
-        List<RewardModifierEntry> pool,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        RewardPickMode mode,
-        out RewardModifierEntry selected,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias,
-        bool requireAssistDpsReward)
-    {
-        selected = null;
-
-        if (pool == null || pool.Count == 0)
             return false;
-
-        bool preferAssistDpsRewards = !requireAssistDpsReward
-            && RewardSelectionPolicy.ShouldPreferAssistDpsRewards(
-                pool,
-                usedCategories,
-                usedCategoryRarities,
-                mode,
-                RewardWeaponGroup.None,
-                rollContext);
-        bool requireDpsReward = requireAssistDpsReward || preferAssistDpsRewards;
-        float totalWeight = 0f;
-
-        for (int i = 0; i < pool.Count; i++)
-        {
-            RewardModifierEntry entry = pool[i];
-
-            if (RewardSelectionPolicy.IsEligible(
-                    entry,
-                    usedCategories,
-                    usedCategoryRarities,
-                    mode,
-                    RewardWeaponGroup.None,
-                    requireDpsReward))
-            {
-                totalWeight += RewardSelectionPolicy.GetEffectiveWeight(
-                    entry,
-                    rollContext,
-                    weaponDpsBias);
-            }
         }
 
-        if (totalWeight <= 0f)
-            return false;
-
-        float roll = randomSource.NextUnitFloat() * totalWeight;
-        float currentWeight = 0f;
-
-        for (int i = 0; i < pool.Count; i++)
+        private static float GetTotalWeight(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            RewardPickMode mode,
+            bool allowLegendary,
+            RewardRollContext rollContext,
+            RewardWeaponDpsBias weaponDpsBias)
         {
-            RewardModifierEntry entry = pool[i];
+            float totalWeight = 0f;
 
-            if (!RewardSelectionPolicy.IsEligible(
-                    entry,
-                    usedCategories,
-                    usedCategoryRarities,
-                    mode,
-                    RewardWeaponGroup.None,
-                    requireDpsReward))
+            foreach (KeyValuePair<RewardRarity, List<RewardModifierEntry>> rarityPool in pools)
             {
-                continue;
-            }
+                if (!allowLegendary && rarityPool.Key == RewardRarity.Legendary)
+                    continue;
 
-            currentWeight += RewardSelectionPolicy.GetEffectiveWeight(
-                entry,
-                rollContext,
-                weaponDpsBias);
+                List<RewardModifierEntry> pool = rarityPool.Value;
 
-            if (roll > currentWeight)
-                continue;
+                if (pool == null)
+                    continue;
 
-            selected = entry;
-            pool.RemoveAt(i);
-            return true;
-        }
-
-        return false;
-    }
-
-    private static float GetTotalWeight(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        RewardPickMode mode,
-        bool allowLegendary,
-        RewardRollContext rollContext,
-        RewardWeaponDpsBias weaponDpsBias)
-    {
-        float totalWeight = 0f;
-
-        foreach (KeyValuePair<RewardRarity, List<RewardModifierEntry>> rarityPool in pools)
-        {
-            if (!allowLegendary && rarityPool.Key == RewardRarity.Legendary)
-                continue;
-
-            List<RewardModifierEntry> pool = rarityPool.Value;
-
-            if (pool == null)
-                continue;
-
-            for (int i = 0; i < pool.Count; i++)
-            {
-                RewardModifierEntry entry = pool[i];
-
-                if (RewardSelectionPolicy.IsEligible(
-                        entry,
-                        usedCategories,
-                        usedCategoryRarities,
-                        mode,
-                        RewardWeaponGroup.None))
+                for (int i = 0; i < pool.Count; i++)
                 {
-                    totalWeight += RewardSelectionPolicy.GetEffectiveWeight(
-                        entry,
-                        rollContext,
-                        weaponDpsBias);
+                    RewardModifierEntry entry = pool[i];
+
+                    if (RewardSelectionPolicy.IsEligible(
+                            entry,
+                            usedCategories,
+                            usedCategoryRarities,
+                            mode,
+                            RewardWeaponGroup.None))
+                    {
+                        totalWeight += RewardSelectionPolicy.GetEffectiveWeight(
+                            entry,
+                            rollContext,
+                            weaponDpsBias);
+                    }
                 }
             }
-        }
 
-        return totalWeight;
+            return totalWeight;
+        }
     }
+
 }

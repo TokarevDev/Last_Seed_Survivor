@@ -1,22 +1,29 @@
-using System;
-using System.Collections.Generic;
 
-public sealed class RewardBatchApplyService
+using Game.Gameplay.Rewards.Runtime;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    private readonly IRewardChoiceApplier _choiceApplier;
+    using System;
+    using System.Collections.Generic;
 
-    public RewardBatchApplyService(IRewardChoiceApplier choiceApplier)
+    public sealed class RewardBatchApplyService
     {
-        _choiceApplier = choiceApplier ??
-            throw new ArgumentNullException(nameof(choiceApplier));
+        private readonly IRewardChoiceApplier _choiceApplier;
+
+        public RewardBatchApplyService(IRewardChoiceApplier choiceApplier)
+        {
+            _choiceApplier = choiceApplier ??
+                throw new ArgumentNullException(nameof(choiceApplier));
+        }
+
+        public void ApplyAll(IReadOnlyList<RewardChoiceData> choices)
+        {
+            if (choices == null)
+                throw new ArgumentNullException(nameof(choices));
+
+            for (int index = 0; index < choices.Count; index++)
+                _choiceApplier.Apply(choices[index]);
+        }
     }
 
-    public void ApplyAll(IReadOnlyList<RewardChoiceData> choices)
-    {
-        if (choices == null)
-            throw new ArgumentNullException(nameof(choices));
-
-        for (int index = 0; index < choices.Count; index++)
-            _choiceApplier.Apply(choices[index]);
-    }
 }

@@ -1,16 +1,24 @@
-using System.Collections.Generic;
 
-public readonly struct RewardChoiceRollResult
+using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Rewards.Runtime;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    public RewardChoiceRollResult(
-        RewardRarity guaranteeRarity,
-        List<RewardChoiceData> choices)
+    using System.Collections.Generic;
+
+    public readonly struct RewardChoiceRollResult
     {
-        GuaranteeRarity = guaranteeRarity;
-        Choices = choices;
+        public RewardChoiceRollResult(
+            RewardRarity guaranteeRarity,
+            List<RewardChoiceData> choices)
+        {
+            GuaranteeRarity = guaranteeRarity;
+            Choices = choices;
+        }
+
+        public RewardRarity GuaranteeRarity { get; }
+        public List<RewardChoiceData> Choices { get; }
+        public bool HasChoices => Choices != null && Choices.Count > 0;
     }
 
-    public RewardRarity GuaranteeRarity { get; }
-    public List<RewardChoiceData> Choices { get; }
-    public bool HasChoices => Choices != null && Choices.Count > 0;
 }

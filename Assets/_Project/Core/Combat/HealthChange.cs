@@ -1,4 +1,4 @@
-namespace LastSeed.Core.Combat
+namespace Game.Core.Combat
 {
     public readonly struct HealthChange
     {

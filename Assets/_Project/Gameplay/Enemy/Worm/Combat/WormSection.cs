@@ -1,130 +1,139 @@
-using System;
-using System.Collections.Generic;
-using LastSeed.Core.Combat;
-using UnityEngine;
 
-public sealed class WormSection : IWormSectionHpTarget
+using Game.Core.Combat;
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Balance;
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    private readonly Health _health = new();
-    private readonly List<WormSegment> _segments = new();
+    using System;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-    public WormSection()
+    public sealed class WormSection : IWormSectionHpTarget
     {
-        _health.Changed += HandleHealthChanged;
-        _health.Depleted += HandleDestroyed;
-    }
+        private readonly Health _health = new();
+        private readonly List<WormSegment> _segments = new();
 
-    public event Action<WormSectionHealthChanged> HpChanged;
-    public event Action<WormSectionDestroyed> Destroyed;
-
-    public int MaxHp => _health.MaxHp;
-    public int CurrentHp => _health.CurrentHp;
-    public int Index { get; set; }
-    public int HpOrder => GetCenterSegmentIndex();
-
-    public CocoonRewardProfile CocoonProfile { get; private set; }
-    public bool HasCocoon => CocoonProfile != null;
-    public bool HasReward => HasCocoon;
-
-    public IReadOnlyList<WormSegment> Segments => _segments;
-    public bool IsDestroyed => _health.IsDepleted;
-    public bool HasTakenDamage => _health.HasTakenDamage;
-    public bool HasVisibleAliveSegment => ContainsVisibleAliveSegment();
-
-    public void InitializeHp(int hp)
-    {
-        _health.Initialize(hp);
-    }
-
-    public void ResetHp(int hp)
-    {
-        _health.Reset(hp);
-    }
-
-    private bool ContainsVisibleAliveSegment()
-    {
-        for (int i = 0; i < _segments.Count; i++)
+        public WormSection()
         {
-            WormSegment segment = _segments[i];
-
-            if (segment != null && segment.IsAlive && segment.gameObject.activeInHierarchy)
-                return true;
+            _health.Changed += HandleHealthChanged;
+            _health.Depleted += HandleDestroyed;
         }
 
-        return false;
-    }
+        public event Action<WormSectionHealthChanged> HpChanged;
+        public event Action<WormSectionDestroyed> Destroyed;
 
-    public void SetCocoon(CocoonRewardProfile profile)
-    {
-        CocoonProfile = profile;
-    }
+        public int MaxHp => _health.MaxHp;
+        public int CurrentHp => _health.CurrentHp;
+        public int Index { get; set; }
+        public int HpOrder => GetCenterSegmentIndex();
 
-    public void AddSegment(WormSegment segment)
-    {
-        if (segment == null)
-            return;
+        public CocoonRewardProfile CocoonProfile { get; private set; }
+        public bool HasCocoon => CocoonProfile != null;
+        public bool HasReward => HasCocoon;
 
-        _segments.Add(segment);
-        segment.Section = this;
-    }
+        public IReadOnlyList<WormSegment> Segments => _segments;
+        public bool IsDestroyed => _health.IsDepleted;
+        public bool HasTakenDamage => _health.HasTakenDamage;
+        public bool HasVisibleAliveSegment => ContainsVisibleAliveSegment();
 
-    public Transform GetHpAnchor()
-    {
-        for (int i = 0; i < _segments.Count; i++)
+        public void InitializeHp(int hp)
         {
-            if (_segments[i].HasCocoon)
-                return _segments[i].CachedTransform;
+            _health.Initialize(hp);
         }
 
-        int centerIndex = _segments.Count / 2;
-        return _segments[centerIndex].CachedTransform;
-    }
-
-    public int GetCenterSegmentIndex()
-    {
-        for (int i = 0; i < _segments.Count; i++)
+        public void ResetHp(int hp)
         {
-            if (_segments[i].HasCocoon)
-                return _segments[i].Index;
+            _health.Reset(hp);
         }
 
-        int mid = _segments.Count / 2;
-        return _segments[mid].Index;
-    }
-
-    public void Damage(int damage)
-    {
-        _health.ApplyDamage(damage);
-    }
-
-    public List<WormSegment> ReleaseSegments()
-    {
-        List<WormSegment> released = new(_segments.Count);
-
-        for (int i = 0; i < _segments.Count; i++)
+        private bool ContainsVisibleAliveSegment()
         {
-            WormSegment segment = _segments[i];
+            for (int i = 0; i < _segments.Count; i++)
+            {
+                WormSegment segment = _segments[i];
 
+                if (segment != null && segment.IsAlive && segment.gameObject.activeInHierarchy)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void SetCocoon(CocoonRewardProfile profile)
+        {
+            CocoonProfile = profile;
+        }
+
+        public void AddSegment(WormSegment segment)
+        {
             if (segment == null)
-                continue;
+                return;
 
-            if (segment.Section == this)
-                segment.Section = null;
-
-            released.Add(segment);
+            _segments.Add(segment);
+            segment.Section = this;
         }
 
-        _segments.Clear();
-        return released;
+        public Transform GetHpAnchor()
+        {
+            for (int i = 0; i < _segments.Count; i++)
+            {
+                if (_segments[i].HasCocoon)
+                    return _segments[i].CachedTransform;
+            }
+
+            int centerIndex = _segments.Count / 2;
+            return _segments[centerIndex].CachedTransform;
+        }
+
+        public int GetCenterSegmentIndex()
+        {
+            for (int i = 0; i < _segments.Count; i++)
+            {
+                if (_segments[i].HasCocoon)
+                    return _segments[i].Index;
+            }
+
+            int mid = _segments.Count / 2;
+            return _segments[mid].Index;
+        }
+
+        public void Damage(int damage)
+        {
+            _health.ApplyDamage(damage);
+        }
+
+        public List<WormSegment> ReleaseSegments()
+        {
+            List<WormSegment> released = new(_segments.Count);
+
+            for (int i = 0; i < _segments.Count; i++)
+            {
+                WormSegment segment = _segments[i];
+
+                if (segment == null)
+                    continue;
+
+                if (segment.Section == this)
+                    segment.Section = null;
+
+                released.Add(segment);
+            }
+
+            _segments.Clear();
+            return released;
+        }
+
+        private void HandleHealthChanged(HealthChange change)
+        {
+            HpChanged?.Invoke(new WormSectionHealthChanged(this, change));
+        }
+
+        private void HandleDestroyed(HealthChange finalChange)
+        {
+            Destroyed?.Invoke(new WormSectionDestroyed(this, finalChange));
+        }
     }
 
-    private void HandleHealthChanged(HealthChange change)
-    {
-        HpChanged?.Invoke(new WormSectionHealthChanged(this, change));
-    }
-
-    private void HandleDestroyed(HealthChange finalChange)
-    {
-        Destroyed?.Invoke(new WormSectionDestroyed(this, finalChange));
-    }
 }

@@ -1,36 +1,43 @@
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Combat/Projectile Config")]
-public sealed class ProjectileConfig : ScriptableObject
+using Game.Gameplay.Combat.Projectiles;
+
+namespace Game.Gameplay.Combat.Projectiles.Configs
 {
-    [Header("Prefab")]
-    [SerializeField] private Projectile _prefab;
+    using UnityEngine;
 
-    [Header("Weapon")]
-    [SerializeField] private int _damage = 5;
+    [CreateAssetMenu(menuName = "Combat/Projectile Config")]
+    public sealed class ProjectileConfig : ScriptableObject
+    {
+        [Header("Prefab")]
+        [SerializeField] private Projectile _prefab;
 
-    [SerializeField] private int _penetration = 0;
+        [Header("Weapon")]
+        [SerializeField] private int _damage = 5;
 
-    [Header("Movement")]
-    [SerializeField] private float _lifeTime = 2f;
+        [SerializeField] private int _penetration = 0;
 
-    [SerializeField] private float _speed = 6f;
+        [Header("Movement")]
+        [SerializeField] private float _lifeTime = 2f;
 
-    [Header("Bounce")]
-    [SerializeField] private int _bounceCount = 0;
+        [SerializeField] private float _speed = 6f;
 
-    [SerializeField] private bool _bounceX = true;
-    [SerializeField] private bool _bounceY = false;
+        [Header("Bounce")]
+        [SerializeField] private int _bounceCount = 0;
 
-    public Projectile Prefab => _prefab;
+        [SerializeField] private bool _bounceX = true;
+        [SerializeField] private bool _bounceY = false;
 
-    public int Damage => _damage;
-    public int Penetration => _penetration;
+        public Projectile Prefab => _prefab;
 
-    public float LifeTime => _lifeTime;
-    public float Speed => _speed;
+        public int Damage => _damage;
+        public int Penetration => _penetration;
 
-    public int BounceCount => _bounceCount;
-    public bool BounceX => _bounceX;
-    public bool BounceY => _bounceY;
+        public float LifeTime => _lifeTime;
+        public float Speed => _speed;
+
+        public int BounceCount => _bounceCount;
+        public bool BounceX => _bounceX;
+        public bool BounceY => _bounceY;
+    }
+
 }

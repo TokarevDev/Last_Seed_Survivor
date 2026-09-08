@@ -77,7 +77,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cbd221ee19c7da049b3613f4a8b09d4c, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.SceneNavigationInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Project.SceneNavigationInstaller
 --- !u!114 &1860796515276809269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -89,4 +89,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ea583d79f1b20ec468e13513c947a431, type: 3}
   m_Name:
-  m_EditorClassIdentifier: LastSeed.Bootstrap::LastSeed.Bootstrap.Installers.ApplicationBootstrapInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Project.ApplicationBootstrapInstaller

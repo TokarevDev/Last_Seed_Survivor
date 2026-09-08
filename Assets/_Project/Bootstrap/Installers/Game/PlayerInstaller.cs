@@ -1,9 +1,13 @@
 using System;
-using LastSeed.Bootstrap.Gameplay;
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Bootstrap.Scenes.Game;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Player;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class PlayerInstaller : MonoInstaller
     {

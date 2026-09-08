@@ -1,7 +1,9 @@
 using System;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core;
+
+namespace Game.Tests
 {
     public sealed class FloatMathTests
     {

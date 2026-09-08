@@ -1,8 +1,9 @@
 using System;
-using LastSeed.Core.Collections;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.Collections;
+
+namespace Game.Tests
 {
     public sealed class QueuedActivationStateTests
     {

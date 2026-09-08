@@ -1,67 +1,69 @@
-using System.Collections.Generic;
-using UnityEngine;
-
-[CreateAssetMenu(menuName = "Game/Rewards/Reward Database")]
-public sealed class RewardDatabase : ScriptableObject
+namespace Game.Gameplay.Rewards.Data
 {
-    [SerializeField] private List<CocoonRewardProfile> _cocoonProfiles = new();
-    [SerializeField] private List<RewardModifierEntry> _rewards;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-    public IReadOnlyList<CocoonRewardProfile> CocoonProfiles =>
-        HasSpawnableCocoonProfile(_cocoonProfiles)
-            ? _cocoonProfiles
-            : CocoonRewardProfile.Defaults;
-
-    public IReadOnlyList<RewardModifierEntry> Rewards => _rewards;
-
-    private void OnEnable()
+    [CreateAssetMenu(menuName = "Game/Rewards/Reward Database")]
+    public sealed class RewardDatabase : ScriptableObject
     {
-        EnsureDefaultCocoonProfiles();
-    }
+        [SerializeField] private List<CocoonRewardProfile> _cocoonProfiles = new();
+        [SerializeField] private List<RewardModifierEntry> _rewards;
 
-    private void Reset()
-    {
-        EnsureDefaultCocoonProfiles();
-    }
+        public IReadOnlyList<CocoonRewardProfile> CocoonProfiles =>
+            HasSpawnableCocoonProfile(_cocoonProfiles)
+                ? _cocoonProfiles
+                : CocoonRewardProfile.Defaults;
 
-    private void OnValidate()
-    {
-        EnsureDefaultCocoonProfiles();
-    }
+        public IReadOnlyList<RewardModifierEntry> Rewards => _rewards;
 
-    private void EnsureDefaultCocoonProfiles()
-    {
-        if (_cocoonProfiles == null)
-            _cocoonProfiles = new List<CocoonRewardProfile>();
-
-        if (_cocoonProfiles.Count > 0)
-            return;
-
-        CocoonRewardProfile.AddDefaultsTo(_cocoonProfiles);
-    }
-
-    private static bool HasSpawnableCocoonProfile(IReadOnlyList<CocoonRewardProfile> profiles)
-    {
-        if (profiles == null)
-            return false;
-
-        for (int i = 0; i < profiles.Count; i++)
+        private void OnEnable()
         {
-            CocoonRewardProfile profile = profiles[i];
-
-            if (profile != null && profile.SpawnWeight > 0f)
-                return true;
+            EnsureDefaultCocoonProfiles();
         }
 
-        return false;
-    }
-}
+        private void Reset()
+        {
+            EnsureDefaultCocoonProfiles();
+        }
 
-[System.Serializable]
-public sealed class CocoonRewardProfile
-{
-    private static readonly CocoonRewardProfile[] DefaultProfileSet =
+        private void OnValidate()
+        {
+            EnsureDefaultCocoonProfiles();
+        }
+
+        private void EnsureDefaultCocoonProfiles()
+        {
+            if (_cocoonProfiles == null)
+                _cocoonProfiles = new List<CocoonRewardProfile>();
+
+            if (_cocoonProfiles.Count > 0)
+                return;
+
+            CocoonRewardProfile.AddDefaultsTo(_cocoonProfiles);
+        }
+
+        private static bool HasSpawnableCocoonProfile(IReadOnlyList<CocoonRewardProfile> profiles)
+        {
+            if (profiles == null)
+                return false;
+
+            for (int i = 0; i < profiles.Count; i++)
+            {
+                CocoonRewardProfile profile = profiles[i];
+
+                if (profile != null && profile.SpawnWeight > 0f)
+                    return true;
+            }
+
+            return false;
+        }
+    }
+
+    [System.Serializable]
+    public sealed class CocoonRewardProfile
     {
+        private static readonly CocoonRewardProfile[] DefaultProfileSet =
+        {
         new(
             "White",
             Color.white,
@@ -119,106 +121,108 @@ public sealed class CocoonRewardProfile
             new RewardRaritySlot(RewardRarity.Rare))
     };
 
-    [SerializeField] private string _displayName = "White";
-    [SerializeField, HideInInspector] private Color _visualColor = Color.white;
-    [SerializeField][Min(0f)] private float _spawnWeight = 1f;
-    [SerializeField][Range(0f, 1f)] private float _minDestroyedProgressToSpawn;
-    [SerializeField] private bool _useFixedSpawnChance;
-    [SerializeField][Range(0f, 1f)] private float _fixedSpawnChance;
-    [SerializeField] private bool _guaranteesLegendaryReward;
-    [SerializeField][Range(0f, 1f)] private float _secondaryLegendaryChance;
-    [SerializeField] private bool _usesLegendaryCocoonVisual;
-    [SerializeField] private List<RewardRaritySlot> _raritySlots = new();
+        [SerializeField] private string _displayName = "White";
+        [SerializeField, HideInInspector] private Color _visualColor = Color.white;
+        [SerializeField][Min(0f)] private float _spawnWeight = 1f;
+        [SerializeField][Range(0f, 1f)] private float _minDestroyedProgressToSpawn;
+        [SerializeField] private bool _useFixedSpawnChance;
+        [SerializeField][Range(0f, 1f)] private float _fixedSpawnChance;
+        [SerializeField] private bool _guaranteesLegendaryReward;
+        [SerializeField][Range(0f, 1f)] private float _secondaryLegendaryChance;
+        [SerializeField] private bool _usesLegendaryCocoonVisual;
+        [SerializeField] private List<RewardRaritySlot> _raritySlots = new();
 
-    public static IReadOnlyList<CocoonRewardProfile> Defaults => DefaultProfileSet;
-    public static CocoonRewardProfile Default => DefaultProfileSet[0];
+        public static IReadOnlyList<CocoonRewardProfile> Defaults => DefaultProfileSet;
+        public static CocoonRewardProfile Default => DefaultProfileSet[0];
 
-    public string DisplayName => _displayName;
-    public Color VisualColor => _visualColor;
-    public float SpawnWeight => Mathf.Max(0f, _spawnWeight);
-    public float MinDestroyedProgressToSpawn => Mathf.Clamp01(_minDestroyedProgressToSpawn);
-    public bool UseFixedSpawnChance => _useFixedSpawnChance;
-    public float FixedSpawnChance => Mathf.Clamp01(_fixedSpawnChance);
-    public bool GuaranteesLegendaryReward => _guaranteesLegendaryReward || _usesLegendaryCocoonVisual;
-    public float SecondaryLegendaryChance => Mathf.Clamp01(_secondaryLegendaryChance);
-    public bool UsesLegendaryCocoonVisual => _usesLegendaryCocoonVisual;
-    public IReadOnlyList<RewardRaritySlot> RaritySlots => _raritySlots;
+        public string DisplayName => _displayName;
+        public Color VisualColor => _visualColor;
+        public float SpawnWeight => Mathf.Max(0f, _spawnWeight);
+        public float MinDestroyedProgressToSpawn => Mathf.Clamp01(_minDestroyedProgressToSpawn);
+        public bool UseFixedSpawnChance => _useFixedSpawnChance;
+        public float FixedSpawnChance => Mathf.Clamp01(_fixedSpawnChance);
+        public bool GuaranteesLegendaryReward => _guaranteesLegendaryReward || _usesLegendaryCocoonVisual;
+        public float SecondaryLegendaryChance => Mathf.Clamp01(_secondaryLegendaryChance);
+        public bool UsesLegendaryCocoonVisual => _usesLegendaryCocoonVisual;
+        public IReadOnlyList<RewardRaritySlot> RaritySlots => _raritySlots;
 
-    public CocoonRewardProfile()
-    {
-    }
-
-    private CocoonRewardProfile(
-        string displayName,
-        Color visualColor,
-        float spawnWeight,
-        float minDestroyedProgressToSpawn,
-        bool useFixedSpawnChance,
-        float fixedSpawnChance,
-        bool guaranteesLegendaryReward,
-        float secondaryLegendaryChance,
-        bool usesLegendaryCocoonVisual,
-        params RewardRaritySlot[] raritySlots)
-    {
-        _displayName = displayName;
-        _visualColor = visualColor;
-        _spawnWeight = Mathf.Max(0f, spawnWeight);
-        _minDestroyedProgressToSpawn = Mathf.Clamp01(minDestroyedProgressToSpawn);
-        _useFixedSpawnChance = useFixedSpawnChance;
-        _fixedSpawnChance = Mathf.Clamp01(fixedSpawnChance);
-        _guaranteesLegendaryReward = guaranteesLegendaryReward;
-        _secondaryLegendaryChance = Mathf.Clamp01(secondaryLegendaryChance);
-        _usesLegendaryCocoonVisual = usesLegendaryCocoonVisual;
-        _raritySlots = new List<RewardRaritySlot>();
-
-        if (raritySlots == null)
-            return;
-
-        for (int i = 0; i < raritySlots.Length; i++)
+        public CocoonRewardProfile()
         {
-            RewardRaritySlot slot = raritySlots[i];
+        }
 
-            if (slot == null)
-                continue;
+        private CocoonRewardProfile(
+            string displayName,
+            Color visualColor,
+            float spawnWeight,
+            float minDestroyedProgressToSpawn,
+            bool useFixedSpawnChance,
+            float fixedSpawnChance,
+            bool guaranteesLegendaryReward,
+            float secondaryLegendaryChance,
+            bool usesLegendaryCocoonVisual,
+            params RewardRaritySlot[] raritySlots)
+        {
+            _displayName = displayName;
+            _visualColor = visualColor;
+            _spawnWeight = Mathf.Max(0f, spawnWeight);
+            _minDestroyedProgressToSpawn = Mathf.Clamp01(minDestroyedProgressToSpawn);
+            _useFixedSpawnChance = useFixedSpawnChance;
+            _fixedSpawnChance = Mathf.Clamp01(fixedSpawnChance);
+            _guaranteesLegendaryReward = guaranteesLegendaryReward;
+            _secondaryLegendaryChance = Mathf.Clamp01(secondaryLegendaryChance);
+            _usesLegendaryCocoonVisual = usesLegendaryCocoonVisual;
+            _raritySlots = new List<RewardRaritySlot>();
 
-            _raritySlots.Add(slot.Clone());
+            if (raritySlots == null)
+                return;
+
+            for (int i = 0; i < raritySlots.Length; i++)
+            {
+                RewardRaritySlot slot = raritySlots[i];
+
+                if (slot == null)
+                    continue;
+
+                _raritySlots.Add(slot.Clone());
+            }
+        }
+
+        public static void AddDefaultsTo(List<CocoonRewardProfile> target)
+        {
+            if (target == null)
+                return;
+
+            for (int i = 0; i < DefaultProfileSet.Length; i++)
+            {
+                target.Add(DefaultProfileSet[i].Clone());
+            }
+        }
+
+        private CocoonRewardProfile Clone()
+        {
+            int slotCount = _raritySlots != null ? _raritySlots.Count : 0;
+            RewardRaritySlot[] slots = new RewardRaritySlot[slotCount];
+
+            for (int i = 0; i < slotCount; i++)
+            {
+                RewardRaritySlot slot = _raritySlots[i];
+                slots[i] = slot != null
+                    ? slot.Clone()
+                    : null;
+            }
+
+            return new CocoonRewardProfile(
+                _displayName,
+                _visualColor,
+                _spawnWeight,
+                _minDestroyedProgressToSpawn,
+                _useFixedSpawnChance,
+                _fixedSpawnChance,
+                _guaranteesLegendaryReward,
+                _secondaryLegendaryChance,
+                _usesLegendaryCocoonVisual,
+                slots);
         }
     }
 
-    public static void AddDefaultsTo(List<CocoonRewardProfile> target)
-    {
-        if (target == null)
-            return;
-
-        for (int i = 0; i < DefaultProfileSet.Length; i++)
-        {
-            target.Add(DefaultProfileSet[i].Clone());
-        }
-    }
-
-    private CocoonRewardProfile Clone()
-    {
-        int slotCount = _raritySlots != null ? _raritySlots.Count : 0;
-        RewardRaritySlot[] slots = new RewardRaritySlot[slotCount];
-
-        for (int i = 0; i < slotCount; i++)
-        {
-            RewardRaritySlot slot = _raritySlots[i];
-            slots[i] = slot != null
-                ? slot.Clone()
-                : null;
-        }
-
-        return new CocoonRewardProfile(
-            _displayName,
-            _visualColor,
-            _spawnWeight,
-            _minDestroyedProgressToSpawn,
-            _useFixedSpawnChance,
-            _fixedSpawnChance,
-            _guaranteesLegendaryReward,
-            _secondaryLegendaryChance,
-            _usesLegendaryCocoonVisual,
-            slots);
-    }
 }

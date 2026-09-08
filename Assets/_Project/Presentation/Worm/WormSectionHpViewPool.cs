@@ -1,57 +1,62 @@
-using System;
-using LastSeed.Core.Pooling;
-using UnityEngine;
+using Game.Core.Pooling;
 
-public sealed class WormSectionHpViewPool
+namespace Game.Presentation.Worm
 {
-    private readonly WormSectionHpView _prefab;
-    private readonly Transform _root;
-    private readonly ObjectPool<WormSectionHpView> _pool;
+    using System;
+    using UnityEngine;
 
-    public WormSectionHpViewPool(WormSectionHpView prefab, Transform root)
+    public sealed class WormSectionHpViewPool
     {
-        _prefab = prefab != null ? prefab : throw new ArgumentNullException(nameof(prefab));
-        _root = root != null ? root : throw new ArgumentNullException(nameof(root));
-        _pool = new ObjectPool<WormSectionHpView>(CreateView, DeactivateView);
-    }
+        private readonly WormSectionHpView _prefab;
+        private readonly Transform _root;
+        private readonly ObjectPool<WormSectionHpView> _pool;
 
-    public WormSectionHpView Rent(Transform target, int currentHp)
-    {
-        Binding binding = new(target, currentHp);
-        return _pool.Rent(binding, BindView);
-    }
-
-    public bool Return(WormSectionHpView view)
-    {
-        return _pool.Return(view);
-    }
-
-    private WormSectionHpView CreateView()
-    {
-        return UnityEngine.Object.Instantiate(_prefab, _root);
-    }
-
-    private static void BindView(WormSectionHpView view, in Binding binding)
-    {
-        view.gameObject.SetActive(true);
-        view.Bind(binding.Target, binding.CurrentHp);
-    }
-
-    private static void DeactivateView(WormSectionHpView view)
-    {
-        view.Unbind();
-        view.gameObject.SetActive(false);
-    }
-
-    private readonly struct Binding
-    {
-        public Binding(Transform target, int currentHp)
+        public WormSectionHpViewPool(WormSectionHpView prefab, Transform root)
         {
-            Target = target;
-            CurrentHp = currentHp;
+            _prefab = prefab != null ? prefab : throw new ArgumentNullException(nameof(prefab));
+            _root = root != null ? root : throw new ArgumentNullException(nameof(root));
+            _pool = new ObjectPool<WormSectionHpView>(CreateView, DeactivateView);
         }
 
-        public Transform Target { get; }
-        public int CurrentHp { get; }
+        public WormSectionHpView Rent(Transform target, int currentHp)
+        {
+            Binding binding = new(target, currentHp);
+            return _pool.Rent(binding, BindView);
+        }
+
+        public bool Return(WormSectionHpView view)
+        {
+            return _pool.Return(view);
+        }
+
+        private WormSectionHpView CreateView()
+        {
+            return UnityEngine.Object.Instantiate(_prefab, _root);
+        }
+
+        private static void BindView(WormSectionHpView view, in Binding binding)
+        {
+            view.gameObject.SetActive(true);
+            view.Bind(binding.Target, binding.CurrentHp);
+        }
+
+        private static void DeactivateView(WormSectionHpView view)
+        {
+            view.Unbind();
+            view.gameObject.SetActive(false);
+        }
+
+        private readonly struct Binding
+        {
+            public Binding(Transform target, int currentHp)
+            {
+                Target = target;
+                CurrentHp = currentHp;
+            }
+
+            public Transform Target { get; }
+            public int CurrentHp { get; }
+        }
     }
+
 }

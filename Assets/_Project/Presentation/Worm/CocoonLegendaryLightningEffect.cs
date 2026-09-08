@@ -1,254 +1,259 @@
-using UnityEngine;
 
-[DisallowMultipleComponent]
-public sealed class CocoonLegendaryLightningEffect : MonoBehaviour
+namespace Game.Presentation.Worm
 {
-    private const int DefaultLineCount = 3;
-    private const int DefaultPointCount = 4;
+    using UnityEngine;
 
-    [SerializeField, Min(1)] private int _lineCount = DefaultLineCount;
-    [SerializeField, Min(2)] private int _pointCount = DefaultPointCount;
-    [SerializeField, Min(0.01f)] private float _radius = 0.38f;
-    [SerializeField, Min(0f)] private float _radiusJitter = 0.08f;
-    [SerializeField, Min(0.01f)] private float _arcAngle = 0.9f;
-    [SerializeField, Min(0.01f)] private float _refreshInterval = 0.13f;
-    [SerializeField, Min(0.001f)] private float _lineWidth = 0.018f;
-    [SerializeField] private Color _color = new(1f, 0.58f, 0.08f, 0.85f);
-
-    private LineState[] _lines;
-    private float _refreshTimer;
-    private int _sortingLayerId;
-    private int _sortingOrder;
-    private bool _hasSorting;
-    private Material _lineMaterial;
-
-    private Material LineMaterial
+    [DisallowMultipleComponent]
+    public sealed class CocoonLegendaryLightningEffect : MonoBehaviour
     {
-        get
+        private const int DefaultLineCount = 3;
+        private const int DefaultPointCount = 4;
+
+        [SerializeField, Min(1)] private int _lineCount = DefaultLineCount;
+        [SerializeField, Min(2)] private int _pointCount = DefaultPointCount;
+        [SerializeField, Min(0.01f)] private float _radius = 0.38f;
+        [SerializeField, Min(0f)] private float _radiusJitter = 0.08f;
+        [SerializeField, Min(0.01f)] private float _arcAngle = 0.9f;
+        [SerializeField, Min(0.01f)] private float _refreshInterval = 0.13f;
+        [SerializeField, Min(0.001f)] private float _lineWidth = 0.018f;
+        [SerializeField] private Color _color = new(1f, 0.58f, 0.08f, 0.85f);
+
+        private LineState[] _lines;
+        private float _refreshTimer;
+        private int _sortingLayerId;
+        private int _sortingOrder;
+        private bool _hasSorting;
+        private Material _lineMaterial;
+
+        private Material LineMaterial
+        {
+            get
+            {
+                if (_lineMaterial != null)
+                    return _lineMaterial;
+
+                Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+
+                if (shader == null)
+                    shader = Shader.Find("Sprites/Default");
+
+                if (shader == null)
+                {
+                    Debug.LogError("CocoonLegendaryLightningEffect: line shader is missing.", this);
+                    return null;
+                }
+
+                _lineMaterial = new Material(shader)
+                {
+                    hideFlags = HideFlags.DontSave,
+                    name = "Cocoon Legendary Lightning Runtime"
+                };
+
+                return _lineMaterial;
+            }
+        }
+
+        private void OnEnable()
+        {
+            EnsureLines();
+            RefreshLines();
+            _refreshTimer = 0f;
+        }
+
+        private void OnDisable()
+        {
+            SetLinesVisible(false);
+        }
+
+        private void OnDestroy()
         {
             if (_lineMaterial != null)
-                return _lineMaterial;
+                Destroy(_lineMaterial);
 
-            Shader shader = Shader.Find("Universal Render Pipeline/2D/Sprite-Unlit-Default");
+            _lineMaterial = null;
+        }
 
-            if (shader == null)
-                shader = Shader.Find("Sprites/Default");
+        private void Update()
+        {
+            _refreshTimer -= Time.deltaTime;
 
-            if (shader == null)
+            if (_refreshTimer > 0f)
+                return;
+
+            RefreshLines();
+            _refreshTimer = _refreshInterval;
+        }
+
+        public void Configure(Color color)
+        {
+            _color = color;
+
+            if (_lines != null)
+                ApplyColor();
+        }
+
+        public void SetActive(bool active)
+        {
+            if (gameObject.activeSelf != active)
+                gameObject.SetActive(active);
+
+            enabled = active;
+        }
+
+        public void SetSorting(int sortingLayerId, int sortingOrder)
+        {
+            _hasSorting = true;
+            _sortingLayerId = sortingLayerId;
+            _sortingOrder = sortingOrder;
+
+            if (_lines == null)
+                return;
+
+            for (int i = 0; i < _lines.Length; i++)
             {
-                Debug.LogError("CocoonLegendaryLightningEffect: line shader is missing.", this);
-                return null;
+                LineRenderer lineRenderer = _lines[i].Renderer;
+
+                if (lineRenderer == null)
+                    continue;
+
+                lineRenderer.sortingLayerID = _sortingLayerId;
+                lineRenderer.sortingOrder = _sortingOrder + i;
+            }
+        }
+
+        private void EnsureLines()
+        {
+            if (_lines != null && _lines.Length == _lineCount)
+                return;
+
+            Material lineMaterial = LineMaterial;
+
+            if (lineMaterial == null)
+                return;
+
+            _lineCount = Mathf.Max(1, _lineCount);
+            _pointCount = Mathf.Max(2, _pointCount);
+            DestroyLineObjects();
+            _lines = new LineState[_lineCount];
+
+            for (int i = 0; i < _lineCount; i++)
+            {
+                GameObject lineObject = new($"LightningArc_{i + 1}");
+                lineObject.transform.SetParent(transform, false);
+
+                LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
+                lineRenderer.useWorldSpace = false;
+                lineRenderer.loop = false;
+                lineRenderer.positionCount = _pointCount;
+                lineRenderer.widthMultiplier = _lineWidth;
+                lineRenderer.numCapVertices = 2;
+                lineRenderer.numCornerVertices = 2;
+                lineRenderer.sharedMaterial = lineMaterial;
+                lineRenderer.textureMode = LineTextureMode.Stretch;
+                lineRenderer.alignment = LineAlignment.View;
+
+                _lines[i] = new LineState(lineRenderer, new Vector3[_pointCount]);
             }
 
-            _lineMaterial = new Material(shader)
-            {
-                hideFlags = HideFlags.DontSave,
-                name = "Cocoon Legendary Lightning Runtime"
-            };
-
-            return _lineMaterial;
-        }
-    }
-
-    private void OnEnable()
-    {
-        EnsureLines();
-        RefreshLines();
-        _refreshTimer = 0f;
-    }
-
-    private void OnDisable()
-    {
-        SetLinesVisible(false);
-    }
-
-    private void OnDestroy()
-    {
-        if (_lineMaterial != null)
-            Destroy(_lineMaterial);
-
-        _lineMaterial = null;
-    }
-
-    private void Update()
-    {
-        _refreshTimer -= Time.deltaTime;
-
-        if (_refreshTimer > 0f)
-            return;
-
-        RefreshLines();
-        _refreshTimer = _refreshInterval;
-    }
-
-    public void Configure(Color color)
-    {
-        _color = color;
-
-        if (_lines != null)
             ApplyColor();
-    }
 
-    public void SetActive(bool active)
-    {
-        if (gameObject.activeSelf != active)
-            gameObject.SetActive(active);
-
-        enabled = active;
-    }
-
-    public void SetSorting(int sortingLayerId, int sortingOrder)
-    {
-        _hasSorting = true;
-        _sortingLayerId = sortingLayerId;
-        _sortingOrder = sortingOrder;
-
-        if (_lines == null)
-            return;
-
-        for (int i = 0; i < _lines.Length; i++)
-        {
-            LineRenderer lineRenderer = _lines[i].Renderer;
-
-            if (lineRenderer == null)
-                continue;
-
-            lineRenderer.sortingLayerID = _sortingLayerId;
-            lineRenderer.sortingOrder = _sortingOrder + i;
-        }
-    }
-
-    private void EnsureLines()
-    {
-        if (_lines != null && _lines.Length == _lineCount)
-            return;
-
-        Material lineMaterial = LineMaterial;
-
-        if (lineMaterial == null)
-            return;
-
-        _lineCount = Mathf.Max(1, _lineCount);
-        _pointCount = Mathf.Max(2, _pointCount);
-        DestroyLineObjects();
-        _lines = new LineState[_lineCount];
-
-        for (int i = 0; i < _lineCount; i++)
-        {
-            GameObject lineObject = new($"LightningArc_{i + 1}");
-            lineObject.transform.SetParent(transform, false);
-
-            LineRenderer lineRenderer = lineObject.AddComponent<LineRenderer>();
-            lineRenderer.useWorldSpace = false;
-            lineRenderer.loop = false;
-            lineRenderer.positionCount = _pointCount;
-            lineRenderer.widthMultiplier = _lineWidth;
-            lineRenderer.numCapVertices = 2;
-            lineRenderer.numCornerVertices = 2;
-            lineRenderer.sharedMaterial = lineMaterial;
-            lineRenderer.textureMode = LineTextureMode.Stretch;
-            lineRenderer.alignment = LineAlignment.View;
-
-            _lines[i] = new LineState(lineRenderer, new Vector3[_pointCount]);
+            if (_hasSorting)
+                SetSorting(_sortingLayerId, _sortingOrder);
         }
 
-        ApplyColor();
-
-        if (_hasSorting)
-            SetSorting(_sortingLayerId, _sortingOrder);
-    }
-
-    private void RefreshLines()
-    {
-        EnsureLines();
-
-        if (_lines == null)
-            return;
-
-        SetLinesVisible(true);
-
-        for (int i = 0; i < _lines.Length; i++)
+        private void RefreshLines()
         {
-            LineState state = _lines[i];
-            float centerAngle = Random.Range(0f, Mathf.PI * 2f);
-            float startAngle = centerAngle - _arcAngle * 0.5f;
-            float alpha = Random.Range(0.45f, 0.95f);
+            EnsureLines();
 
-            for (int pointIndex = 0; pointIndex < state.Points.Length; pointIndex++)
+            if (_lines == null)
+                return;
+
+            SetLinesVisible(true);
+
+            for (int i = 0; i < _lines.Length; i++)
             {
-                float t = pointIndex / (float)(state.Points.Length - 1);
-                float angle = startAngle + _arcAngle * t + Random.Range(-0.14f, 0.14f);
-                float radius = _radius + Random.Range(-_radiusJitter, _radiusJitter);
-                state.Points[pointIndex] = new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    Mathf.Sin(angle) * radius * 1.15f,
-                    0f);
+                LineState state = _lines[i];
+                float centerAngle = Random.Range(0f, Mathf.PI * 2f);
+                float startAngle = centerAngle - _arcAngle * 0.5f;
+                float alpha = Random.Range(0.45f, 0.95f);
+
+                for (int pointIndex = 0; pointIndex < state.Points.Length; pointIndex++)
+                {
+                    float t = pointIndex / (float)(state.Points.Length - 1);
+                    float angle = startAngle + _arcAngle * t + Random.Range(-0.14f, 0.14f);
+                    float radius = _radius + Random.Range(-_radiusJitter, _radiusJitter);
+                    state.Points[pointIndex] = new Vector3(
+                        Mathf.Cos(angle) * radius,
+                        Mathf.Sin(angle) * radius * 1.15f,
+                        0f);
+                }
+
+                Color lineColor = _color;
+                lineColor.a *= alpha;
+                state.Renderer.startColor = lineColor;
+                state.Renderer.endColor = lineColor;
+                state.Renderer.SetPositions(state.Points);
+            }
+        }
+
+        private void ApplyColor()
+        {
+            if (_lines == null)
+                return;
+
+            for (int i = 0; i < _lines.Length; i++)
+            {
+                LineRenderer lineRenderer = _lines[i].Renderer;
+
+                if (lineRenderer == null)
+                    continue;
+
+                lineRenderer.startColor = _color;
+                lineRenderer.endColor = _color;
+            }
+        }
+
+        private void SetLinesVisible(bool visible)
+        {
+            if (_lines == null)
+                return;
+
+            for (int i = 0; i < _lines.Length; i++)
+            {
+                LineRenderer lineRenderer = _lines[i].Renderer;
+
+                if (lineRenderer != null && lineRenderer.enabled != visible)
+                    lineRenderer.enabled = visible;
+            }
+        }
+
+        private void DestroyLineObjects()
+        {
+            if (_lines == null)
+                return;
+
+            for (int index = 0; index < _lines.Length; index++)
+            {
+                LineRenderer lineRenderer = _lines[index].Renderer;
+
+                if (lineRenderer != null)
+                    Destroy(lineRenderer.gameObject);
             }
 
-            Color lineColor = _color;
-            lineColor.a *= alpha;
-            state.Renderer.startColor = lineColor;
-            state.Renderer.endColor = lineColor;
-            state.Renderer.SetPositions(state.Points);
+            _lines = null;
         }
-    }
 
-    private void ApplyColor()
-    {
-        if (_lines == null)
-            return;
-
-        for (int i = 0; i < _lines.Length; i++)
+        private sealed class LineState
         {
-            LineRenderer lineRenderer = _lines[i].Renderer;
+            public LineState(LineRenderer renderer, Vector3[] points)
+            {
+                Renderer = renderer;
+                Points = points;
+            }
 
-            if (lineRenderer == null)
-                continue;
-
-            lineRenderer.startColor = _color;
-            lineRenderer.endColor = _color;
+            public LineRenderer Renderer { get; }
+            public Vector3[] Points { get; }
         }
     }
 
-    private void SetLinesVisible(bool visible)
-    {
-        if (_lines == null)
-            return;
-
-        for (int i = 0; i < _lines.Length; i++)
-        {
-            LineRenderer lineRenderer = _lines[i].Renderer;
-
-            if (lineRenderer != null && lineRenderer.enabled != visible)
-                lineRenderer.enabled = visible;
-        }
-    }
-
-    private void DestroyLineObjects()
-    {
-        if (_lines == null)
-            return;
-
-        for (int index = 0; index < _lines.Length; index++)
-        {
-            LineRenderer lineRenderer = _lines[index].Renderer;
-
-            if (lineRenderer != null)
-                Destroy(lineRenderer.gameObject);
-        }
-
-        _lines = null;
-    }
-
-    private sealed class LineState
-    {
-        public LineState(LineRenderer renderer, Vector3[] points)
-        {
-            Renderer = renderer;
-            Points = points;
-        }
-
-        public LineRenderer Renderer { get; }
-        public Vector3[] Points { get; }
-    }
 }

@@ -1,4 +1,7 @@
-namespace LastSeed.Gameplay.Signals
+
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Signals
 {
     public interface IWormCombatEventPublisher
     {

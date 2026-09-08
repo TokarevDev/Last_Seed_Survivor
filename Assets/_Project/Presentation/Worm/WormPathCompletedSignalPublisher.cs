@@ -1,22 +1,29 @@
-using System;
-using LastSeed.Gameplay.Signals;
-using Zenject;
 
-public sealed class WormPathCompletedSignalPublisher
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Gameplay.Signals;
+
+namespace Game.Presentation.Worm
 {
-    private readonly SignalBus _signalBus;
+    using System;
+    using Zenject;
 
-    public WormPathCompletedSignalPublisher(SignalBus signalBus)
+    public sealed class WormPathCompletedSignalPublisher
     {
-        _signalBus = signalBus ?? throw new ArgumentNullException(nameof(signalBus));
+        private readonly SignalBus _signalBus;
+
+        public WormPathCompletedSignalPublisher(SignalBus signalBus)
+        {
+            _signalBus = signalBus ?? throw new ArgumentNullException(nameof(signalBus));
+        }
+
+        public void Publish(in WormFrameResult result)
+        {
+            if (!result.PathCompleted)
+                return;
+
+            _signalBus.Fire(new WormPathCompletedSignal(
+                result.HeadPathProgressNormalized));
+        }
     }
 
-    public void Publish(in WormFrameResult result)
-    {
-        if (!result.PathCompleted)
-            return;
-
-        _signalBus.Fire(new WormPathCompletedSignal(
-            result.HeadPathProgressNormalized));
-    }
 }

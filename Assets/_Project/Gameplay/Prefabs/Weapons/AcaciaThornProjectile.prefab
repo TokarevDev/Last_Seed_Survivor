@@ -46,7 +46,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa9c5e4d7b2a49f1a6c8d3e0b7f5a219, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AcaciaThornProjectile
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.AcaciaThornProjectile
   _renderer: {fileID: 2859308452093847107}
   _hitMask:
     serializedVersion: 2

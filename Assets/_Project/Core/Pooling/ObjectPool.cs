@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using LastSeed.Core.Collections;
+using Game.Core.Collections;
 
-namespace LastSeed.Core.Pooling
+namespace Game.Core.Pooling
 {
     public sealed class ObjectPool<T>
         where T : class

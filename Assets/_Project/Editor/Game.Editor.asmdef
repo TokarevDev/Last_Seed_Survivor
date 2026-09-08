@@ -1,12 +1,12 @@
 {
-  "name": "LastSeed.Editor",
-  "rootNamespace": "LastSeed.Editor",
+  "name": "Game.Editor",
+  "rootNamespace": "Game.Editor",
   "references": [
-    "LastSeed.Core",
-    "LastSeed.Gameplay",
-    "LastSeed.Infrastructure",
-    "LastSeed.Presentation",
-    "LastSeed.Bootstrap",
+    "Game.Core",
+    "Game.Gameplay",
+    "Game.Infrastructure",
+    "Game.Presentation",
+    "Game.Bootstrap",
     "Zenject",
     "Zenject-Editor"
   ],

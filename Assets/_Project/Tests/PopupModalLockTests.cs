@@ -1,10 +1,11 @@
 using System;
-using LastSeed.Core.Timing;
-using LastSeed.Gameplay.Input;
-using LastSeed.Presentation.UI.Popups;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.Timing;
+using Game.Gameplay.Input;
+using Game.Presentation.UI.Common.Popups;
+
+namespace Game.Tests
 {
     public sealed class PopupModalLockTests
     {

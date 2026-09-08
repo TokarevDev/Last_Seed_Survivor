@@ -1,11 +1,15 @@
-public readonly struct WormSectionRollbackMotionResult
+namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    public WormSectionRollbackMotionResult(float headDistance, bool completed)
+    public readonly struct WormSectionRollbackMotionResult
     {
-        HeadDistance = headDistance;
-        Completed = completed;
+        public WormSectionRollbackMotionResult(float headDistance, bool completed)
+        {
+            HeadDistance = headDistance;
+            Completed = completed;
+        }
+
+        public float HeadDistance { get; }
+        public bool Completed { get; }
     }
 
-    public float HeadDistance { get; }
-    public bool Completed { get; }
 }

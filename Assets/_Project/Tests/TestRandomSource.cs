@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 
-namespace LastSeed.Tests
+using Game.Core.Random;
+
+namespace Game.Tests
 {
     internal sealed class TestRandomSource : IRandomSource
     {

@@ -1,36 +1,43 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using UnityEditor;
-using UnityEngine;
-using Random = UnityEngine.Random;
 
-internal sealed class WormBalanceRewardSelection
+using Game.Gameplay.Rewards.Runtime;
+
+namespace Game.Editor.Worm
 {
-    private readonly List<WormBalanceRewardChoiceEvaluation> _evaluations;
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Text;
+    using UnityEditor;
+    using UnityEngine;
+    using Random = UnityEngine.Random;
 
-    public WormBalanceRewardSelection(
-        List<RewardChoiceData> rewards,
-        List<WormBalanceRewardChoiceEvaluation> evaluations)
+    internal sealed class WormBalanceRewardSelection
     {
-        Rewards = rewards ?? new List<RewardChoiceData>();
-        _evaluations = evaluations ?? new List<WormBalanceRewardChoiceEvaluation>();
-    }
+        private readonly List<WormBalanceRewardChoiceEvaluation> _evaluations;
 
-    public readonly List<RewardChoiceData> Rewards;
-
-    public float GetDpsGain(RewardChoiceData reward)
-    {
-        if (reward == null)
-            return 0f;
-
-        for (int i = 0; i < _evaluations.Count; i++)
+        public WormBalanceRewardSelection(
+            List<RewardChoiceData> rewards,
+            List<WormBalanceRewardChoiceEvaluation> evaluations)
         {
-            if (ReferenceEquals(_evaluations[i].Reward, reward))
-                return _evaluations[i].DpsGain;
+            Rewards = rewards ?? new List<RewardChoiceData>();
+            _evaluations = evaluations ?? new List<WormBalanceRewardChoiceEvaluation>();
         }
 
-        return 0f;
+        public readonly List<RewardChoiceData> Rewards;
+
+        public float GetDpsGain(RewardChoiceData reward)
+        {
+            if (reward == null)
+                return 0f;
+
+            for (int i = 0; i < _evaluations.Count; i++)
+            {
+                if (ReferenceEquals(_evaluations[i].Reward, reward))
+                    return _evaluations[i].DpsGain;
+            }
+
+            return 0f;
+        }
     }
+
 }

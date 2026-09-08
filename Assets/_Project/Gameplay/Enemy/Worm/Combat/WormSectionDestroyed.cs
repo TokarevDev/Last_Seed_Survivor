@@ -1,15 +1,19 @@
-using LastSeed.Core.Combat;
+using Game.Core.Combat;
 
-public readonly struct WormSectionDestroyed
+namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    public WormSectionDestroyed(
-        WormSection section,
-        in HealthChange finalChange)
+    public readonly struct WormSectionDestroyed
     {
-        Section = section;
-        FinalChange = finalChange;
+        public WormSectionDestroyed(
+            WormSection section,
+            in HealthChange finalChange)
+        {
+            Section = section;
+            FinalChange = finalChange;
+        }
+
+        public WormSection Section { get; }
+        public HealthChange FinalChange { get; }
     }
 
-    public WormSection Section { get; }
-    public HealthChange FinalChange { get; }
 }

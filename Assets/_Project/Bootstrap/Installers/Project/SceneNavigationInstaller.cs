@@ -1,7 +1,8 @@
-using LastSeed.Infrastructure.Navigation;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Infrastructure.Navigation;
+
+namespace Game.Bootstrap.Installers.Project
 {
     public sealed class SceneNavigationInstaller : MonoInstaller
     {

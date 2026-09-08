@@ -1,6 +1,10 @@
-using UnityEngine;
-
-public abstract class WormFaceBurstView : MonoBehaviour, IWormFaceBurstView
+namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    public abstract void SetBoostActive(bool isActive);
+    using UnityEngine;
+
+    public abstract class WormFaceBurstView : MonoBehaviour, IWormFaceBurstView
+    {
+        public abstract void SetBoostActive(bool isActive);
+    }
+
 }

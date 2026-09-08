@@ -1,16 +1,10 @@
 {
-  "name": "LastSeed.Presentation",
-  "rootNamespace": "LastSeed.Presentation",
+  "name": "Game.Infrastructure",
+  "rootNamespace": "Game.Infrastructure",
   "references": [
-    "LastSeed.Core",
-    "LastSeed.Gameplay",
-    "LastSeed.Infrastructure",
-    "LastSeed.DOTween.Modules",
+    "Game.Core",
     "UniTask",
-    "Unity.InputSystem",
-    "Unity.TextMeshPro",
-    "Unity.ugui",
-    "Zenject"
+    "Unity.InputSystem"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

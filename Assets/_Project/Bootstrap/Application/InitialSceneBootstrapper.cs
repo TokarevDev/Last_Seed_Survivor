@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using LastSeed.Infrastructure.Navigation;
+using Game.Infrastructure.Navigation;
 
-namespace LastSeed.Bootstrap.Application
+namespace Game.Bootstrap.Application
 {
     public sealed class InitialSceneBootstrapper
     {

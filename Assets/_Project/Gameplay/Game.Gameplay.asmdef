@@ -1,7 +1,10 @@
 {
-  "name": "LastSeed.Core",
-  "rootNamespace": "LastSeed.Core",
-  "references": [],
+  "name": "Game.Gameplay",
+  "rootNamespace": "Game.Gameplay",
+  "references": [
+    "Game.Core",
+    "UniTask"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
@@ -10,5 +13,5 @@
   "autoReferenced": true,
   "defineConstraints": [],
   "versionDefines": [],
-  "noEngineReferences": true
+  "noEngineReferences": false
 }

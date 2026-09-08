@@ -1,8 +1,16 @@
 {
-  "name": "LastSeed.DOTween.Modules",
-  "rootNamespace": "",
+  "name": "Game.Presentation",
+  "rootNamespace": "Game.Presentation",
   "references": [
-    "Unity.ugui"
+    "Game.Core",
+    "Game.Gameplay",
+    "Game.Infrastructure",
+    "Game.DOTween.Modules",
+    "UniTask",
+    "Unity.InputSystem",
+    "Unity.TextMeshPro",
+    "Unity.ugui",
+    "Zenject"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

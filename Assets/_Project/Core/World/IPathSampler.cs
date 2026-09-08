@@ -1,4 +1,4 @@
-namespace LastSeed.Core.World
+namespace Game.Core.World
 {
     public interface IPathSampler<out TPoint>
     {

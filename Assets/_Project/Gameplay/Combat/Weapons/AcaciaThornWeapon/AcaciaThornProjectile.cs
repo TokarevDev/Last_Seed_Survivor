@@ -1,313 +1,324 @@
-using UnityEngine;
 
-[DisallowMultipleComponent]
-public sealed class AcaciaThornProjectile : MonoBehaviour
+using Game.Core.Combat;
+using Game.Core.World;
+using Game.Gameplay.Combat;
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Combat;
+
+namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    [SerializeField] private SpriteRenderer _renderer;
-    [SerializeField] private LayerMask _hitMask;
-    [SerializeField, Min(0f)] private float _spawnHitDelay = 0.04f;
-    [SerializeField, Min(0f)] private float _minHitTravelDistance = 0.25f;
-    [SerializeField, Min(0f)] private float _hitCooldown = 0.06f;
-    [SerializeField, Min(0f)] private float _releaseBoundsPadding = 1.5f;
+    using UnityEngine;
 
-    private AcaciaThornProjectilePool _pool;
-    private IScreenBounds _screenBounds;
-    private Vector2 _direction;
-    private Vector3 _spawnPosition;
-    private float _speed;
-    private float _lifeTime;
-    private float _timer;
-    private float _hitDelayTimer;
-    private float _hitCooldownTimer;
-    private Quaternion _visualRotationOffset = Quaternion.identity;
-    private int _damage;
-    private DamageKind _damageKind;
-    private int _bouncesLeft;
-    private int _splitCount;
-    private bool _canSplit;
-    private bool _isCritical;
-    private bool _hasHitWorm;
-    private bool _active;
-
-    private void Awake()
+    [DisallowMultipleComponent]
+    public sealed class AcaciaThornProjectile : MonoBehaviour
     {
-        if (_renderer == null)
+        [SerializeField] private SpriteRenderer _renderer;
+        [SerializeField] private LayerMask _hitMask;
+        [SerializeField, Min(0f)] private float _spawnHitDelay = 0.04f;
+        [SerializeField, Min(0f)] private float _minHitTravelDistance = 0.25f;
+        [SerializeField, Min(0f)] private float _hitCooldown = 0.06f;
+        [SerializeField, Min(0f)] private float _releaseBoundsPadding = 1.5f;
+
+        private AcaciaThornProjectilePool _pool;
+        private IScreenBounds _screenBounds;
+        private Vector2 _direction;
+        private Vector3 _spawnPosition;
+        private float _speed;
+        private float _lifeTime;
+        private float _timer;
+        private float _hitDelayTimer;
+        private float _hitCooldownTimer;
+        private Quaternion _visualRotationOffset = Quaternion.identity;
+        private int _damage;
+        private DamageKind _damageKind;
+        private int _bouncesLeft;
+        private int _splitCount;
+        private bool _canSplit;
+        private bool _isCritical;
+        private bool _hasHitWorm;
+        private bool _active;
+
+        private void Awake()
         {
-            Debug.LogError("AcaciaThornProjectile: SpriteRenderer reference is not set.", this);
-            return;
+            if (_renderer == null)
+            {
+                Debug.LogError("AcaciaThornProjectile: SpriteRenderer reference is not set.", this);
+                return;
+            }
+
+            _visualRotationOffset = _renderer.transform.localRotation;
         }
 
-        _visualRotationOffset = _renderer.transform.localRotation;
-    }
+        public void Init(AcaciaThornProjectilePool pool, IScreenBounds screenBounds)
+        {
+            _pool = pool;
+            _screenBounds = screenBounds;
+        }
 
-    public void Init(AcaciaThornProjectilePool pool, IScreenBounds screenBounds)
-    {
-        _pool = pool;
-        _screenBounds = screenBounds;
-    }
+        public void Activate(
+            Vector3 position,
+            Vector2 direction,
+            int damage,
+            DamageKind damageKind,
+            bool isCritical,
+            float speed,
+            float lifeTime,
+            int bounces,
+            int splitCount,
+            bool canSplit)
+        {
+            _spawnPosition = position;
+            _direction = NormalizeDirection(direction);
+            _damage = Mathf.Max(1, damage);
+            _damageKind = damageKind;
+            _isCritical = isCritical;
+            _speed = Mathf.Max(0.1f, speed);
+            _lifeTime = Mathf.Max(0.05f, lifeTime);
+            _timer = _lifeTime;
+            _bouncesLeft = Mathf.Max(0, bounces);
+            _splitCount = Mathf.Max(0, splitCount);
+            _canSplit = canSplit;
+            _hasHitWorm = false;
+            _hitDelayTimer = _spawnHitDelay;
+            _hitCooldownTimer = 0f;
 
-    public void Activate(
-        Vector3 position,
-        Vector2 direction,
-        int damage,
-        DamageKind damageKind,
-        bool isCritical,
-        float speed,
-        float lifeTime,
-        int bounces,
-        int splitCount,
-        bool canSplit)
-    {
-        _spawnPosition = position;
-        _direction = NormalizeDirection(direction);
-        _damage = Mathf.Max(1, damage);
-        _damageKind = damageKind;
-        _isCritical = isCritical;
-        _speed = Mathf.Max(0.1f, speed);
-        _lifeTime = Mathf.Max(0.05f, lifeTime);
-        _timer = _lifeTime;
-        _bouncesLeft = Mathf.Max(0, bounces);
-        _splitCount = Mathf.Max(0, splitCount);
-        _canSplit = canSplit;
-        _hasHitWorm = false;
-        _hitDelayTimer = _spawnHitDelay;
-        _hitCooldownTimer = 0f;
+            transform.position = position;
+            transform.rotation = Quaternion.identity;
 
-        transform.position = position;
-        transform.rotation = Quaternion.identity;
+            _active = true;
+            gameObject.SetActive(true);
+            UpdateVisualRotation();
+        }
 
-        _active = true;
-        gameObject.SetActive(true);
-        UpdateVisualRotation();
-    }
-
-    public void ForceRelease()
-    {
-        ReleaseSelf();
-    }
-
-    private void Update()
-    {
-        if (!_active)
-            return;
-
-        float deltaTime = Time.deltaTime;
-        _timer -= deltaTime;
-
-        if (_timer <= 0f)
+        public void ForceRelease()
         {
             ReleaseSelf();
-            return;
         }
 
-        if (_hitDelayTimer > 0f)
-            _hitDelayTimer -= deltaTime;
-
-        if (_hitCooldownTimer > 0f)
-            _hitCooldownTimer -= deltaTime;
-
-        transform.position += (Vector3)(_direction * (_speed * deltaTime));
-
-        TryBounceFromScreen();
-
-        if (!_active)
-            return;
-
-        if (IsOutsideReleaseBounds())
+        private void Update()
         {
-            ReleaseSelf();
-            return;
+            if (!_active)
+                return;
+
+            float deltaTime = Time.deltaTime;
+            _timer -= deltaTime;
+
+            if (_timer <= 0f)
+            {
+                ReleaseSelf();
+                return;
+            }
+
+            if (_hitDelayTimer > 0f)
+                _hitDelayTimer -= deltaTime;
+
+            if (_hitCooldownTimer > 0f)
+                _hitCooldownTimer -= deltaTime;
+
+            transform.position += (Vector3)(_direction * (_speed * deltaTime));
+
+            TryBounceFromScreen();
+
+            if (!_active)
+                return;
+
+            if (IsOutsideReleaseBounds())
+            {
+                ReleaseSelf();
+                return;
+            }
+
+            UpdateVisualRotation();
         }
 
-        UpdateVisualRotation();
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (!_active || !CanHitNow())
-            return;
-
-        if (((1 << collision.gameObject.layer) & _hitMask) == 0)
-            return;
-
-        if (!collision.TryGetComponent(out WormSegmentDamageReceiver receiver))
-            return;
-
-        WormSegment segment = receiver.GetSegment();
-        if (segment == null || !segment.IsAlive)
-            return;
-
-        WormSection section = receiver.GetDamageSection();
-        if (section == null || section.IsDestroyed)
-            return;
-
-        Vector3 hitPosition = collision.ClosestPoint(transform.position);
-        _hasHitWorm = true;
-
-        DamageInfo damageInfo = new(_damage, _damageKind, _isCritical);
-        receiver.TakeDamage(new DamageHit(damageInfo, hitPosition));
-
-        _hitCooldownTimer = _hitCooldown;
-
-        if (_canSplit && _splitCount > 0)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
-            SpawnSplitProjectiles(hitPosition);
-            ReleaseSelf();
-            return;
+            if (!_active || !CanHitNow())
+                return;
+
+            if (((1 << collision.gameObject.layer) & _hitMask) == 0)
+                return;
+
+            if (!collision.TryGetComponent(out WormSegmentDamageReceiver receiver))
+                return;
+
+            WormSegment segment = receiver.GetSegment();
+            if (segment == null || !segment.IsAlive)
+                return;
+
+            WormSection section = receiver.GetDamageSection();
+            if (section == null || section.IsDestroyed)
+                return;
+
+            Vector3 hitPosition = collision.ClosestPoint(transform.position);
+            _hasHitWorm = true;
+
+            DamageInfo damageInfo = new(_damage, _damageKind, _isCritical);
+            receiver.TakeDamage(new DamageHit(damageInfo, hitPosition));
+
+            _hitCooldownTimer = _hitCooldown;
+
+            if (_canSplit && _splitCount > 0)
+            {
+                SpawnSplitProjectiles(hitPosition);
+                ReleaseSelf();
+                return;
+            }
+
+            BounceFromWorm(hitPosition);
         }
 
-        BounceFromWorm(hitPosition);
-    }
-
-    private bool CanHitNow()
-    {
-        if (_hitDelayTimer > 0f || _hitCooldownTimer > 0f)
-            return false;
-
-        if (_minHitTravelDistance <= 0f)
-            return true;
-
-        float sqrDistance = Vector3.SqrMagnitude(transform.position - _spawnPosition);
-        return sqrDistance >= _minHitTravelDistance * _minHitTravelDistance;
-    }
-
-    private void SpawnSplitProjectiles(Vector3 position)
-    {
-        if (_pool == null)
-            return;
-
-        for (int i = 0; i < _splitCount; i++)
+        private bool CanHitNow()
         {
-            AcaciaThornProjectile projectile = _pool.Spawn(
-                position,
-                GetRandomDirection(),
-                _damage,
-                _damageKind,
-                _isCritical,
-                _speed,
-                _lifeTime,
-                _bouncesLeft,
-                0,
-                false);
-            projectile._hasHitWorm = true;
+            if (_hitDelayTimer > 0f || _hitCooldownTimer > 0f)
+                return false;
+
+            if (_minHitTravelDistance <= 0f)
+                return true;
+
+            float sqrDistance = Vector3.SqrMagnitude(transform.position - _spawnPosition);
+            return sqrDistance >= _minHitTravelDistance * _minHitTravelDistance;
         }
-    }
 
-    private void BounceFromWorm(Vector3 hitPosition)
-    {
-        Vector2 normal = (Vector2)(transform.position - hitPosition);
-
-        if (normal.sqrMagnitude < 0.0001f)
-            normal = -_direction;
-
-        TryBounce(normal.normalized);
-    }
-
-    private void TryBounceFromScreen()
-    {
-        if (_screenBounds == null || !_hasHitWorm)
-            return;
-
-        Vector3 position = transform.position;
-        Vector2 normal = Vector2.zero;
-
-        if (position.x < _screenBounds.Left)
+        private void SpawnSplitProjectiles(Vector3 position)
         {
-            position.x = _screenBounds.Left;
-            normal.x += 1f;
+            if (_pool == null)
+                return;
+
+            for (int i = 0; i < _splitCount; i++)
+            {
+                AcaciaThornProjectile projectile = _pool.Spawn(
+                    position,
+                    GetRandomDirection(),
+                    _damage,
+                    _damageKind,
+                    _isCritical,
+                    _speed,
+                    _lifeTime,
+                    _bouncesLeft,
+                    0,
+                    false);
+                projectile._hasHitWorm = true;
+            }
         }
-        else if (position.x > _screenBounds.Right)
+
+        private void BounceFromWorm(Vector3 hitPosition)
         {
-            position.x = _screenBounds.Right;
-            normal.x -= 1f;
+            Vector2 normal = (Vector2)(transform.position - hitPosition);
+
+            if (normal.sqrMagnitude < 0.0001f)
+                normal = -_direction;
+
+            TryBounce(normal.normalized);
         }
 
-        if (position.y < _screenBounds.Bottom)
+        private void TryBounceFromScreen()
         {
-            position.y = _screenBounds.Bottom;
-            normal.y += 1f;
+            if (_screenBounds == null || !_hasHitWorm)
+                return;
+
+            Vector3 position = transform.position;
+            Vector2 normal = Vector2.zero;
+
+            if (position.x < _screenBounds.Left)
+            {
+                position.x = _screenBounds.Left;
+                normal.x += 1f;
+            }
+            else if (position.x > _screenBounds.Right)
+            {
+                position.x = _screenBounds.Right;
+                normal.x -= 1f;
+            }
+
+            if (position.y < _screenBounds.Bottom)
+            {
+                position.y = _screenBounds.Bottom;
+                normal.y += 1f;
+            }
+            else if (position.y > _screenBounds.Top)
+            {
+                position.y = _screenBounds.Top;
+                normal.y -= 1f;
+            }
+
+            if (normal.sqrMagnitude < 0.0001f)
+                return;
+
+            transform.position = position;
+            TryBounce(normal.normalized);
         }
-        else if (position.y > _screenBounds.Top)
+
+        private void TryBounce(Vector2 normal)
         {
-            position.y = _screenBounds.Top;
-            normal.y -= 1f;
+            if (_bouncesLeft <= 0)
+            {
+                ReleaseSelf();
+                return;
+            }
+
+            _direction = Vector2.Reflect(_direction, normal).normalized;
+            _bouncesLeft--;
+            _hitCooldownTimer = Mathf.Max(_hitCooldownTimer, _hitCooldown);
         }
 
-        if (normal.sqrMagnitude < 0.0001f)
-            return;
-
-        transform.position = position;
-        TryBounce(normal.normalized);
-    }
-
-    private void TryBounce(Vector2 normal)
-    {
-        if (_bouncesLeft <= 0)
+        private bool IsOutsideReleaseBounds()
         {
-            ReleaseSelf();
-            return;
+            if (_screenBounds == null)
+                return false;
+
+            Vector3 position = transform.position;
+            float padding = _releaseBoundsPadding;
+
+            return position.x < _screenBounds.Left - padding ||
+                   position.x > _screenBounds.Right + padding ||
+                   position.y < _screenBounds.Bottom - padding ||
+                   position.y > _screenBounds.Top + padding;
         }
 
-        _direction = Vector2.Reflect(_direction, normal).normalized;
-        _bouncesLeft--;
-        _hitCooldownTimer = Mathf.Max(_hitCooldownTimer, _hitCooldown);
-    }
-
-    private bool IsOutsideReleaseBounds()
-    {
-        if (_screenBounds == null)
-            return false;
-
-        Vector3 position = transform.position;
-        float padding = _releaseBoundsPadding;
-
-        return position.x < _screenBounds.Left - padding ||
-               position.x > _screenBounds.Right + padding ||
-               position.y < _screenBounds.Bottom - padding ||
-               position.y > _screenBounds.Top + padding;
-    }
-
-    private void UpdateVisualRotation()
-    {
-        if (_renderer == null || _direction.sqrMagnitude < 0.0001f)
-            return;
-
-        float angle = -Mathf.Atan2(_direction.x, _direction.y) * Mathf.Rad2Deg;
-        _renderer.transform.localRotation =
-            Quaternion.Euler(0f, 0f, angle) * _visualRotationOffset;
-    }
-
-    private void ReleaseSelf()
-    {
-        if (!_active)
-            return;
-
-        _active = false;
-
-        if (_pool != null)
+        private void UpdateVisualRotation()
         {
-            _pool.Release(this);
-            return;
+            if (_renderer == null || _direction.sqrMagnitude < 0.0001f)
+                return;
+
+            float angle = -Mathf.Atan2(_direction.x, _direction.y) * Mathf.Rad2Deg;
+            _renderer.transform.localRotation =
+                Quaternion.Euler(0f, 0f, angle) * _visualRotationOffset;
         }
 
-        gameObject.SetActive(false);
+        private void ReleaseSelf()
+        {
+            if (!_active)
+                return;
+
+            _active = false;
+
+            if (_pool != null)
+            {
+                _pool.Release(this);
+                return;
+            }
+
+            gameObject.SetActive(false);
+        }
+
+        private static Vector2 NormalizeDirection(Vector2 direction)
+        {
+            if (direction.sqrMagnitude < 0.0001f)
+                return Vector2.up;
+
+            return direction.normalized;
+        }
+
+        private static Vector2 GetRandomDirection()
+        {
+            Vector2 direction = Random.insideUnitCircle;
+
+            if (direction.sqrMagnitude < 0.0001f)
+                return Vector2.up;
+
+            return direction.normalized;
+        }
     }
 
-    private static Vector2 NormalizeDirection(Vector2 direction)
-    {
-        if (direction.sqrMagnitude < 0.0001f)
-            return Vector2.up;
-
-        return direction.normalized;
-    }
-
-    private static Vector2 GetRandomDirection()
-    {
-        Vector2 direction = Random.insideUnitCircle;
-
-        if (direction.sqrMagnitude < 0.0001f)
-            return Vector2.up;
-
-        return direction.normalized;
-    }
 }

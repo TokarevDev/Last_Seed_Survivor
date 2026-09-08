@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Infrastructure.Advertising;
+using Game.Presentation.UI.Rewards;
+
+namespace Game.Tests
 {
     public sealed class RewardAdOperationTests
     {

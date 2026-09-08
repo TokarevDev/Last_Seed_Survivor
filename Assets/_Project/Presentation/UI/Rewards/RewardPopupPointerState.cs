@@ -1,35 +1,37 @@
-using UnityEngine;
+namespace Game.Presentation.UI.Rewards
+{
+    using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
+    using UnityEngine.InputSystem;
 #endif
 
-public static class RewardPopupPointerState
-{
-    public static bool IsAnyPressed()
+    public static class RewardPopupPointerState
     {
-#if ENABLE_INPUT_SYSTEM
-        Touchscreen touchscreen = Touchscreen.current;
-
-        if (touchscreen != null)
+        public static bool IsAnyPressed()
         {
-            var touches = touchscreen.touches;
+#if ENABLE_INPUT_SYSTEM
+            Touchscreen touchscreen = Touchscreen.current;
 
-            for (int i = 0; i < touches.Count; i++)
+            if (touchscreen != null)
             {
-                if (touches[i].press.isPressed)
-                    return true;
+                var touches = touchscreen.touches;
+
+                for (int i = 0; i < touches.Count; i++)
+                {
+                    if (touches[i].press.isPressed)
+                        return true;
+                }
             }
-        }
 
-        Mouse mouse = Mouse.current;
+            Mouse mouse = Mouse.current;
 
-        if (mouse != null && mouse.leftButton.isPressed)
-            return true;
+            if (mouse != null && mouse.leftButton.isPressed)
+                return true;
 
-        Pen pen = Pen.current;
+            Pen pen = Pen.current;
 
-        if (pen != null && pen.tip.isPressed)
-            return true;
+            if (pen != null && pen.tip.isPressed)
+                return true;
 #endif
 
 #if ENABLE_LEGACY_INPUT_MANAGER
@@ -37,6 +39,8 @@ public static class RewardPopupPointerState
             return true;
 #endif
 
-        return false;
+            return false;
+        }
     }
+
 }

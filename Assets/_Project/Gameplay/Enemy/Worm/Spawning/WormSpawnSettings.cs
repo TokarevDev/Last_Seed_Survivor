@@ -1,20 +1,27 @@
-using System;
 
-public sealed class WormSpawnSettings
+using Game.Gameplay.Enemy.Worm;
+
+namespace Game.Gameplay.Enemy.Worm.Spawning
 {
-    public WormSpawnSettings(
-        int sectionCount,
-        int poolPadding,
-        int prewarmBatchSize)
+    using System;
+
+    public sealed class WormSpawnSettings
     {
-        SectionCount = Math.Max(1, sectionCount);
-        PoolPadding = Math.Max(0, poolPadding);
-        PrewarmBatchSize = Math.Max(1, prewarmBatchSize);
+        public WormSpawnSettings(
+            int sectionCount,
+            int poolPadding,
+            int prewarmBatchSize)
+        {
+            SectionCount = Math.Max(1, sectionCount);
+            PoolPadding = Math.Max(0, poolPadding);
+            PrewarmBatchSize = Math.Max(1, prewarmBatchSize);
+        }
+
+        public int SectionCount { get; }
+        public int PoolPadding { get; }
+        public int PrewarmBatchSize { get; }
+        public int BodyPoolCapacity =>
+            WormPatternBuilder.GetBodySegmentCount(SectionCount) + PoolPadding;
     }
 
-    public int SectionCount { get; }
-    public int PoolPadding { get; }
-    public int PrewarmBatchSize { get; }
-    public int BodyPoolCapacity =>
-        WormPatternBuilder.GetBodySegmentCount(SectionCount) + PoolPadding;
 }

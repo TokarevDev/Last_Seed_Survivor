@@ -1,22 +1,36 @@
 using System;
 using System.Collections;
-using LastSeed.Bootstrap.Gameplay;
-using LastSeed.Bootstrap.GameplayLoop;
-using LastSeed.Core.Collections;
-using LastSeed.Core.Input;
-using LastSeed.Core.Timing;
-using LastSeed.Gameplay.Combat;
-using LastSeed.Gameplay.Signals;
-using LastSeed.Presentation.Signals;
-using LastSeed.Infrastructure.Input;
-using LastSeed.Infrastructure.Navigation;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 using Zenject;
 
-namespace LastSeed.Tests.PlayMode
+using Game.Bootstrap.GameplayLoop;
+using Game.Bootstrap.Scenes.Game;
+using Game.Core.Collections;
+using Game.Core.Pooling;
+using Game.Core.Random;
+using Game.Core.Timing;
+using Game.Gameplay.Combat;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Balance;
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Gameplay.Enemy.Worm.Presentation;
+using Game.Gameplay.Enemy.Worm.Spawning;
+using Game.Gameplay.Player;
+using Game.Gameplay.Rewards.Runtime;
+using Game.Gameplay.Rewards.Services;
+using Game.Gameplay.Signals;
+using Game.Infrastructure.Advertising;
+using Game.Infrastructure.Input;
+using Game.Infrastructure.Navigation;
+using Game.Presentation.Signals;
+using Game.Presentation.UI.Rewards;
+using Game.Presentation.Worm;
+
+namespace Game.Tests.PlayMode
 {
     public sealed class GameplaySceneStartupTests
     {

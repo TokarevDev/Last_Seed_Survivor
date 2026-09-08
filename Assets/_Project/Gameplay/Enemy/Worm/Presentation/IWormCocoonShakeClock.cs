@@ -1,7 +1,11 @@
-public interface IWormCocoonShakeClock
+namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    float RotationOffset { get; }
+    public interface IWormCocoonShakeClock
+    {
+        float RotationOffset { get; }
 
-    void Register(float interval, float angle);
-    void Unregister();
+        void Register(float interval, float angle);
+        void Unregister();
+    }
+
 }

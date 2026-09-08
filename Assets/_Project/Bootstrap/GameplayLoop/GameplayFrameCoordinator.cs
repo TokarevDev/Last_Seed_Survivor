@@ -1,7 +1,12 @@
-using LastSeed.Gameplay.Input;
-using LastSeed.Core.Input;
 
-namespace LastSeed.Bootstrap.GameplayLoop
+using Game.Core.Input;
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Gameplay.Input;
+using Game.Gameplay.Player;
+using Game.Presentation.Worm;
+
+namespace Game.Bootstrap.GameplayLoop
 {
     public sealed class GameplayFrameCoordinator
     {

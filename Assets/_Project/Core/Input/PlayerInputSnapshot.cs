@@ -1,4 +1,4 @@
-namespace LastSeed.Core.Input
+namespace Game.Core.Input
 {
     public readonly struct PlayerInputSnapshot
     {

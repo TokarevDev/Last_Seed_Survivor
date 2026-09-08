@@ -1,4 +1,4 @@
-namespace LastSeed.Gameplay.Signals
+namespace Game.Gameplay.Signals
 {
     public enum WeaponRuntimeStatsSource
     {

@@ -1,4 +1,4 @@
-namespace LastSeed.Presentation.UI.Popups
+namespace Game.Presentation.UI.Common.Popups
 {
     public sealed class ShowPopupRequestedSignal
     {

@@ -3,7 +3,9 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Application
+using Game.Presentation.UI.Loading;
+
+namespace Game.Bootstrap.Application
 {
     [DisallowMultipleComponent]
     public sealed class ApplicationEntryPoint : MonoBehaviour

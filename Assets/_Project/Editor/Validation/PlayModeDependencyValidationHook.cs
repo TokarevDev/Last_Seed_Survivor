@@ -1,13 +1,13 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace LastSeed.Editor.Validation
+namespace Game.Editor.Validation
 {
     [InitializeOnLoad]
     public static class PlayModeDependencyValidationHook
     {
         private const string SkipNextValidationSessionKey =
-            "LastSeed.DependencyValidation.SkipNextPlayModeValidation";
+            "Game.DependencyValidation.SkipNextPlayModeValidation";
 
         private static bool _isPlayModeRestartScheduled;
 

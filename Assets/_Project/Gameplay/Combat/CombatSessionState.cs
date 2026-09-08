@@ -1,6 +1,6 @@
 using System;
 
-namespace LastSeed.Gameplay.Combat
+namespace Game.Gameplay.Combat
 {
     public sealed class CombatSessionState : ICombatSessionState
     {

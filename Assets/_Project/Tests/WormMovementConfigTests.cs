@@ -1,7 +1,10 @@
 using NUnit.Framework;
 using UnityEngine;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Gameplay.Enemy.Worm.Presentation;
+
+namespace Game.Tests
 {
     public sealed class WormMovementConfigTests
     {

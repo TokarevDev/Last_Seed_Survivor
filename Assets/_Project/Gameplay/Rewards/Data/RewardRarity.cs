@@ -1,6 +1,10 @@
-public enum RewardRarity
+namespace Game.Gameplay.Rewards.Data
 {
-    Common = 0,
-    Rare = 1,
-    Legendary = 2
+    public enum RewardRarity
+    {
+        Common = 0,
+        Rare = 1,
+        Legendary = 2
+    }
+
 }

@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 66673befed4df024cbdf7d193b8efb94, type: 3}
   m_Name: MainWeaponConfig_Default
-  m_EditorClassIdentifier: Assembly-CSharp::WeaponConfig
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Weapons.ProjectileWeapon.WeaponConfig
   FireRate: 2.5
   MinShotCooldown: 0.25
   MaxFireRateBonus: 3

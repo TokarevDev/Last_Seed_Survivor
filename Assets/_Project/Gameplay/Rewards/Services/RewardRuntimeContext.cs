@@ -1,82 +1,93 @@
-using System;
 
-public readonly struct RewardRollContext
+using Game.Core;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    public readonly float HeadPathProgressNormalized;
-    public readonly float WormDestructionProgressNormalized;
-    public readonly bool HasRevivedThisRun;
-    public readonly bool IsPaidAssistRoll;
+    using System;
 
-    public RewardRollContext(
-        float headPathProgressNormalized,
-        float wormDestructionProgressNormalized,
-        bool hasRevivedThisRun,
-        bool isPaidAssistRoll = false)
+    public readonly struct RewardRollContext
     {
-        HeadPathProgressNormalized = FloatMath.Clamp01(headPathProgressNormalized);
-        WormDestructionProgressNormalized = FloatMath.Clamp01(wormDestructionProgressNormalized);
-        HasRevivedThisRun = hasRevivedThisRun;
-        IsPaidAssistRoll = isPaidAssistRoll;
-    }
+        public readonly float HeadPathProgressNormalized;
+        public readonly float WormDestructionProgressNormalized;
+        public readonly bool HasRevivedThisRun;
+        public readonly bool IsPaidAssistRoll;
 
-    public RewardRollContext WithPaidAssistRoll()
-    {
-        return new RewardRollContext(
-            HeadPathProgressNormalized,
-            WormDestructionProgressNormalized,
-            HasRevivedThisRun,
-            true);
-    }
-}
-
-public sealed class RewardRuntimeContext
-{
-    private readonly WeaponRuntimeState _mainWeaponState;
-    private readonly AcaciaThornRuntimeState _acaciaThornState;
-    private readonly Func<int> _mainWeaponDamageProvider;
-
-    public RewardRuntimeContext(
-        ProjectileWeapon mainWeapon,
-        AcaciaThornWeapon acaciaThornWeapon)
-    {
-        MainWeapon = mainWeapon;
-        AcaciaThornWeapon = acaciaThornWeapon;
-        MainWeaponConfig = mainWeapon != null ? mainWeapon.Config : null;
-        AcaciaThornConfig = acaciaThornWeapon != null ? acaciaThornWeapon.Config : null;
-    }
-
-    public RewardRuntimeContext(
-        WeaponRuntimeState mainWeaponState,
-        AcaciaThornRuntimeState acaciaThornState,
-        Func<int> mainWeaponDamageProvider = null,
-        WeaponConfig mainWeaponConfig = null,
-        AcaciaThornWeaponConfig acaciaThornConfig = null)
-    {
-        _mainWeaponState = mainWeaponState;
-        _acaciaThornState = acaciaThornState;
-        _mainWeaponDamageProvider = mainWeaponDamageProvider;
-        MainWeaponConfig = mainWeaponConfig;
-        AcaciaThornConfig = acaciaThornConfig;
-    }
-
-    public ProjectileWeapon MainWeapon { get; }
-    public AcaciaThornWeapon AcaciaThornWeapon { get; }
-    public WeaponConfig MainWeaponConfig { get; }
-    public AcaciaThornWeaponConfig AcaciaThornConfig { get; }
-    public WeaponRuntimeState MainWeaponState =>
-        _mainWeaponState ?? (MainWeapon != null ? MainWeapon.RuntimeState : null);
-
-    public AcaciaThornRuntimeState AcaciaThornState =>
-        _acaciaThornState ?? (AcaciaThornWeapon != null ? AcaciaThornWeapon.RuntimeState : null);
-
-    public int MainWeaponDamageSnapshot
-    {
-        get
+        public RewardRollContext(
+            float headPathProgressNormalized,
+            float wormDestructionProgressNormalized,
+            bool hasRevivedThisRun,
+            bool isPaidAssistRoll = false)
         {
-            if (_mainWeaponDamageProvider != null)
-                return _mainWeaponDamageProvider();
+            HeadPathProgressNormalized = FloatMath.Clamp01(headPathProgressNormalized);
+            WormDestructionProgressNormalized = FloatMath.Clamp01(wormDestructionProgressNormalized);
+            HasRevivedThisRun = hasRevivedThisRun;
+            IsPaidAssistRoll = isPaidAssistRoll;
+        }
 
-            return MainWeapon != null ? MainWeapon.CurrentProjectileDamage : 0;
+        public RewardRollContext WithPaidAssistRoll()
+        {
+            return new RewardRollContext(
+                HeadPathProgressNormalized,
+                WormDestructionProgressNormalized,
+                HasRevivedThisRun,
+                true);
         }
     }
+
+    public sealed class RewardRuntimeContext
+    {
+        private readonly WeaponRuntimeState _mainWeaponState;
+        private readonly AcaciaThornRuntimeState _acaciaThornState;
+        private readonly Func<int> _mainWeaponDamageProvider;
+
+        public RewardRuntimeContext(
+            ProjectileWeapon mainWeapon,
+            AcaciaThornWeapon acaciaThornWeapon)
+        {
+            MainWeapon = mainWeapon;
+            AcaciaThornWeapon = acaciaThornWeapon;
+            MainWeaponConfig = mainWeapon != null ? mainWeapon.Config : null;
+            AcaciaThornConfig = acaciaThornWeapon != null ? acaciaThornWeapon.Config : null;
+        }
+
+        public RewardRuntimeContext(
+            WeaponRuntimeState mainWeaponState,
+            AcaciaThornRuntimeState acaciaThornState,
+            Func<int> mainWeaponDamageProvider = null,
+            WeaponConfig mainWeaponConfig = null,
+            AcaciaThornWeaponConfig acaciaThornConfig = null)
+        {
+            _mainWeaponState = mainWeaponState;
+            _acaciaThornState = acaciaThornState;
+            _mainWeaponDamageProvider = mainWeaponDamageProvider;
+            MainWeaponConfig = mainWeaponConfig;
+            AcaciaThornConfig = acaciaThornConfig;
+        }
+
+        public ProjectileWeapon MainWeapon { get; }
+        public AcaciaThornWeapon AcaciaThornWeapon { get; }
+        public WeaponConfig MainWeaponConfig { get; }
+        public AcaciaThornWeaponConfig AcaciaThornConfig { get; }
+        public WeaponRuntimeState MainWeaponState =>
+            _mainWeaponState ?? (MainWeapon != null ? MainWeapon.RuntimeState : null);
+
+        public AcaciaThornRuntimeState AcaciaThornState =>
+            _acaciaThornState ?? (AcaciaThornWeapon != null ? AcaciaThornWeapon.RuntimeState : null);
+
+        public int MainWeaponDamageSnapshot
+        {
+            get
+            {
+                if (_mainWeaponDamageProvider != null)
+                    return _mainWeaponDamageProvider();
+
+                return MainWeapon != null ? MainWeapon.CurrentProjectileDamage : 0;
+            }
+        }
+    }
+
 }

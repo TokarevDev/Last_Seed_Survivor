@@ -1,8 +1,14 @@
-using LastSeed.Core.Input;
 using UnityEngine;
 using Zenject;
 
-namespace _Project.App.Gameplay
+using Game.Core.Input;
+using Game.Gameplay.Player;
+using Game.Presentation.UI.Common.Popups;
+using Game.Presentation.UI.Revive;
+using Game.Presentation.UI.Rewards;
+using Game.Presentation.Worm;
+
+namespace Game.Bootstrap
 {
     [DisallowMultipleComponent]
     public sealed class GameplayRunRestarter : MonoBehaviour

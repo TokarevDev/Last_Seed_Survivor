@@ -1,7 +1,9 @@
 using NUnit.Framework;
 using UnityEngine;
 
-namespace LastSeed.Tests
+using Game.Presentation.UI.Rewards;
+
+namespace Game.Tests
 {
     public sealed class RewardPopupAnimationConfigTests
     {

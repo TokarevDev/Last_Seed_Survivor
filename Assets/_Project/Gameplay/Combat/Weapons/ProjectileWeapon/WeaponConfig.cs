@@ -1,26 +1,35 @@
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Combat/Weapon Config")]
-public sealed class WeaponConfig : ScriptableObject
+using Game.Gameplay.Combat.Projectiles;
+using Game.Gameplay.Combat.Projectiles.Configs;
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 {
-    [Header("Base")]
-    public float FireRate = 2.2f;
+    using UnityEngine;
 
-    [Header("Fire Rate Limits")]
-    [Min(0.05f)] public float MinShotCooldown = 0.5f;
-    [Min(0f)] public float MaxFireRateBonus = WeaponRuntimeState.DefaultMaxFireRateBonus;
+    [CreateAssetMenu(menuName = "Combat/Weapon Config")]
+    public sealed class WeaponConfig : ScriptableObject
+    {
+        [Header("Base")]
+        public float FireRate = 2.2f;
 
-    [Header("Projectile Speed Limits")]
-    [Min(0f)] public float MaxProjectileSpeedBonus = WeaponRuntimeState.DefaultMaxProjectileSpeedBonus;
+        [Header("Fire Rate Limits")]
+        [Min(0.05f)] public float MinShotCooldown = 0.5f;
+        [Min(0f)] public float MaxFireRateBonus = WeaponRuntimeState.DefaultMaxFireRateBonus;
 
-    [Header("Progression Limits")]
-    [Min(1f)] public float MaxDamageMultiplier = WeaponRuntimeState.MaxDamageMultiplier;
-    [Range(0f, WeaponRuntimeState.MaxCriticalChance)] public float MaxCriticalChance = WeaponRuntimeState.MaxCriticalChance;
-    [Min(1f)] public float MaxCriticalDamageMultiplier = WeaponRuntimeState.MaxCriticalDamageMultiplier;
-    [Range(0, WeaponRuntimeState.MaxPenetrationBonus)] public int MaxPenetrationBonus = WeaponRuntimeState.MaxPenetrationBonus;
-    [Range(1, WeaponRuntimeState.MaxParallelProjectiles)] public int MaxParallelProjectiles = WeaponRuntimeState.DefaultMaxParallelProjectiles;
-    [Range(0, WeaponRuntimeState.MaxSalvoExtraShots)] public int MaxSalvoExtraShots = WeaponRuntimeState.DefaultMaxSalvoExtraShots;
+        [Header("Projectile Speed Limits")]
+        [Min(0f)] public float MaxProjectileSpeedBonus = WeaponRuntimeState.DefaultMaxProjectileSpeedBonus;
 
-    [Header("Projectile")]
-    public ProjectileConfig Projectile;
+        [Header("Progression Limits")]
+        [Min(1f)] public float MaxDamageMultiplier = WeaponRuntimeState.MaxDamageMultiplier;
+        [Range(0f, WeaponRuntimeState.MaxCriticalChance)] public float MaxCriticalChance = WeaponRuntimeState.MaxCriticalChance;
+        [Min(1f)] public float MaxCriticalDamageMultiplier = WeaponRuntimeState.MaxCriticalDamageMultiplier;
+        [Range(0, WeaponRuntimeState.MaxPenetrationBonus)] public int MaxPenetrationBonus = WeaponRuntimeState.MaxPenetrationBonus;
+        [Range(1, WeaponRuntimeState.MaxParallelProjectiles)] public int MaxParallelProjectiles = WeaponRuntimeState.DefaultMaxParallelProjectiles;
+        [Range(0, WeaponRuntimeState.MaxSalvoExtraShots)] public int MaxSalvoExtraShots = WeaponRuntimeState.DefaultMaxSalvoExtraShots;
+
+        [Header("Projectile")]
+        public ProjectileConfig Projectile;
+    }
+
 }

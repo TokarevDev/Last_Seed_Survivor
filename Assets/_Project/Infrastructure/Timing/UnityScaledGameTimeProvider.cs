@@ -1,7 +1,8 @@
-using LastSeed.Core.Timing;
 using UnityEngine;
 
-namespace LastSeed.Infrastructure.Timing
+using Game.Core.Timing;
+
+namespace Game.Infrastructure.Timing
 {
     public sealed class UnityScaledGameTimeProvider : IGameTimeProvider
     {

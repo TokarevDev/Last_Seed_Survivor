@@ -76,7 +76,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1116e914668b67a4eb1e64363a0fe73e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSectionHpView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormSectionHpView
   _text: {fileID: 3368013684385338308}
   _visualRoot: {fileID: 5337797012005060535}
   _minScale: 1

@@ -1,24 +1,28 @@
-using UnityEngine;
-
-public readonly struct ProjectileRuntimeStats
+namespace Game.Gameplay.Combat.Projectiles
 {
-    public readonly int Damage;
-    public readonly int ExtraPenetration;
-    public readonly float CriticalChance;
-    public readonly float CriticalDamageMultiplier;
-    public readonly float ProjectileSpeedMultiplier;
+    using UnityEngine;
 
-    public ProjectileRuntimeStats(
-        int damage,
-        int extraPenetration,
-        float criticalChance,
-        float criticalDamageMultiplier,
-        float projectileSpeedMultiplier)
+    public readonly struct ProjectileRuntimeStats
     {
-        Damage = Mathf.Max(0, damage);
-        ExtraPenetration = Mathf.Max(0, extraPenetration);
-        CriticalChance = Mathf.Clamp01(criticalChance);
-        CriticalDamageMultiplier = Mathf.Max(1f, criticalDamageMultiplier);
-        ProjectileSpeedMultiplier = Mathf.Max(0.1f, projectileSpeedMultiplier);
+        public readonly int Damage;
+        public readonly int ExtraPenetration;
+        public readonly float CriticalChance;
+        public readonly float CriticalDamageMultiplier;
+        public readonly float ProjectileSpeedMultiplier;
+
+        public ProjectileRuntimeStats(
+            int damage,
+            int extraPenetration,
+            float criticalChance,
+            float criticalDamageMultiplier,
+            float projectileSpeedMultiplier)
+        {
+            Damage = Mathf.Max(0, damage);
+            ExtraPenetration = Mathf.Max(0, extraPenetration);
+            CriticalChance = Mathf.Clamp01(criticalChance);
+            CriticalDamageMultiplier = Mathf.Max(1f, criticalDamageMultiplier);
+            ProjectileSpeedMultiplier = Mathf.Max(0.1f, projectileSpeedMultiplier);
+        }
     }
+
 }

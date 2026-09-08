@@ -1,9 +1,17 @@
-using LastSeed.Core.Collections;
-using LastSeed.Bootstrap.Gameplay;
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Installers
+using Game.Bootstrap.Scenes.Game;
+using Game.Core.Collections;
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Balance;
+using Game.Gameplay.Enemy.Worm.Combat;
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Gameplay.Enemy.Worm.Presentation;
+using Game.Gameplay.Enemy.Worm.Spawning;
+using Game.Presentation.Worm;
+
+namespace Game.Bootstrap.Installers.Game
 {
     public sealed class WormInstaller : MonoInstaller
     {

@@ -1,173 +1,181 @@
-using System.Collections.Generic;
 
-public static class RewardChoiceSelector
+using Game.Core.Random;
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    public static bool TrySelectForSlot(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        RewardRarity preferredRarity,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        bool useAssistDpsBias,
-        bool usePremiumFallback,
-        bool allowLegendaryFallback,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias,
-        out RewardModifierEntry selected)
-    {
-        selected = null;
+    using System.Collections.Generic;
 
-        if (useAssistDpsBias && TrySelectAssistPrimaryDps(
+    public static class RewardChoiceSelector
+    {
+        public static bool TrySelectForSlot(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            RewardRarity preferredRarity,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            bool useAssistDpsBias,
+            bool usePremiumFallback,
+            bool allowLegendaryFallback,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias,
+            out RewardModifierEntry selected)
+        {
+            selected = null;
+
+            if (useAssistDpsBias && TrySelectAssistPrimaryDps(
+                    pools,
+                    preferredRarity,
+                    usedCategories,
+                    usedCategoryRarities,
+                    rollContext,
+                    randomSource,
+                    weaponDpsBias,
+                    out selected))
+            {
+                return true;
+            }
+
+            if (TrySelectAtRarity(
+                    pools,
+                    preferredRarity,
+                    usedCategories,
+                    usedCategoryRarities,
+                    rollContext,
+                    randomSource,
+                    weaponDpsBias,
+                    out selected))
+            {
+                return true;
+            }
+
+            if (usePremiumFallback && TrySelectPremiumFallback(
+                    pools,
+                    preferredRarity,
+                    usedCategories,
+                    usedCategoryRarities,
+                    rollContext,
+                    randomSource,
+                    weaponDpsBias,
+                    out selected))
+            {
+                return true;
+            }
+
+            return TrySelectFromAllRarities(
                 pools,
-                preferredRarity,
                 usedCategories,
                 usedCategoryRarities,
+                allowLegendaryFallback,
                 rollContext,
                 randomSource,
                 weaponDpsBias,
-                out selected))
-        {
-            return true;
+                out selected);
         }
 
-        if (TrySelectAtRarity(
-                pools,
-                preferredRarity,
-                usedCategories,
-                usedCategoryRarities,
-                rollContext,
-                randomSource,
-                weaponDpsBias,
-                out selected))
+        private static bool TrySelectAtRarity(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            RewardRarity rarity,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias,
+            out RewardModifierEntry selected,
+            bool requireAssistDpsReward = false)
         {
-            return true;
+            return RewardWeightedPicker.TryTakeFromRarity(
+                       pools, rarity, usedCategories, usedCategoryRarities,
+                       RewardPickMode.UniqueCategory, out selected, rollContext,
+                       randomSource, weaponDpsBias, requireAssistDpsReward)
+                || RewardWeightedPicker.TryTakeFromRarity(
+                    pools, rarity, usedCategories, usedCategoryRarities,
+                    RewardPickMode.UniqueCategoryRarity, out selected, rollContext,
+                    randomSource, weaponDpsBias, requireAssistDpsReward)
+                || RewardWeightedPicker.TryTakeFromRarity(
+                    pools, rarity, usedCategories, usedCategoryRarities,
+                    RewardPickMode.Any, out selected, rollContext,
+                    randomSource, weaponDpsBias, requireAssistDpsReward);
         }
 
-        if (usePremiumFallback && TrySelectPremiumFallback(
-                pools,
-                preferredRarity,
-                usedCategories,
-                usedCategoryRarities,
-                rollContext,
-                randomSource,
-                weaponDpsBias,
-                out selected))
+        private static bool TrySelectAssistPrimaryDps(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            RewardRarity preferredRarity,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias,
+            out RewardModifierEntry selected)
         {
-            return true;
+            if (TrySelectAtRarity(
+                    pools, preferredRarity, usedCategories, usedCategoryRarities,
+                    rollContext, randomSource, weaponDpsBias, out selected, true))
+            {
+                return true;
+            }
+
+            if (preferredRarity == RewardRarity.Legendary && TrySelectAtRarity(
+                    pools, RewardRarity.Rare, usedCategories, usedCategoryRarities,
+                    rollContext, randomSource, weaponDpsBias, out selected, true))
+            {
+                return true;
+            }
+
+            return preferredRarity != RewardRarity.Common
+                && TrySelectAtRarity(
+                    pools, RewardRarity.Common, usedCategories, usedCategoryRarities,
+                    rollContext, randomSource, weaponDpsBias, out selected, true);
         }
 
-        return TrySelectFromAllRarities(
-            pools,
-            usedCategories,
-            usedCategoryRarities,
-            allowLegendaryFallback,
-            rollContext,
-            randomSource,
-            weaponDpsBias,
-            out selected);
-    }
-
-    private static bool TrySelectAtRarity(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        RewardRarity rarity,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias,
-        out RewardModifierEntry selected,
-        bool requireAssistDpsReward = false)
-    {
-        return RewardWeightedPicker.TryTakeFromRarity(
-                   pools, rarity, usedCategories, usedCategoryRarities,
-                   RewardPickMode.UniqueCategory, out selected, rollContext,
-                   randomSource, weaponDpsBias, requireAssistDpsReward)
-            || RewardWeightedPicker.TryTakeFromRarity(
-                pools, rarity, usedCategories, usedCategoryRarities,
-                RewardPickMode.UniqueCategoryRarity, out selected, rollContext,
-                randomSource, weaponDpsBias, requireAssistDpsReward)
-            || RewardWeightedPicker.TryTakeFromRarity(
-                pools, rarity, usedCategories, usedCategoryRarities,
-                RewardPickMode.Any, out selected, rollContext,
-                randomSource, weaponDpsBias, requireAssistDpsReward);
-    }
-
-    private static bool TrySelectAssistPrimaryDps(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        RewardRarity preferredRarity,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias,
-        out RewardModifierEntry selected)
-    {
-        if (TrySelectAtRarity(
-                pools, preferredRarity, usedCategories, usedCategoryRarities,
-                rollContext, randomSource, weaponDpsBias, out selected, true))
+        private static bool TrySelectPremiumFallback(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            RewardRarity preferredRarity,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias,
+            out RewardModifierEntry selected)
         {
-            return true;
+            RewardRarity first = preferredRarity == RewardRarity.Legendary
+                ? RewardRarity.Legendary
+                : RewardRarity.Rare;
+            RewardRarity second = preferredRarity == RewardRarity.Legendary
+                ? RewardRarity.Rare
+                : RewardRarity.Legendary;
+
+            return TrySelectAtRarity(
+                       pools, first, usedCategories, usedCategoryRarities,
+                       rollContext, randomSource, weaponDpsBias, out selected)
+                || TrySelectAtRarity(
+                    pools, second, usedCategories, usedCategoryRarities,
+                    rollContext, randomSource, weaponDpsBias, out selected);
         }
 
-        if (preferredRarity == RewardRarity.Legendary && TrySelectAtRarity(
-                pools, RewardRarity.Rare, usedCategories, usedCategoryRarities,
-                rollContext, randomSource, weaponDpsBias, out selected, true))
+        private static bool TrySelectFromAllRarities(
+            Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
+            HashSet<RewardModifierCategory> usedCategories,
+            HashSet<int> usedCategoryRarities,
+            bool allowLegendary,
+            RewardRollContext rollContext,
+            IRandomSource randomSource,
+            RewardWeaponDpsBias weaponDpsBias,
+            out RewardModifierEntry selected)
         {
-            return true;
+            return RewardWeightedPicker.TryTakeFromAllRarities(
+                       pools, usedCategories, usedCategoryRarities,
+                       RewardPickMode.UniqueCategory, out selected, allowLegendary,
+                       rollContext, randomSource, weaponDpsBias)
+                || RewardWeightedPicker.TryTakeFromAllRarities(
+                    pools, usedCategories, usedCategoryRarities,
+                    RewardPickMode.UniqueCategoryRarity, out selected, allowLegendary,
+                    rollContext, randomSource, weaponDpsBias)
+                || RewardWeightedPicker.TryTakeFromAllRarities(
+                    pools, usedCategories, usedCategoryRarities,
+                    RewardPickMode.Any, out selected, allowLegendary,
+                    rollContext, randomSource, weaponDpsBias);
         }
-
-        return preferredRarity != RewardRarity.Common
-            && TrySelectAtRarity(
-                pools, RewardRarity.Common, usedCategories, usedCategoryRarities,
-                rollContext, randomSource, weaponDpsBias, out selected, true);
     }
 
-    private static bool TrySelectPremiumFallback(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        RewardRarity preferredRarity,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias,
-        out RewardModifierEntry selected)
-    {
-        RewardRarity first = preferredRarity == RewardRarity.Legendary
-            ? RewardRarity.Legendary
-            : RewardRarity.Rare;
-        RewardRarity second = preferredRarity == RewardRarity.Legendary
-            ? RewardRarity.Rare
-            : RewardRarity.Legendary;
-
-        return TrySelectAtRarity(
-                   pools, first, usedCategories, usedCategoryRarities,
-                   rollContext, randomSource, weaponDpsBias, out selected)
-            || TrySelectAtRarity(
-                pools, second, usedCategories, usedCategoryRarities,
-                rollContext, randomSource, weaponDpsBias, out selected);
-    }
-
-    private static bool TrySelectFromAllRarities(
-        Dictionary<RewardRarity, List<RewardModifierEntry>> pools,
-        HashSet<RewardModifierCategory> usedCategories,
-        HashSet<int> usedCategoryRarities,
-        bool allowLegendary,
-        RewardRollContext rollContext,
-        IRandomSource randomSource,
-        RewardWeaponDpsBias weaponDpsBias,
-        out RewardModifierEntry selected)
-    {
-        return RewardWeightedPicker.TryTakeFromAllRarities(
-                   pools, usedCategories, usedCategoryRarities,
-                   RewardPickMode.UniqueCategory, out selected, allowLegendary,
-                   rollContext, randomSource, weaponDpsBias)
-            || RewardWeightedPicker.TryTakeFromAllRarities(
-                pools, usedCategories, usedCategoryRarities,
-                RewardPickMode.UniqueCategoryRarity, out selected, allowLegendary,
-                rollContext, randomSource, weaponDpsBias)
-            || RewardWeightedPicker.TryTakeFromAllRarities(
-                pools, usedCategories, usedCategoryRarities,
-                RewardPickMode.Any, out selected, allowLegendary,
-                rollContext, randomSource, weaponDpsBias);
-    }
 }

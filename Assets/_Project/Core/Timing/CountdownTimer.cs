@@ -1,6 +1,6 @@
 using System;
 
-namespace LastSeed.Core.Timing
+namespace Game.Core.Timing
 {
     public sealed class CountdownTimer
     {

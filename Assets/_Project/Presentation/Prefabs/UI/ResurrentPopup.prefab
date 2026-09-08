@@ -980,7 +980,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bb4a14c2e10443729b70668aebd3d3ae, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RevivalPopupView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.Popups.RevivalPopupView
   _popupId: Revival
   _root: {fileID: 5158860398019954923}
   _reviveButton: {fileID: 7623616282367392126}

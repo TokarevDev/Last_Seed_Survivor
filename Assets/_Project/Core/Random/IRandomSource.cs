@@ -1,5 +1,9 @@
-public interface IRandomSource
+namespace Game.Core.Random
 {
-    float NextUnitFloat();
-    int NextInt(int minInclusive, int maxExclusive);
+    public interface IRandomSource
+    {
+        float NextUnitFloat();
+        int NextInt(int minInclusive, int maxExclusive);
+    }
+
 }

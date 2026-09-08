@@ -1,8 +1,8 @@
 using System;
-using LastSeed.Core.Timing;
-using LastSeed.Gameplay.Input;
+using Game.Core.Timing;
+using Game.Gameplay.Input;
 
-namespace LastSeed.Presentation.UI.Popups
+namespace Game.Presentation.UI.Common.Popups
 {
     public sealed class PopupModalLock : IDisposable
     {

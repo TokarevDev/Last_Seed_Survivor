@@ -1,23 +1,27 @@
-using System.Collections.Generic;
-
-public sealed class RewardRequestQueue
+namespace Game.Gameplay.Rewards.Runtime
 {
-    private readonly Queue<RewardOpenRequest> _requests = new();
+    using System.Collections.Generic;
 
-    public int Count => _requests.Count;
-
-    public void Enqueue(in RewardOpenRequest request)
+    public sealed class RewardRequestQueue
     {
-        _requests.Enqueue(request);
+        private readonly Queue<RewardOpenRequest> _requests = new();
+
+        public int Count => _requests.Count;
+
+        public void Enqueue(in RewardOpenRequest request)
+        {
+            _requests.Enqueue(request);
+        }
+
+        public bool TryDequeue(out RewardOpenRequest request)
+        {
+            return _requests.TryDequeue(out request);
+        }
+
+        public void Clear()
+        {
+            _requests.Clear();
+        }
     }
 
-    public bool TryDequeue(out RewardOpenRequest request)
-    {
-        return _requests.TryDequeue(out request);
-    }
-
-    public void Clear()
-    {
-        _requests.Clear();
-    }
 }

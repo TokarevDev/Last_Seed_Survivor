@@ -1,18 +1,22 @@
-using System;
-
-public sealed class RewardFlowSettings
+namespace Game.Gameplay.Rewards.Runtime
 {
-    public RewardFlowSettings(
-        int freeRerollAttemptsPerSession,
-        int adRerollAttemptsPerSession,
-        int takeAllAttemptsPerSession)
+    using System;
+
+    public sealed class RewardFlowSettings
     {
-        FreeRerollAttemptsPerSession = Math.Max(0, freeRerollAttemptsPerSession);
-        AdRerollAttemptsPerSession = Math.Max(0, adRerollAttemptsPerSession);
-        TakeAllAttemptsPerSession = Math.Max(0, takeAllAttemptsPerSession);
+        public RewardFlowSettings(
+            int freeRerollAttemptsPerSession,
+            int adRerollAttemptsPerSession,
+            int takeAllAttemptsPerSession)
+        {
+            FreeRerollAttemptsPerSession = Math.Max(0, freeRerollAttemptsPerSession);
+            AdRerollAttemptsPerSession = Math.Max(0, adRerollAttemptsPerSession);
+            TakeAllAttemptsPerSession = Math.Max(0, takeAllAttemptsPerSession);
+        }
+
+        public int FreeRerollAttemptsPerSession { get; }
+        public int AdRerollAttemptsPerSession { get; }
+        public int TakeAllAttemptsPerSession { get; }
     }
 
-    public int FreeRerollAttemptsPerSession { get; }
-    public int AdRerollAttemptsPerSession { get; }
-    public int TakeAllAttemptsPerSession { get; }
 }

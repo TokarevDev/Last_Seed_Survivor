@@ -1,20 +1,27 @@
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Rewards/Effects/Penetration")]
-public sealed class PenetrationRewardEffect : RewardEffect
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    [SerializeField][Min(1)] private int _bonusPenetration = 1;
+    using UnityEngine;
 
-    public override bool CanApply(WeaponRuntimeState state)
+    [CreateAssetMenu(menuName = "Game/Rewards/Effects/Penetration")]
+    public sealed class PenetrationRewardEffect : RewardEffect
     {
-        return state != null && state.CanApplyPenetrationBonus(_bonusPenetration);
+        [SerializeField][Min(1)] private int _bonusPenetration = 1;
+
+        public override bool CanApply(WeaponRuntimeState state)
+        {
+            return state != null && state.CanApplyPenetrationBonus(_bonusPenetration);
+        }
+
+        public override void Apply(WeaponRuntimeState state)
+        {
+            if (state == null)
+                return;
+
+            state.AddPenetration(_bonusPenetration);
+        }
     }
 
-    public override void Apply(WeaponRuntimeState state)
-    {
-        if (state == null)
-            return;
-
-        state.AddPenetration(_bonusPenetration);
-    }
 }

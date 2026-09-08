@@ -1,181 +1,189 @@
-using System.Collections.Generic;
-using UnityEngine;
 
-public static class WormCocoonRules
+using Game.Core.Random;
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    public const int EmptySegmentsAroundCocoon = 3;
-    public const int SectionSize = EmptySegmentsAroundCocoon * 2 + 1;
-    public const int CocoonSegmentIndex = EmptySegmentsAroundCocoon;
+    using System.Collections.Generic;
+    using UnityEngine;
 
-    private const int FirstCocoonSectionIndex = 1;
-    private const int EarlyEmptySectionsBetweenCocoons = 1;
-    private const int LateEmptySectionsBetweenCocoons = 2;
-    private const float LateProgressStart = 0.5f;
-
-    public static int CountGameplaySections(int gameplaySegmentCount)
+    public static class WormCocoonRules
     {
-        return Mathf.CeilToInt(Mathf.Max(0, gameplaySegmentCount) / (float)SectionSize);
-    }
+        public const int EmptySegmentsAroundCocoon = 3;
+        public const int SectionSize = EmptySegmentsAroundCocoon * 2 + 1;
+        public const int CocoonSegmentIndex = EmptySegmentsAroundCocoon;
 
-    public static float GetSectionProgress(int sectionIndex, int totalSections)
-    {
-        if (totalSections <= 1)
-            return 0f;
+        private const int FirstCocoonSectionIndex = 1;
+        private const int EarlyEmptySectionsBetweenCocoons = 1;
+        private const int LateEmptySectionsBetweenCocoons = 2;
+        private const float LateProgressStart = 0.5f;
 
-        return Mathf.Clamp01(sectionIndex / (float)(totalSections - 1));
-    }
-
-    public static bool TryGetCocoonSegmentIndex(int sectionSegmentCount, out int segmentIndex)
-    {
-        segmentIndex = CocoonSegmentIndex;
-        return sectionSegmentCount == SectionSize;
-    }
-
-    public static bool ShouldPlaceCocoon(
-        int sectionIndex,
-        int totalSections,
-        int sectionsWithoutCocoon)
-    {
-        return ShouldPlaceCocoon(
-            sectionIndex,
-            totalSections,
-            GetSectionProgress(sectionIndex, totalSections),
-            sectionsWithoutCocoon);
-    }
-
-    public static bool ShouldPlaceCocoon(
-        int sectionIndex,
-        int totalSections,
-        float sectionProgress,
-        int sectionsWithoutCocoon)
-    {
-        if (sectionIndex <= 0 || sectionIndex >= totalSections - 1)
-            return false;
-
-        if (sectionIndex == FirstCocoonSectionIndex)
-            return true;
-
-        int requiredEmptySections = sectionProgress < LateProgressStart
-            ? EarlyEmptySectionsBetweenCocoons
-            : LateEmptySectionsBetweenCocoons;
-
-        return sectionsWithoutCocoon >= requiredEmptySections;
-    }
-
-    public static CocoonRewardProfile RollCocoonProfile(
-        IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        float sectionProgress,
-        IRandomSource randomSource)
-    {
-        sectionProgress = Mathf.Clamp01(sectionProgress);
-
-        IReadOnlyList<CocoonRewardProfile> profiles = HasSpawnableProfile(cocoonProfiles, sectionProgress)
-            ? cocoonProfiles
-            : CocoonRewardProfile.Defaults;
-
-        if (TryRollFixedSpawnChanceProfile(
-                profiles,
-                sectionProgress,
-                randomSource,
-                out CocoonRewardProfile fixedChanceProfile))
+        public static int CountGameplaySections(int gameplaySegmentCount)
         {
-            return fixedChanceProfile;
+            return Mathf.CeilToInt(Mathf.Max(0, gameplaySegmentCount) / (float)SectionSize);
         }
 
-        float totalWeight = 0f;
-
-        for (int i = 0; i < profiles.Count; i++)
+        public static float GetSectionProgress(int sectionIndex, int totalSections)
         {
-            CocoonRewardProfile profile = profiles[i];
+            if (totalSections <= 1)
+                return 0f;
 
-            if (!IsSpawnableProfile(profile, sectionProgress))
-                continue;
-
-            if (profile.UseFixedSpawnChance)
-                continue;
-
-            totalWeight += profile.SpawnWeight;
+            return Mathf.Clamp01(sectionIndex / (float)(totalSections - 1));
         }
 
-        if (totalWeight <= 0f)
-            return CocoonRewardProfile.Default;
-
-        float roll = randomSource.NextUnitFloat() * totalWeight;
-        float current = 0f;
-
-        for (int i = 0; i < profiles.Count; i++)
+        public static bool TryGetCocoonSegmentIndex(int sectionSegmentCount, out int segmentIndex)
         {
-            CocoonRewardProfile profile = profiles[i];
-
-            if (!IsSpawnableProfile(profile, sectionProgress))
-                continue;
-
-            if (profile.UseFixedSpawnChance)
-                continue;
-
-            current += profile.SpawnWeight;
-
-            if (roll <= current)
-                return profile;
+            segmentIndex = CocoonSegmentIndex;
+            return sectionSegmentCount == SectionSize;
         }
 
-        return CocoonRewardProfile.Default;
-    }
-
-    private static bool TryRollFixedSpawnChanceProfile(
-        IReadOnlyList<CocoonRewardProfile> profiles,
-        float sectionProgress,
-        IRandomSource randomSource,
-        out CocoonRewardProfile selected)
-    {
-        selected = null;
-
-        if (profiles == null)
-            return false;
-
-        for (int i = 0; i < profiles.Count; i++)
+        public static bool ShouldPlaceCocoon(
+            int sectionIndex,
+            int totalSections,
+            int sectionsWithoutCocoon)
         {
-            CocoonRewardProfile profile = profiles[i];
-
-            if (!IsSpawnableProfile(profile, sectionProgress))
-                continue;
-
-            if (!profile.UseFixedSpawnChance)
-                continue;
-
-            if (randomSource.NextUnitFloat() >= profile.FixedSpawnChance)
-                continue;
-
-            selected = profile;
-            return true;
+            return ShouldPlaceCocoon(
+                sectionIndex,
+                totalSections,
+                GetSectionProgress(sectionIndex, totalSections),
+                sectionsWithoutCocoon);
         }
 
-        return false;
-    }
-
-    private static bool HasSpawnableProfile(
-        IReadOnlyList<CocoonRewardProfile> profiles,
-        float sectionProgress)
-    {
-        if (profiles == null)
-            return false;
-
-        for (int i = 0; i < profiles.Count; i++)
+        public static bool ShouldPlaceCocoon(
+            int sectionIndex,
+            int totalSections,
+            float sectionProgress,
+            int sectionsWithoutCocoon)
         {
-            if (IsSpawnableProfile(profiles[i], sectionProgress))
+            if (sectionIndex <= 0 || sectionIndex >= totalSections - 1)
+                return false;
+
+            if (sectionIndex == FirstCocoonSectionIndex)
                 return true;
+
+            int requiredEmptySections = sectionProgress < LateProgressStart
+                ? EarlyEmptySectionsBetweenCocoons
+                : LateEmptySectionsBetweenCocoons;
+
+            return sectionsWithoutCocoon >= requiredEmptySections;
         }
 
-        return false;
-    }
+        public static CocoonRewardProfile RollCocoonProfile(
+            IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+            float sectionProgress,
+            IRandomSource randomSource)
+        {
+            sectionProgress = Mathf.Clamp01(sectionProgress);
 
-    private static bool IsSpawnableProfile(
-        CocoonRewardProfile profile,
-        float sectionProgress)
-    {
-        return profile != null
-            && profile.SpawnWeight > 0f
-            && sectionProgress + Mathf.Epsilon >= profile.MinDestroyedProgressToSpawn;
+            IReadOnlyList<CocoonRewardProfile> profiles = HasSpawnableProfile(cocoonProfiles, sectionProgress)
+                ? cocoonProfiles
+                : CocoonRewardProfile.Defaults;
+
+            if (TryRollFixedSpawnChanceProfile(
+                    profiles,
+                    sectionProgress,
+                    randomSource,
+                    out CocoonRewardProfile fixedChanceProfile))
+            {
+                return fixedChanceProfile;
+            }
+
+            float totalWeight = 0f;
+
+            for (int i = 0; i < profiles.Count; i++)
+            {
+                CocoonRewardProfile profile = profiles[i];
+
+                if (!IsSpawnableProfile(profile, sectionProgress))
+                    continue;
+
+                if (profile.UseFixedSpawnChance)
+                    continue;
+
+                totalWeight += profile.SpawnWeight;
+            }
+
+            if (totalWeight <= 0f)
+                return CocoonRewardProfile.Default;
+
+            float roll = randomSource.NextUnitFloat() * totalWeight;
+            float current = 0f;
+
+            for (int i = 0; i < profiles.Count; i++)
+            {
+                CocoonRewardProfile profile = profiles[i];
+
+                if (!IsSpawnableProfile(profile, sectionProgress))
+                    continue;
+
+                if (profile.UseFixedSpawnChance)
+                    continue;
+
+                current += profile.SpawnWeight;
+
+                if (roll <= current)
+                    return profile;
+            }
+
+            return CocoonRewardProfile.Default;
+        }
+
+        private static bool TryRollFixedSpawnChanceProfile(
+            IReadOnlyList<CocoonRewardProfile> profiles,
+            float sectionProgress,
+            IRandomSource randomSource,
+            out CocoonRewardProfile selected)
+        {
+            selected = null;
+
+            if (profiles == null)
+                return false;
+
+            for (int i = 0; i < profiles.Count; i++)
+            {
+                CocoonRewardProfile profile = profiles[i];
+
+                if (!IsSpawnableProfile(profile, sectionProgress))
+                    continue;
+
+                if (!profile.UseFixedSpawnChance)
+                    continue;
+
+                if (randomSource.NextUnitFloat() >= profile.FixedSpawnChance)
+                    continue;
+
+                selected = profile;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool HasSpawnableProfile(
+            IReadOnlyList<CocoonRewardProfile> profiles,
+            float sectionProgress)
+        {
+            if (profiles == null)
+                return false;
+
+            for (int i = 0; i < profiles.Count; i++)
+            {
+                if (IsSpawnableProfile(profiles[i], sectionProgress))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsSpawnableProfile(
+            CocoonRewardProfile profile,
+            float sectionProgress)
+        {
+            return profile != null
+                && profile.SpawnWeight > 0f
+                && sectionProgress + Mathf.Epsilon >= profile.MinDestroyedProgressToSpawn;
+        }
+
     }
 
 }

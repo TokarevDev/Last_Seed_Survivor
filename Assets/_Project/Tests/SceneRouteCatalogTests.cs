@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
-using LastSeed.Infrastructure.Navigation;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Infrastructure.Navigation;
+
+namespace Game.Tests
 {
     public sealed class SceneRouteCatalogTests
     {

@@ -1,38 +1,42 @@
-using System.Text;
-
-internal static class WormBalanceAssistanceSummaryFormatter
+namespace Game.Editor.Worm
 {
-    public static void Append(
-        StringBuilder builder,
-        WormBalanceScenarioStatistics noAds,
-        WormBalanceScenarioStatistics reviveOnly,
-        WormBalanceScenarioStatistics adsNoRevive,
-        WormBalanceScenarioStatistics fullAds)
+    using System.Text;
+
+    internal static class WormBalanceAssistanceSummaryFormatter
     {
-        if (!HasSamples(noAds))
-            return;
-
-        if (HasSamples(reviveOnly))
+        public static void Append(
+            StringBuilder builder,
+            WormBalanceScenarioStatistics noAds,
+            WormBalanceScenarioStatistics reviveOnly,
+            WormBalanceScenarioStatistics adsNoRevive,
+            WormBalanceScenarioStatistics fullAds)
         {
-            builder.AppendLine(
-                $"Revive rescue uplift: +{(reviveOnly.WinRate - noAds.WinRate) * 100f:0.0} pp | target: revive should convert most endpoint losses into wins");
+            if (!HasSamples(noAds))
+                return;
+
+            if (HasSamples(reviveOnly))
+            {
+                builder.AppendLine(
+                    $"Revive rescue uplift: +{(reviveOnly.WinRate - noAds.WinRate) * 100f:0.0} pp | target: revive should convert most endpoint losses into wins");
+            }
+
+            if (HasSamples(adsNoRevive))
+            {
+                builder.AppendLine(
+                    $"Paid assist uplift without revive: +{(adsNoRevive.WinRate - noAds.WinRate) * 100f:0.0} pp | target: paid reroll/take-all should help, not replace revive");
+            }
+
+            if (HasSamples(fullAds))
+            {
+                builder.AppendLine(
+                    $"Full ads uplift: +{(fullAds.WinRate - noAds.WinRate) * 100f:0.0} pp | target: full assist should feel like a near-guaranteed save");
+            }
         }
 
-        if (HasSamples(adsNoRevive))
+        private static bool HasSamples(WormBalanceScenarioStatistics statistics)
         {
-            builder.AppendLine(
-                $"Paid assist uplift without revive: +{(adsNoRevive.WinRate - noAds.WinRate) * 100f:0.0} pp | target: paid reroll/take-all should help, not replace revive");
-        }
-
-        if (HasSamples(fullAds))
-        {
-            builder.AppendLine(
-                $"Full ads uplift: +{(fullAds.WinRate - noAds.WinRate) * 100f:0.0} pp | target: full assist should feel like a near-guaranteed save");
+            return statistics != null && statistics.SampleCount > 0;
         }
     }
 
-    private static bool HasSamples(WormBalanceScenarioStatistics statistics)
-    {
-        return statistics != null && statistics.SampleCount > 0;
-    }
 }

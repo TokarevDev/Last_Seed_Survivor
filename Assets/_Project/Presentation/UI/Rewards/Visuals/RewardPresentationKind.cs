@@ -1,5 +1,9 @@
-public enum RewardPresentationKind
+namespace Game.Presentation.UI.Rewards.Visuals
 {
-    StatUpgrade = 0,
-    WeaponUnlock = 1
+    public enum RewardPresentationKind
+    {
+        StatUpgrade = 0,
+        WeaponUnlock = 1
+    }
+
 }

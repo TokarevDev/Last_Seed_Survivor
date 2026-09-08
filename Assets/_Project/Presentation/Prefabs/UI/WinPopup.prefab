@@ -217,7 +217,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7b64a9439f96498fbfe2f0c4cf5ff027, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WinPopupView
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Common.Popups.WinPopupView
   _popupId: WinPopup
   _root: {fileID: 1532346906640716998}
   _acceptButton: {fileID: 745244332203476494}

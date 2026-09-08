@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dfbb51c7784e5a544b70a2c7174b0872, type: 3}
   m_Name: RE_Parallel_Plus3
-  m_EditorClassIdentifier: Assembly-CSharp::AddModifierRewardEffect
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Rewards.Effects.AddModifierRewardEffect
   _modifier: {fileID: 11400000, guid: a91b0985e4ef444d80f7f2fb23a930c1, type: 2}
   _extendsParallelLimit: 1
   _maxParallelProjectilesAfterApply: 8

@@ -1,33 +1,40 @@
-public readonly struct RewardPopupState
+
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Presentation.UI.Rewards
 {
-    public RewardPopupState(
-        int freeRerollAttemptsLeft,
-        int adRerollAttemptsLeft,
-        int takeAllAttemptsLeft,
-        RewardRarity guaranteeRarity,
-        RewardRarity adRerollGuaranteeRarity,
-        bool canFreeReroll,
-        bool canAdReroll,
-        bool canTakeAll)
+    public readonly struct RewardPopupState
     {
-        FreeRerollAttemptsLeft = freeRerollAttemptsLeft;
-        AdRerollAttemptsLeft = adRerollAttemptsLeft;
-        TakeAllAttemptsLeft = takeAllAttemptsLeft;
-        GuaranteeRarity = guaranteeRarity;
-        AdRerollGuaranteeRarity = adRerollGuaranteeRarity;
-        CanFreeReroll = canFreeReroll;
-        CanAdReroll = canAdReroll;
-        CanTakeAll = canTakeAll;
+        public RewardPopupState(
+            int freeRerollAttemptsLeft,
+            int adRerollAttemptsLeft,
+            int takeAllAttemptsLeft,
+            RewardRarity guaranteeRarity,
+            RewardRarity adRerollGuaranteeRarity,
+            bool canFreeReroll,
+            bool canAdReroll,
+            bool canTakeAll)
+        {
+            FreeRerollAttemptsLeft = freeRerollAttemptsLeft;
+            AdRerollAttemptsLeft = adRerollAttemptsLeft;
+            TakeAllAttemptsLeft = takeAllAttemptsLeft;
+            GuaranteeRarity = guaranteeRarity;
+            AdRerollGuaranteeRarity = adRerollGuaranteeRarity;
+            CanFreeReroll = canFreeReroll;
+            CanAdReroll = canAdReroll;
+            CanTakeAll = canTakeAll;
+        }
+
+        public int FreeRerollAttemptsLeft { get; }
+        public int AdRerollAttemptsLeft { get; }
+        public int TakeAllAttemptsLeft { get; }
+        public RewardRarity GuaranteeRarity { get; }
+        public RewardRarity AdRerollGuaranteeRarity { get; }
+        public bool CanFreeReroll { get; }
+        public bool CanAdReroll { get; }
+        public bool CanTakeAll { get; }
+        public bool UseFreeRerollButton => FreeRerollAttemptsLeft > 0;
+        public bool UseTakeAllButton => TakeAllAttemptsLeft > 0 && CanTakeAll;
     }
 
-    public int FreeRerollAttemptsLeft { get; }
-    public int AdRerollAttemptsLeft { get; }
-    public int TakeAllAttemptsLeft { get; }
-    public RewardRarity GuaranteeRarity { get; }
-    public RewardRarity AdRerollGuaranteeRarity { get; }
-    public bool CanFreeReroll { get; }
-    public bool CanAdReroll { get; }
-    public bool CanTakeAll { get; }
-    public bool UseFreeRerollButton => FreeRerollAttemptsLeft > 0;
-    public bool UseTakeAllButton => TakeAllAttemptsLeft > 0 && CanTakeAll;
 }

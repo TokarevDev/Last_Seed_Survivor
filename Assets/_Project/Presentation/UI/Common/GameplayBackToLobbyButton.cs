@@ -1,11 +1,12 @@
 using System;
 using Cysharp.Threading.Tasks;
-using LastSeed.Infrastructure.Navigation;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-namespace _Project.App.Presentation
+using Game.Infrastructure.Navigation;
+
+namespace Game.Presentation.UI.Common
 {
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Button))]

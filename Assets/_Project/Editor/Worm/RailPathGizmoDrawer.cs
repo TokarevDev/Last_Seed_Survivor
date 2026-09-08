@@ -1,34 +1,41 @@
-using UnityEditor;
-using UnityEngine;
 
-internal static class RailPathGizmoDrawer
+using Game.Gameplay.Enemy.Worm;
+
+namespace Game.Editor.Worm
 {
-    private const float PointRadius = 0.08f;
-    private static readonly Color PathColor = new(0.1f, 1f, 0.25f, 0.9f);
-    private static readonly Color LegacyPathColor = new(1f, 0.8f, 0.1f, 0.9f);
+    using UnityEditor;
+    using UnityEngine;
 
-    [DrawGizmo(GizmoType.Selected | GizmoType.Active)]
-    private static void DrawSelected(RailPath path, GizmoType gizmoType)
+    internal static class RailPathGizmoDrawer
     {
-        if (path == null)
-            return;
+        private const float PointRadius = 0.08f;
+        private static readonly Color PathColor = new(0.1f, 1f, 0.25f, 0.9f);
+        private static readonly Color LegacyPathColor = new(1f, 0.8f, 0.1f, 0.9f);
 
-        RailPathSerializedData data = new(path, new SerializedObject(path));
-        Vector3[] points = data.BuildPreviewWorldPoints();
-
-        if (points.Length < 2)
-            return;
-
-        Gizmos.color = data.PointCount >= 2 ? PathColor : LegacyPathColor;
-        Vector3 previous = points[0];
-        Gizmos.DrawSphere(previous, PointRadius);
-
-        for (int index = 1; index < points.Length; index++)
+        [DrawGizmo(GizmoType.Selected | GizmoType.Active)]
+        private static void DrawSelected(RailPath path, GizmoType gizmoType)
         {
-            Vector3 current = points[index];
-            Gizmos.DrawLine(previous, current);
-            Gizmos.DrawSphere(current, PointRadius);
-            previous = current;
+            if (path == null)
+                return;
+
+            RailPathSerializedData data = new(path, new SerializedObject(path));
+            Vector3[] points = data.BuildPreviewWorldPoints();
+
+            if (points.Length < 2)
+                return;
+
+            Gizmos.color = data.PointCount >= 2 ? PathColor : LegacyPathColor;
+            Vector3 previous = points[0];
+            Gizmos.DrawSphere(previous, PointRadius);
+
+            for (int index = 1; index < points.Length; index++)
+            {
+                Vector3 current = points[index];
+                Gizmos.DrawLine(previous, current);
+                Gizmos.DrawSphere(current, PointRadius);
+                previous = current;
+            }
         }
     }
+
 }

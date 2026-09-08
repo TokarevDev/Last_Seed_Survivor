@@ -1,11 +1,15 @@
-public readonly struct WormFrameResult
+namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    public WormFrameResult(bool pathCompleted, float headPathProgressNormalized)
+    public readonly struct WormFrameResult
     {
-        PathCompleted = pathCompleted;
-        HeadPathProgressNormalized = headPathProgressNormalized;
+        public WormFrameResult(bool pathCompleted, float headPathProgressNormalized)
+        {
+            PathCompleted = pathCompleted;
+            HeadPathProgressNormalized = headPathProgressNormalized;
+        }
+
+        public bool PathCompleted { get; }
+        public float HeadPathProgressNormalized { get; }
     }
 
-    public bool PathCompleted { get; }
-    public float HeadPathProgressNormalized { get; }
 }

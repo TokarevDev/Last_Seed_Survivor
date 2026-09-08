@@ -2,10 +2,11 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using LastSeed.Infrastructure.Navigation;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Infrastructure.Navigation;
+
+namespace Game.Tests
 {
     public sealed class SceneNavigatorTests
     {

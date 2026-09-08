@@ -1,6 +1,6 @@
 using System;
 
-namespace LastSeed.Infrastructure.Navigation
+namespace Game.Infrastructure.Navigation
 {
     public readonly struct SceneRoute<TScene>
     {

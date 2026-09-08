@@ -1,34 +1,44 @@
-using System;
 
-public sealed class RewardPopupStateFactory
+using Game.Gameplay.Rewards;
+using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Rewards.Runtime;
+using Game.Gameplay.Rewards.Services;
+
+namespace Game.Presentation.UI.Rewards
 {
-    private readonly RewardAttemptState _attempts;
+    using System;
 
-    public RewardPopupStateFactory(RewardAttemptState attempts)
+    public sealed class RewardPopupStateFactory
     {
-        _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
+        private readonly RewardAttemptState _attempts;
+
+        public RewardPopupStateFactory(RewardAttemptState attempts)
+        {
+            _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
+        }
+
+        public RewardPopupState Create(
+            RewardRarity guaranteeRarity,
+            CocoonRewardProfile cocoonProfile,
+            in RewardRollContext rollContext,
+            bool isRewardOperationPending)
+        {
+            bool canTakeAll = _attempts.HasTakeAll
+                && !isRewardOperationPending
+                && RewardAdRerollPolicy.CanOfferTakeAll(rollContext);
+
+            return new RewardPopupState(
+                _attempts.FreeRerollsLeft,
+                _attempts.AdRerollsLeft,
+                _attempts.TakeAllLeft,
+                guaranteeRarity,
+                RewardAdRerollPolicy.GetDisplayedGuaranteeRarity(cocoonProfile),
+                _attempts.HasFreeReroll && !isRewardOperationPending,
+                !_attempts.HasFreeReroll
+                    && _attempts.HasAdReroll
+                    && !isRewardOperationPending,
+                canTakeAll);
+        }
     }
 
-    public RewardPopupState Create(
-        RewardRarity guaranteeRarity,
-        CocoonRewardProfile cocoonProfile,
-        in RewardRollContext rollContext,
-        bool isRewardOperationPending)
-    {
-        bool canTakeAll = _attempts.HasTakeAll
-            && !isRewardOperationPending
-            && RewardAdRerollPolicy.CanOfferTakeAll(rollContext);
-
-        return new RewardPopupState(
-            _attempts.FreeRerollsLeft,
-            _attempts.AdRerollsLeft,
-            _attempts.TakeAllLeft,
-            guaranteeRarity,
-            RewardAdRerollPolicy.GetDisplayedGuaranteeRarity(cocoonProfile),
-            _attempts.HasFreeReroll && !isRewardOperationPending,
-            !_attempts.HasFreeReroll
-                && _attempts.HasAdReroll
-                && !isRewardOperationPending,
-            canTakeAll);
-    }
 }

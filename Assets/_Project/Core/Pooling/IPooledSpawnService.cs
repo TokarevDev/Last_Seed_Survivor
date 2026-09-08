@@ -1,4 +1,4 @@
-namespace LastSeed.Core.Pooling
+namespace Game.Core.Pooling
 {
     public interface IPooledSpawnService<TRequest>
         where TRequest : struct

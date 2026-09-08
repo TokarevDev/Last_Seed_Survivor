@@ -1,13 +1,21 @@
-public readonly struct RewardOpenRequest
+
+using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Rewards.Services;
+
+namespace Game.Gameplay.Rewards.Runtime
 {
-    public RewardOpenRequest(
-        CocoonRewardProfile cocoonProfile,
-        RewardRollContext rollContext)
+    public readonly struct RewardOpenRequest
     {
-        CocoonProfile = cocoonProfile;
-        RollContext = rollContext;
+        public RewardOpenRequest(
+            CocoonRewardProfile cocoonProfile,
+            RewardRollContext rollContext)
+        {
+            CocoonProfile = cocoonProfile;
+            RollContext = rollContext;
+        }
+
+        public CocoonRewardProfile CocoonProfile { get; }
+        public RewardRollContext RollContext { get; }
     }
 
-    public CocoonRewardProfile CocoonProfile { get; }
-    public RewardRollContext RollContext { get; }
 }

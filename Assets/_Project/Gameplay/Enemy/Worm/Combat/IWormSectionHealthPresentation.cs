@@ -1,8 +1,12 @@
-using System.Collections.Generic;
-
-public interface IWormSectionHealthPresentation
+namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    void BindSections(IReadOnlyList<WormSection> sections);
+    using System.Collections.Generic;
 
-    void Clear();
+    public interface IWormSectionHealthPresentation
+    {
+        void BindSections(IReadOnlyList<WormSection> sections);
+
+        void Clear();
+    }
+
 }

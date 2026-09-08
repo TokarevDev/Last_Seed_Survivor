@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace LastSeed.Core.Collections
+using Game.Core.Pooling;
+
+namespace Game.Core.Collections
 {
     public sealed class ReferenceEqualityComparer<T> : IEqualityComparer<T>
         where T : class

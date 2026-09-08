@@ -2,7 +2,12 @@ using System;
 using UnityEngine;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Gameplay
+using Game.Core.Random;
+using Game.Gameplay.Player;
+using Game.Gameplay.Pooling;
+using Game.Gameplay.World;
+
+namespace Game.Bootstrap.Scenes.Game
 {
     public sealed class GameSceneInitializer : IInitializable
     {

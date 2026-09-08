@@ -1,6 +1,9 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Rewards.Runtime;
+using Game.Gameplay.Rewards.Services;
+
+namespace Game.Tests
 {
     public sealed class RewardRequestCoordinatorTests
     {

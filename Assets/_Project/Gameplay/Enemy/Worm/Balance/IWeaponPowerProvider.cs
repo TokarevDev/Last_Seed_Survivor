@@ -1,4 +1,8 @@
-public interface IWeaponPowerProvider
+namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    WeaponPowerSnapshot GetCurrentPower();
+    public interface IWeaponPowerProvider
+    {
+        WeaponPowerSnapshot GetCurrentPower();
+    }
+
 }

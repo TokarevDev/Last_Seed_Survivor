@@ -1,22 +1,29 @@
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Rewards/Effects/Critical Power")]
-public sealed class CriticalPowerRewardEffect : RewardEffect
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    [SerializeField][Min(0f)] private float _criticalDamageBonus = 0.5f;
+    using UnityEngine;
 
-    public override bool CanApply(WeaponRuntimeState state)
+    [CreateAssetMenu(menuName = "Game/Rewards/Effects/Critical Power")]
+    public sealed class CriticalPowerRewardEffect : RewardEffect
     {
-        return state != null
-            && state.CriticalChance > 0f
-            && state.CanApplyCriticalDamageBonus(_criticalDamageBonus);
+        [SerializeField][Min(0f)] private float _criticalDamageBonus = 0.5f;
+
+        public override bool CanApply(WeaponRuntimeState state)
+        {
+            return state != null
+                && state.CriticalChance > 0f
+                && state.CanApplyCriticalDamageBonus(_criticalDamageBonus);
+        }
+
+        public override void Apply(WeaponRuntimeState state)
+        {
+            if (state == null)
+                return;
+
+            state.AddCriticalDamageBonus(_criticalDamageBonus);
+        }
     }
 
-    public override void Apply(WeaponRuntimeState state)
-    {
-        if (state == null)
-            return;
-
-        state.AddCriticalDamageBonus(_criticalDamageBonus);
-    }
 }

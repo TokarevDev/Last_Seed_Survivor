@@ -1,9 +1,12 @@
 using System;
 using System.Numerics;
-using LastSeed.Core.World;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.World;
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Gameplay.Enemy.Worm.Presentation;
+
+namespace Game.Tests
 {
     public sealed class WormSegmentPoseCalculatorTests
     {

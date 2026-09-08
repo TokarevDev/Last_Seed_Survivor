@@ -1,131 +1,140 @@
-using System;
 
-public enum RewardWeaponGroup
+using Game.Core;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Enemy.Worm.Balance;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    None,
-    MainWeapon,
-    AcaciaThorn
-}
+    using System;
 
-public readonly struct RewardWeaponDpsBias
-{
-    public const float MinImbalanceToBias = 0.2f;
-
-    private const float MinPreferredMultiplier = 1.05f;
-    private const float MaxPreferredMultiplier = 1.65f;
-    private const float MinStrongerMultiplier = 0.8f;
-    private const float MaxStrongerMultiplier = 0.98f;
-
-    public static readonly RewardWeaponDpsBias None = new(
-        RewardWeaponGroup.None,
-        1f,
-        1f);
-
-    private readonly RewardWeaponGroup _preferredGroup;
-    private readonly float _preferredMultiplier;
-    private readonly float _strongerMultiplier;
-
-    private RewardWeaponDpsBias(
-        RewardWeaponGroup preferredGroup,
-        float preferredMultiplier,
-        float strongerMultiplier)
+    public enum RewardWeaponGroup
     {
-        _preferredGroup = preferredGroup;
-        _preferredMultiplier = Math.Max(0f, preferredMultiplier);
-        _strongerMultiplier = Math.Max(0f, strongerMultiplier);
+        None,
+        MainWeapon,
+        AcaciaThorn
     }
 
-    public static RewardWeaponDpsBias Create(
-        RewardWeaponGroup preferredGroup,
-        float normalizedImbalance)
+    public readonly struct RewardWeaponDpsBias
     {
-        float t = FloatMath.Clamp01(normalizedImbalance);
+        public const float MinImbalanceToBias = 0.2f;
 
-        return new RewardWeaponDpsBias(
-            preferredGroup,
-            FloatMath.Lerp(MinPreferredMultiplier, MaxPreferredMultiplier, t),
-            FloatMath.Lerp(MaxStrongerMultiplier, MinStrongerMultiplier, t));
-    }
+        private const float MinPreferredMultiplier = 1.05f;
+        private const float MaxPreferredMultiplier = 1.65f;
+        private const float MinStrongerMultiplier = 0.8f;
+        private const float MaxStrongerMultiplier = 0.98f;
 
-    public float GetMultiplier(RewardWeaponGroup group)
-    {
-        if (_preferredGroup == RewardWeaponGroup.None ||
-            group == RewardWeaponGroup.None)
+        public static readonly RewardWeaponDpsBias None = new(
+            RewardWeaponGroup.None,
+            1f,
+            1f);
+
+        private readonly RewardWeaponGroup _preferredGroup;
+        private readonly float _preferredMultiplier;
+        private readonly float _strongerMultiplier;
+
+        private RewardWeaponDpsBias(
+            RewardWeaponGroup preferredGroup,
+            float preferredMultiplier,
+            float strongerMultiplier)
         {
-            return 1f;
+            _preferredGroup = preferredGroup;
+            _preferredMultiplier = Math.Max(0f, preferredMultiplier);
+            _strongerMultiplier = Math.Max(0f, strongerMultiplier);
         }
 
-        return group == _preferredGroup
-            ? _preferredMultiplier
-            : _strongerMultiplier;
-    }
-}
+        public static RewardWeaponDpsBias Create(
+            RewardWeaponGroup preferredGroup,
+            float normalizedImbalance)
+        {
+            float t = FloatMath.Clamp01(normalizedImbalance);
 
-public static class RewardWeaponDpsBiasCalculator
-{
-    public static RewardWeaponDpsBias Calculate(RewardRuntimeContext context)
+            return new RewardWeaponDpsBias(
+                preferredGroup,
+                FloatMath.Lerp(MinPreferredMultiplier, MaxPreferredMultiplier, t),
+                FloatMath.Lerp(MaxStrongerMultiplier, MinStrongerMultiplier, t));
+        }
+
+        public float GetMultiplier(RewardWeaponGroup group)
+        {
+            if (_preferredGroup == RewardWeaponGroup.None ||
+                group == RewardWeaponGroup.None)
+            {
+                return 1f;
+            }
+
+            return group == _preferredGroup
+                ? _preferredMultiplier
+                : _strongerMultiplier;
+        }
+    }
+
+    public static class RewardWeaponDpsBiasCalculator
     {
-        if (!HasAdditionalWeaponUnlocked(context))
-            return RewardWeaponDpsBias.None;
+        public static RewardWeaponDpsBias Calculate(RewardRuntimeContext context)
+        {
+            if (!HasAdditionalWeaponUnlocked(context))
+                return RewardWeaponDpsBias.None;
 
-        WeaponPowerSnapshot mainPower = EstimateMainWeaponPower(context);
-        WeaponPowerSnapshot acaciaPower = EstimateAcaciaPower(context);
+            WeaponPowerSnapshot mainPower = EstimateMainWeaponPower(context);
+            WeaponPowerSnapshot acaciaPower = EstimateAcaciaPower(context);
 
-        if (!mainPower.IsValid || !acaciaPower.IsValid)
-            return RewardWeaponDpsBias.None;
+            if (!mainPower.IsValid || !acaciaPower.IsValid)
+                return RewardWeaponDpsBias.None;
 
-        float mainDps = Math.Max(0f, mainPower.EstimatedDps);
-        float acaciaDps = Math.Max(0f, acaciaPower.EstimatedDps);
-        float strongerDps = Math.Max(mainDps, acaciaDps);
+            float mainDps = Math.Max(0f, mainPower.EstimatedDps);
+            float acaciaDps = Math.Max(0f, acaciaPower.EstimatedDps);
+            float strongerDps = Math.Max(mainDps, acaciaDps);
 
-        if (strongerDps <= 0.01f)
-            return RewardWeaponDpsBias.None;
+            if (strongerDps <= 0.01f)
+                return RewardWeaponDpsBias.None;
 
-        float imbalance = Math.Abs(mainDps - acaciaDps) / strongerDps;
+            float imbalance = Math.Abs(mainDps - acaciaDps) / strongerDps;
 
-        if (imbalance < RewardWeaponDpsBias.MinImbalanceToBias)
-            return RewardWeaponDpsBias.None;
+            if (imbalance < RewardWeaponDpsBias.MinImbalanceToBias)
+                return RewardWeaponDpsBias.None;
 
-        RewardWeaponGroup preferredGroup = mainDps <= acaciaDps
-            ? RewardWeaponGroup.MainWeapon
-            : RewardWeaponGroup.AcaciaThorn;
-        float normalizedImbalance = FloatMath.InverseLerp(
-            RewardWeaponDpsBias.MinImbalanceToBias,
-            1f,
-            imbalance);
+            RewardWeaponGroup preferredGroup = mainDps <= acaciaDps
+                ? RewardWeaponGroup.MainWeapon
+                : RewardWeaponGroup.AcaciaThorn;
+            float normalizedImbalance = FloatMath.InverseLerp(
+                RewardWeaponDpsBias.MinImbalanceToBias,
+                1f,
+                imbalance);
 
-        return RewardWeaponDpsBias.Create(preferredGroup, normalizedImbalance);
+            return RewardWeaponDpsBias.Create(preferredGroup, normalizedImbalance);
+        }
+
+        private static WeaponPowerSnapshot EstimateMainWeaponPower(
+            RewardRuntimeContext context)
+        {
+            if (context == null)
+                return WeaponPowerSnapshot.Invalid;
+
+            return context.MainWeapon != null
+                ? WeaponPowerEstimator.Estimate(context.MainWeapon)
+                : WeaponPowerEstimator.Estimate(
+                    context.MainWeaponConfig,
+                    context.MainWeaponState);
+        }
+
+        private static WeaponPowerSnapshot EstimateAcaciaPower(
+            RewardRuntimeContext context)
+        {
+            if (context == null)
+                return WeaponPowerSnapshot.Invalid;
+
+            return context.AcaciaThornWeapon != null
+                ? WeaponPowerEstimator.Estimate(context.AcaciaThornWeapon)
+                : WeaponPowerEstimator.Estimate(
+                    context.AcaciaThornConfig,
+                    context.AcaciaThornState);
+        }
+
+        private static bool HasAdditionalWeaponUnlocked(RewardRuntimeContext context)
+        {
+            AcaciaThornRuntimeState acaciaState = context?.AcaciaThornState;
+            return acaciaState != null && acaciaState.IsUnlocked;
+        }
     }
 
-    private static WeaponPowerSnapshot EstimateMainWeaponPower(
-        RewardRuntimeContext context)
-    {
-        if (context == null)
-            return WeaponPowerSnapshot.Invalid;
-
-        return context.MainWeapon != null
-            ? WeaponPowerEstimator.Estimate(context.MainWeapon)
-            : WeaponPowerEstimator.Estimate(
-                context.MainWeaponConfig,
-                context.MainWeaponState);
-    }
-
-    private static WeaponPowerSnapshot EstimateAcaciaPower(
-        RewardRuntimeContext context)
-    {
-        if (context == null)
-            return WeaponPowerSnapshot.Invalid;
-
-        return context.AcaciaThornWeapon != null
-            ? WeaponPowerEstimator.Estimate(context.AcaciaThornWeapon)
-            : WeaponPowerEstimator.Estimate(
-                context.AcaciaThornConfig,
-                context.AcaciaThornState);
-    }
-
-    private static bool HasAdditionalWeaponUnlocked(RewardRuntimeContext context)
-    {
-        AcaciaThornRuntimeState acaciaState = context?.AcaciaThornState;
-        return acaciaState != null && acaciaState.IsUnlocked;
-    }
 }

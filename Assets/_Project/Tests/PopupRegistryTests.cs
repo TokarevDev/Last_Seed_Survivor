@@ -1,8 +1,9 @@
-using LastSeed.Presentation.UI.Popups;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace LastSeed.Tests
+using Game.Presentation.UI.Common.Popups;
+
+namespace Game.Tests
 {
     public sealed class PopupRegistryTests
     {

@@ -1,47 +1,54 @@
-using System.Collections.Generic;
 
-public static class RewardPoolBuilder
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    private const float NewWeaponUnlockMinWormProgress = 0.3f;
+    using System.Collections.Generic;
 
-    public static Dictionary<RewardRarity, List<RewardModifierEntry>> Build(
-        IReadOnlyList<RewardModifierEntry> source,
-        RewardRuntimeContext context,
-        RewardRollContext rollContext)
+    public static class RewardPoolBuilder
     {
-        var pools = new Dictionary<RewardRarity, List<RewardModifierEntry>>();
+        private const float NewWeaponUnlockMinWormProgress = 0.3f;
 
-        if (source == null || context == null)
-            return pools;
-
-        for (int i = 0; i < source.Count; i++)
+        public static Dictionary<RewardRarity, List<RewardModifierEntry>> Build(
+            IReadOnlyList<RewardModifierEntry> source,
+            RewardRuntimeContext context,
+            RewardRollContext rollContext)
         {
-            RewardModifierEntry entry = source[i];
+            var pools = new Dictionary<RewardRarity, List<RewardModifierEntry>>();
 
-            if (!CanEnterPool(entry, context, rollContext))
-                continue;
+            if (source == null || context == null)
+                return pools;
 
-            if (!pools.TryGetValue(entry.Rarity, out List<RewardModifierEntry> pool))
+            for (int i = 0; i < source.Count; i++)
             {
-                pool = new List<RewardModifierEntry>();
-                pools.Add(entry.Rarity, pool);
+                RewardModifierEntry entry = source[i];
+
+                if (!CanEnterPool(entry, context, rollContext))
+                    continue;
+
+                if (!pools.TryGetValue(entry.Rarity, out List<RewardModifierEntry> pool))
+                {
+                    pool = new List<RewardModifierEntry>();
+                    pools.Add(entry.Rarity, pool);
+                }
+
+                pool.Add(entry);
             }
 
-            pool.Add(entry);
+            return pools;
         }
 
-        return pools;
+        private static bool CanEnterPool(
+            RewardModifierEntry entry,
+            RewardRuntimeContext context,
+            RewardRollContext rollContext)
+        {
+            if (entry == null || entry.Effect == null || !entry.Effect.CanApply(context))
+                return false;
+
+            return !RewardSelectionPolicy.IsNewWeaponUnlockReward(entry)
+                || rollContext.WormDestructionProgressNormalized >= NewWeaponUnlockMinWormProgress;
+        }
     }
 
-    private static bool CanEnterPool(
-        RewardModifierEntry entry,
-        RewardRuntimeContext context,
-        RewardRollContext rollContext)
-    {
-        if (entry == null || entry.Effect == null || !entry.Effect.CanApply(context))
-            return false;
-
-        return !RewardSelectionPolicy.IsNewWeaponUnlockReward(entry)
-            || rollContext.WormDestructionProgressNormalized >= NewWeaponUnlockMinWormProgress;
-    }
 }

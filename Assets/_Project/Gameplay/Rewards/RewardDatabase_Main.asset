@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a6531b22a01bcf84f993f1898dfafa80, type: 3}
   m_Name: RewardDatabase_Main
-  m_EditorClassIdentifier: Assembly-CSharp::RewardDatabase
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Rewards.Data.RewardDatabase
   _cocoonProfiles:
   - _displayName: White
     _visualColor: {r: 1, g: 1, b: 1, a: 1}

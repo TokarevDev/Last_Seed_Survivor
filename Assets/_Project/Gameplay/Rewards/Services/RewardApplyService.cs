@@ -1,31 +1,41 @@
-public sealed class RewardApplyService : IRewardChoiceApplier, IRewardRuntimeContextProvider
+
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Combat.Weapons.Runtime;
+using Game.Gameplay.Rewards.Runtime;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    private readonly ProjectileWeapon _weapon;
-    private readonly RewardRuntimeContext _context;
-
-    public RewardApplyService(
-        ProjectileWeapon weapon,
-        AcaciaThornWeapon acaciaThornWeapon)
+    public sealed class RewardApplyService : IRewardChoiceApplier, IRewardRuntimeContextProvider
     {
-        _weapon = weapon;
-        _context = new RewardRuntimeContext(weapon, acaciaThornWeapon);
+        private readonly ProjectileWeapon _weapon;
+        private readonly RewardRuntimeContext _context;
+
+        public RewardApplyService(
+            ProjectileWeapon weapon,
+            AcaciaThornWeapon acaciaThornWeapon)
+        {
+            _weapon = weapon;
+            _context = new RewardRuntimeContext(weapon, acaciaThornWeapon);
+        }
+
+        public WeaponRuntimeState RuntimeState => _weapon != null ? _weapon.RuntimeState : null;
+        public RewardRuntimeContext RuntimeContext => _context;
+
+        public void Apply(RewardChoiceData choice)
+        {
+            if (choice == null || choice.Effect == null)
+                return;
+
+            if (_context == null)
+                return;
+
+            if (!choice.Effect.CanApply(_context))
+                return;
+
+            choice.Effect.Apply(_context);
+            _weapon?.ForceRebuild();
+        }
     }
 
-    public WeaponRuntimeState RuntimeState => _weapon != null ? _weapon.RuntimeState : null;
-    public RewardRuntimeContext RuntimeContext => _context;
-
-    public void Apply(RewardChoiceData choice)
-    {
-        if (choice == null || choice.Effect == null)
-            return;
-
-        if (_context == null)
-            return;
-
-        if (!choice.Effect.CanApply(_context))
-            return;
-
-        choice.Effect.Apply(_context);
-        _weapon?.ForceRebuild();
-    }
 }

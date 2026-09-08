@@ -1,36 +1,43 @@
-using UnityEngine;
 
-[CreateAssetMenu(menuName = "Game/Rewards/Effects/Salvo")]
-public sealed class SalvoFireRewardEffect : RewardEffect
+using Game.Gameplay.Combat.Weapons.Runtime;
+
+namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    [SerializeField][Min(1)] private int _extraShots = 1;
-    [SerializeField][Min(0.01f)] private float _shotInterval = 0.2f;
-    [SerializeField] private bool _extendsSalvoLimit;
-    [SerializeField][Min(1)] private int _maxSalvoShotsAfterApply = WeaponRuntimeState.DefaultMaxSalvoShots;
+    using UnityEngine;
 
-    public override bool CanApply(WeaponRuntimeState state)
+    [CreateAssetMenu(menuName = "Game/Rewards/Effects/Salvo")]
+    public sealed class SalvoFireRewardEffect : RewardEffect
     {
-        if (state == null)
-            return false;
+        [SerializeField][Min(1)] private int _extraShots = 1;
+        [SerializeField][Min(0.01f)] private float _shotInterval = 0.2f;
+        [SerializeField] private bool _extendsSalvoLimit;
+        [SerializeField][Min(1)] private int _maxSalvoShotsAfterApply = WeaponRuntimeState.DefaultMaxSalvoShots;
 
-        return _extendsSalvoLimit
-            ? state.CanApplySalvoShots(_extraShots, GetMaxSalvoExtraShotsAfterApply())
-            : state.CanApplySalvoShots(_extraShots);
+        public override bool CanApply(WeaponRuntimeState state)
+        {
+            if (state == null)
+                return false;
+
+            return _extendsSalvoLimit
+                ? state.CanApplySalvoShots(_extraShots, GetMaxSalvoExtraShotsAfterApply())
+                : state.CanApplySalvoShots(_extraShots);
+        }
+
+        public override void Apply(WeaponRuntimeState state)
+        {
+            if (state == null)
+                return;
+
+            if (_extendsSalvoLimit)
+                state.ExpandSalvoExtraShotLimit(GetMaxSalvoExtraShotsAfterApply());
+
+            state.AddSalvoShots(_extraShots, _shotInterval);
+        }
+
+        private int GetMaxSalvoExtraShotsAfterApply()
+        {
+            return Mathf.Max(0, _maxSalvoShotsAfterApply - 1);
+        }
     }
 
-    public override void Apply(WeaponRuntimeState state)
-    {
-        if (state == null)
-            return;
-
-        if (_extendsSalvoLimit)
-            state.ExpandSalvoExtraShotLimit(GetMaxSalvoExtraShotsAfterApply());
-
-        state.AddSalvoShots(_extraShots, _shotInterval);
-    }
-
-    private int GetMaxSalvoExtraShotsAfterApply()
-    {
-        return Mathf.Max(0, _maxSalvoShotsAfterApply - 1);
-    }
 }

@@ -1,14 +1,21 @@
-using UnityEngine;
 
-public sealed class UnityRandomSource : IRandomSource
+using Game.Core.Random;
+
+namespace Game.Infrastructure.Random
 {
-    public float NextUnitFloat()
+    using UnityEngine;
+
+    public sealed class UnityRandomSource : IRandomSource
     {
-        return Random.value;
+        public float NextUnitFloat()
+        {
+            return Random.value;
+        }
+
+        public int NextInt(int minInclusive, int maxExclusive)
+        {
+            return Random.Range(minInclusive, maxExclusive);
+        }
     }
 
-    public int NextInt(int minInclusive, int maxExclusive)
-    {
-        return Random.Range(minInclusive, maxExclusive);
-    }
 }

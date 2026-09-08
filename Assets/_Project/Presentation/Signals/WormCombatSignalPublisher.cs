@@ -1,8 +1,10 @@
 using System;
-using LastSeed.Gameplay.Signals;
 using Zenject;
 
-namespace LastSeed.Presentation.Signals
+using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Signals;
+
+namespace Game.Presentation.Signals
 {
     public sealed class WormCombatSignalPublisher : IWormCombatEventPublisher
     {

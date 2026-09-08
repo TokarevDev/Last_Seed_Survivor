@@ -1,6 +1,9 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Spawning;
+
+namespace Game.Tests
 {
     public sealed class WormSpawnSettingsTests
     {

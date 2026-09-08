@@ -1,293 +1,302 @@
-using System;
-using LastSeed.Core.Timing;
-using LastSeed.Core.Pooling;
-using LastSeed.Gameplay.Signals;
-using UnityEngine;
 
-[DisallowMultipleComponent]
-public sealed class AcaciaThornWeapon : MonoBehaviour
+using Game.Core.Combat;
+using Game.Core.Pooling;
+using Game.Core.Random;
+using Game.Core.Timing;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
+using Game.Gameplay.Signals;
+
+namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    [SerializeField] private AcaciaThornWeaponConfig _config;
+    using System;
+    using UnityEngine;
 
-    private readonly AcaciaThornRuntimeState _runtimeState = new();
-
-    private Transform _firePoint;
-    private float _currentCooldown;
-    private bool _initialized;
-    private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
-    private IRandomSource _randomSource;
-    private IPooledSpawnService<AcaciaThornProjectileSpawnRequest> _pool;
-    private readonly CooldownBurstCycle _fireCycle = new();
-
-    public AcaciaThornWeaponConfig Config => _config;
-    public AcaciaThornRuntimeState RuntimeState => _runtimeState;
-
-    public void Init(
-        Transform firePoint,
-        IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
-        IRandomSource randomSource,
-        IPooledSpawnService<AcaciaThornProjectileSpawnRequest> pool)
+    [DisallowMultipleComponent]
+    public sealed class AcaciaThornWeapon : MonoBehaviour
     {
-        if (_initialized)
-            return;
+        [SerializeField] private AcaciaThornWeaponConfig _config;
 
-        if (_config == null)
-            throw new InvalidOperationException("Acacia Thorn weapon config is missing.");
+        private readonly AcaciaThornRuntimeState _runtimeState = new();
 
-        if (pool == null)
-            throw new ArgumentNullException(nameof(pool));
+        private Transform _firePoint;
+        private float _currentCooldown;
+        private bool _initialized;
+        private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
+        private IRandomSource _randomSource;
+        private IPooledSpawnService<AcaciaThornProjectileSpawnRequest> _pool;
+        private readonly CooldownBurstCycle _fireCycle = new();
 
-        if (!pool.IsInitialized)
-            throw new InvalidOperationException("Acacia Thorn projectile pool is not initialized.");
+        public AcaciaThornWeaponConfig Config => _config;
+        public AcaciaThornRuntimeState RuntimeState => _runtimeState;
 
-        if (firePoint == null)
-            throw new ArgumentNullException(nameof(firePoint));
-
-        _runtimeStatsPublisher = runtimeStatsPublisher ??
-            throw new ArgumentNullException(nameof(runtimeStatsPublisher));
-        _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
-        _pool = pool;
-        _firePoint = firePoint;
-        ApplyRuntimeLimits();
-        _runtimeState.SetBaseDamage(_config.Damage);
-
-        RebuildCooldown(resetTimer: true);
-        _initialized = true;
-        PublishRuntimeStatsChanged();
-    }
-
-    public void Tick(float deltaTime)
-    {
-        if (!_initialized || !_runtimeState.IsUnlocked || !_pool.IsInitialized)
-            return;
-
-        CooldownBurstCycleStep step = _fireCycle.Advance(deltaTime);
-
-        if (step == CooldownBurstCycleStep.BurstActionReady)
+        public void Init(
+            Transform firePoint,
+            IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
+            IRandomSource randomSource,
+            IPooledSpawnService<AcaciaThornProjectileSpawnRequest> pool)
         {
-            FireSalvoShot();
-            return;
+            if (_initialized)
+                return;
+
+            if (_config == null)
+                throw new InvalidOperationException("Acacia Thorn weapon config is missing.");
+
+            if (pool == null)
+                throw new ArgumentNullException(nameof(pool));
+
+            if (!pool.IsInitialized)
+                throw new InvalidOperationException("Acacia Thorn projectile pool is not initialized.");
+
+            if (firePoint == null)
+                throw new ArgumentNullException(nameof(firePoint));
+
+            _runtimeStatsPublisher = runtimeStatsPublisher ??
+                throw new ArgumentNullException(nameof(runtimeStatsPublisher));
+            _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
+            _pool = pool;
+            _firePoint = firePoint;
+            ApplyRuntimeLimits();
+            _runtimeState.SetBaseDamage(_config.Damage);
+
+            RebuildCooldown(resetTimer: true);
+            _initialized = true;
+            PublishRuntimeStatsChanged();
         }
 
-        if (step == CooldownBurstCycleStep.CycleReady)
-            StartSalvo();
-    }
+        public void Tick(float deltaTime)
+        {
+            if (!_initialized || !_runtimeState.IsUnlocked || !_pool.IsInitialized)
+                return;
 
-    public void Unlock(int baseDamage)
-    {
-        if (!_runtimeState.CanUnlock)
-            return;
+            CooldownBurstCycleStep step = _fireCycle.Advance(deltaTime);
 
-        int fallbackBaseDamage = _config != null ? _config.Damage : 1;
-        _runtimeState.Unlock(Mathf.Max(fallbackBaseDamage, baseDamage));
-        _fireCycle.Reset();
-        PublishRuntimeStatsChanged();
-    }
+            if (step == CooldownBurstCycleStep.BurstActionReady)
+            {
+                FireSalvoShot();
+                return;
+            }
 
-    public void AddDamageMultiplier(float multiplier)
-    {
-        if (!_runtimeState.CanApplyDamageMultiplier(multiplier))
-            return;
+            if (step == CooldownBurstCycleStep.CycleReady)
+                StartSalvo();
+        }
 
-        _runtimeState.ApplyDamageMultiplier(multiplier);
-        PublishRuntimeStatsChanged();
-    }
+        public void Unlock(int baseDamage)
+        {
+            if (!_runtimeState.CanUnlock)
+                return;
 
-    public void AddFireRateBonus(float bonus)
-    {
-        if (!_runtimeState.CanApplyFireRateBonus(bonus))
-            return;
-
-        _runtimeState.AddFireRateBonus(bonus);
-        RebuildCooldown(resetTimer: false);
-        PublishRuntimeStatsChanged();
-    }
-
-    public void AddSalvoShots(int extraShots)
-    {
-        if (!_runtimeState.CanApplySalvoShots(extraShots))
-            return;
-
-        _runtimeState.AddSalvoShots(extraShots);
-        PublishRuntimeStatsChanged();
-    }
-
-    public void AddProjectileSpeedBonus(float bonus)
-    {
-        if (!_runtimeState.CanApplyProjectileSpeedBonus(bonus))
-            return;
-
-        _runtimeState.AddProjectileSpeedBonus(bonus);
-        PublishRuntimeStatsChanged();
-    }
-
-    public void AddCriticalChance(float chanceBonus)
-    {
-        if (!_runtimeState.CanApplyCriticalChance(chanceBonus))
-            return;
-
-        _runtimeState.AddCriticalChance(chanceBonus);
-        PublishRuntimeStatsChanged();
-    }
-
-    public void AddCriticalDamageBonus(float damageBonus)
-    {
-        if (!_runtimeState.CanApplyCriticalDamageBonus(damageBonus))
-            return;
-
-        _runtimeState.AddCriticalDamageBonus(damageBonus);
-        PublishRuntimeStatsChanged();
-    }
-
-    public void ClearTransientState()
-    {
-        _pool.ReleaseAll();
-        _fireCycle.CancelBurst();
-    }
-
-    public void ResetRuntimeState()
-    {
-        ClearTransientState();
-
-        int baseDamage = _config != null ? _config.Damage : 1;
-        _runtimeState.ResetProgression(baseDamage);
-        ApplyRuntimeLimits();
-        RebuildCooldown(resetTimer: true);
-        PublishRuntimeStatsChanged();
-    }
-
-    private void ApplyRuntimeLimits()
-    {
-        if (_config == null)
-            return;
-
-        _runtimeState.SetProgressionLimits(
-            _config.MaxDamageMultiplier,
-            _config.MaxFireRateBonus,
-            _config.MaxSalvoExtraShots,
-            _config.MaxProjectileSpeedBonus,
-            _config.MaxCriticalChance,
-            _config.CriticalDamageMultiplier,
-            _config.MaxCriticalDamageMultiplier);
-    }
-
-    private void StartSalvo()
-    {
-        _fireCycle.BeginBurst(1 + Mathf.Max(0, _runtimeState.SalvoExtraShots));
-        FireSalvoShot();
-    }
-
-    private void FireSalvoShot()
-    {
-        Fire();
-        _fireCycle.CommitBurstAction(GetSalvoInterval(), _currentCooldown);
-    }
-
-    private void Fire()
-    {
-        Vector2 direction = _firePoint.rotation * Vector2.up;
-
-        if (direction.sqrMagnitude < 0.0001f)
-            direction = Vector2.up;
-
-        direction.Normalize();
-
-        Vector3 position = _firePoint.position +
-            (Vector3)(direction * Mathf.Max(0f, _config.SpawnOffset));
-
-        CriticalDamageRoll damageRoll = BuildDamage();
-        AcaciaThornProjectileSpawnRequest request = new(
-            position,
-            direction,
-            damageRoll.Damage,
-            damageRoll.DamageKind,
-            damageRoll.IsCritical,
-            GetProjectileSpeed(),
-            _config.LifeTime,
-            _config.BounceCount,
-            GetSplitCount(),
-            true);
-        _pool.Spawn(in request);
-    }
-
-    private CriticalDamageRoll BuildDamage()
-    {
-        double rawDamage = Mathf.Max(1, _runtimeState.BaseDamage) *
-            (double)_runtimeState.DamageMultiplier;
-
-        return CriticalDamageResolver.Roll(
-            rawDamage,
-            _runtimeState.CriticalChance,
-            _runtimeState.CriticalDamageMultiplier,
-            _randomSource);
-    }
-
-    private int GetSplitCount()
-    {
-        return Mathf.Max(0, _config.BaseSplitCount);
-    }
-
-    private float GetProjectileSpeed()
-    {
-        return Mathf.Max(
-            0.1f,
-            _config.Speed * GetProjectileSpeedMultiplier());
-    }
-
-    private float GetSalvoInterval()
-    {
-        return Mathf.Max(
-            0.01f,
-            _config.SalvoInterval / GetProjectileSpeedMultiplier());
-    }
-
-    private float GetProjectileSpeedMultiplier()
-    {
-        return Mathf.Max(0.1f, 1f + _runtimeState.ProjectileSpeedBonus);
-    }
-
-    private void RebuildCooldown(bool resetTimer)
-    {
-        float cappedFireRateBonus = Mathf.Min(
-            _runtimeState.FireRateBonus,
-            _config.MaxFireRateBonus);
-
-        _currentCooldown = Mathf.Max(
-            _config.MinCooldown,
-            _config.Cooldown / (1f + cappedFireRateBonus));
-
-        if (resetTimer)
+            int fallbackBaseDamage = _config != null ? _config.Damage : 1;
+            _runtimeState.Unlock(Mathf.Max(fallbackBaseDamage, baseDamage));
             _fireCycle.Reset();
-        else
-            _fireCycle.LimitCooldown(_currentCooldown);
-    }
+            PublishRuntimeStatsChanged();
+        }
 
-    private void PublishRuntimeStatsChanged()
-    {
-        _runtimeStatsPublisher?.Publish(WeaponRuntimeStatsSource.AcaciaThorn);
-    }
+        public void AddDamageMultiplier(float multiplier)
+        {
+            if (!_runtimeState.CanApplyDamageMultiplier(multiplier))
+                return;
+
+            _runtimeState.ApplyDamageMultiplier(multiplier);
+            PublishRuntimeStatsChanged();
+        }
+
+        public void AddFireRateBonus(float bonus)
+        {
+            if (!_runtimeState.CanApplyFireRateBonus(bonus))
+                return;
+
+            _runtimeState.AddFireRateBonus(bonus);
+            RebuildCooldown(resetTimer: false);
+            PublishRuntimeStatsChanged();
+        }
+
+        public void AddSalvoShots(int extraShots)
+        {
+            if (!_runtimeState.CanApplySalvoShots(extraShots))
+                return;
+
+            _runtimeState.AddSalvoShots(extraShots);
+            PublishRuntimeStatsChanged();
+        }
+
+        public void AddProjectileSpeedBonus(float bonus)
+        {
+            if (!_runtimeState.CanApplyProjectileSpeedBonus(bonus))
+                return;
+
+            _runtimeState.AddProjectileSpeedBonus(bonus);
+            PublishRuntimeStatsChanged();
+        }
+
+        public void AddCriticalChance(float chanceBonus)
+        {
+            if (!_runtimeState.CanApplyCriticalChance(chanceBonus))
+                return;
+
+            _runtimeState.AddCriticalChance(chanceBonus);
+            PublishRuntimeStatsChanged();
+        }
+
+        public void AddCriticalDamageBonus(float damageBonus)
+        {
+            if (!_runtimeState.CanApplyCriticalDamageBonus(damageBonus))
+                return;
+
+            _runtimeState.AddCriticalDamageBonus(damageBonus);
+            PublishRuntimeStatsChanged();
+        }
+
+        public void ClearTransientState()
+        {
+            _pool.ReleaseAll();
+            _fireCycle.CancelBurst();
+        }
+
+        public void ResetRuntimeState()
+        {
+            ClearTransientState();
+
+            int baseDamage = _config != null ? _config.Damage : 1;
+            _runtimeState.ResetProgression(baseDamage);
+            ApplyRuntimeLimits();
+            RebuildCooldown(resetTimer: true);
+            PublishRuntimeStatsChanged();
+        }
+
+        private void ApplyRuntimeLimits()
+        {
+            if (_config == null)
+                return;
+
+            _runtimeState.SetProgressionLimits(
+                _config.MaxDamageMultiplier,
+                _config.MaxFireRateBonus,
+                _config.MaxSalvoExtraShots,
+                _config.MaxProjectileSpeedBonus,
+                _config.MaxCriticalChance,
+                _config.CriticalDamageMultiplier,
+                _config.MaxCriticalDamageMultiplier);
+        }
+
+        private void StartSalvo()
+        {
+            _fireCycle.BeginBurst(1 + Mathf.Max(0, _runtimeState.SalvoExtraShots));
+            FireSalvoShot();
+        }
+
+        private void FireSalvoShot()
+        {
+            Fire();
+            _fireCycle.CommitBurstAction(GetSalvoInterval(), _currentCooldown);
+        }
+
+        private void Fire()
+        {
+            Vector2 direction = _firePoint.rotation * Vector2.up;
+
+            if (direction.sqrMagnitude < 0.0001f)
+                direction = Vector2.up;
+
+            direction.Normalize();
+
+            Vector3 position = _firePoint.position +
+                (Vector3)(direction * Mathf.Max(0f, _config.SpawnOffset));
+
+            CriticalDamageRoll damageRoll = BuildDamage();
+            AcaciaThornProjectileSpawnRequest request = new(
+                position,
+                direction,
+                damageRoll.Damage,
+                damageRoll.DamageKind,
+                damageRoll.IsCritical,
+                GetProjectileSpeed(),
+                _config.LifeTime,
+                _config.BounceCount,
+                GetSplitCount(),
+                true);
+            _pool.Spawn(in request);
+        }
+
+        private CriticalDamageRoll BuildDamage()
+        {
+            double rawDamage = Mathf.Max(1, _runtimeState.BaseDamage) *
+                (double)_runtimeState.DamageMultiplier;
+
+            return CriticalDamageResolver.Roll(
+                rawDamage,
+                _runtimeState.CriticalChance,
+                _runtimeState.CriticalDamageMultiplier,
+                _randomSource);
+        }
+
+        private int GetSplitCount()
+        {
+            return Mathf.Max(0, _config.BaseSplitCount);
+        }
+
+        private float GetProjectileSpeed()
+        {
+            return Mathf.Max(
+                0.1f,
+                _config.Speed * GetProjectileSpeedMultiplier());
+        }
+
+        private float GetSalvoInterval()
+        {
+            return Mathf.Max(
+                0.01f,
+                _config.SalvoInterval / GetProjectileSpeedMultiplier());
+        }
+
+        private float GetProjectileSpeedMultiplier()
+        {
+            return Mathf.Max(0.1f, 1f + _runtimeState.ProjectileSpeedBonus);
+        }
+
+        private void RebuildCooldown(bool resetTimer)
+        {
+            float cappedFireRateBonus = Mathf.Min(
+                _runtimeState.FireRateBonus,
+                _config.MaxFireRateBonus);
+
+            _currentCooldown = Mathf.Max(
+                _config.MinCooldown,
+                _config.Cooldown / (1f + cappedFireRateBonus));
+
+            if (resetTimer)
+                _fireCycle.Reset();
+            else
+                _fireCycle.LimitCooldown(_currentCooldown);
+        }
+
+        private void PublishRuntimeStatsChanged()
+        {
+            _runtimeStatsPublisher?.Publish(WeaponRuntimeStatsSource.AcaciaThorn);
+        }
 
 #if UNITY_EDITOR
-    [ContextMenu("Debug/Unlock Acacia Thorn")]
-    private void DebugUnlockAcaciaThorn()
-    {
-        Unlock(_config != null ? _config.Damage : 1);
-    }
-
-    [ContextMenu("Debug/Fire Acacia Thorn Once")]
-    private void DebugFireAcaciaThornOnce()
-    {
-        if (!_initialized)
+        [ContextMenu("Debug/Unlock Acacia Thorn")]
+        private void DebugUnlockAcaciaThorn()
         {
-            Debug.LogWarning("AcaciaThornWeapon debug fire skipped: weapon is not initialized.", this);
-            return;
+            Unlock(_config != null ? _config.Damage : 1);
         }
 
-        if (!_runtimeState.IsUnlocked)
-            Unlock(_config != null ? _config.Damage : 1);
+        [ContextMenu("Debug/Fire Acacia Thorn Once")]
+        private void DebugFireAcaciaThornOnce()
+        {
+            if (!_initialized)
+            {
+                Debug.LogWarning("AcaciaThornWeapon debug fire skipped: weapon is not initialized.", this);
+                return;
+            }
 
-        Fire();
-        _fireCycle.StartCooldown(_currentCooldown);
-    }
+            if (!_runtimeState.IsUnlocked)
+                Unlock(_config != null ? _config.Damage : 1);
+
+            Fire();
+            _fireCycle.StartCooldown(_currentCooldown);
+        }
 #endif
+    }
+
 }

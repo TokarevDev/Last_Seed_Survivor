@@ -1,9 +1,14 @@
 using System;
-using LastSeed.Core.Collections;
-using LastSeed.Gameplay.Signals;
 using Zenject;
 
-namespace LastSeed.Bootstrap.Gameplay
+using Game.Core.Collections;
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Combat;
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Gameplay.Enemy.Worm.Presentation;
+using Game.Gameplay.Signals;
+
+namespace Game.Bootstrap.Scenes.Game
 {
     public sealed class WormRuntimeInitializer : IInitializable
     {

@@ -11,5 +11,5 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 82ab0a4fd85d48a4a17de7ec944a93d6, type: 3}
   m_Name: RE_Penetration_Plus1
-  m_EditorClassIdentifier: Assembly-CSharp::PenetrationRewardEffect
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Rewards.Effects.PenetrationRewardEffect
   _bonusPenetration: 1

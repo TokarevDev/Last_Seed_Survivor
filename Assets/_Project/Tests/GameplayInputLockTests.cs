@@ -1,8 +1,9 @@
 using System;
-using LastSeed.Gameplay.Input;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Input;
+
+namespace Game.Tests
 {
     public sealed class GameplayInputLockTests
     {

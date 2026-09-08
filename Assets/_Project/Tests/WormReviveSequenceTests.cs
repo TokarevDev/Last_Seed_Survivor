@@ -1,7 +1,11 @@
 using System;
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Gameplay.Enemy.Worm;
+using Game.Gameplay.Enemy.Worm.Movement;
+using Game.Presentation.Worm;
+
+namespace Game.Tests
 {
     public sealed class WormReviveSequenceTests
     {

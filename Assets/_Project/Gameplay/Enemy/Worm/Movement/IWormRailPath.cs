@@ -1,6 +1,10 @@
-public interface IWormRailPath
+namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    float TotalLength { get; }
+    public interface IWormRailPath
+    {
+        float TotalLength { get; }
 
-    bool TryGetControlPointDistance(int pointIndex, out float distance);
+        bool TryGetControlPointDistance(int pointIndex, out float distance);
+    }
+
 }

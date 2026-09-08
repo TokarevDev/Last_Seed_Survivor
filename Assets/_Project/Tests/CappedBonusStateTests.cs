@@ -1,6 +1,8 @@
 using NUnit.Framework;
 
-namespace LastSeed.Tests
+using Game.Core.Combat;
+
+namespace Game.Tests
 {
     public sealed class CappedBonusStateTests
     {

@@ -1,10 +1,17 @@
-using UnityEngine;
 
-public abstract class WormCocoonVisual : MonoBehaviour
+using Game.Gameplay.Rewards.Data;
+
+namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    public abstract void Apply(CocoonRewardProfile profile);
+    using UnityEngine;
 
-    public abstract void ResetVisual();
+    public abstract class WormCocoonVisual : MonoBehaviour
+    {
+        public abstract void Apply(CocoonRewardProfile profile);
 
-    public abstract void SetEffectSorting(int sortingLayerId, int sortingOrder);
+        public abstract void ResetVisual();
+
+        public abstract void SetEffectSorting(int sortingLayerId, int sortingOrder);
+    }
+
 }

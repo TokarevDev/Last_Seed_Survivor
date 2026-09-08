@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace LastSeed.Infrastructure.Navigation
+namespace Game.Infrastructure.Navigation
 {
     public sealed class UnitySceneLoader : ISceneLoader
     {

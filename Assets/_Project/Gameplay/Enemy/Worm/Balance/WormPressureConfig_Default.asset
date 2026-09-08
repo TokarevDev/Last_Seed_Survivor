@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1b8194f798504f6f998c8a65b983e7a4, type: 3}
   m_Name: WormPressureConfig_Default
-  m_EditorClassIdentifier: Assembly-CSharp::WormPressureConfig
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.Balance.WormPressureConfig
   _enabled: 1
   _targetHeadProgress: 1
   _targetReachTime: 95

@@ -1,4 +1,8 @@
-public interface IWormPathProgressProvider
+namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    float HeadControlPointProgressNormalized { get; }
+    public interface IWormPathProgressProvider
+    {
+        float HeadControlPointProgressNormalized { get; }
+    }
+
 }

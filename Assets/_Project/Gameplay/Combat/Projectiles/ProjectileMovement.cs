@@ -1,22 +1,25 @@
-using UnityEngine;
-
-public sealed class ProjectileMovement : MonoBehaviour
+namespace Game.Gameplay.Combat.Projectiles
 {
-    public Vector2 Direction { get; private set; }
-    private float _speed;
+    using UnityEngine;
 
-    public void SetDirection(Vector2 dir)
+    public sealed class ProjectileMovement : MonoBehaviour
     {
-        Direction = dir.normalized;
-    }
+        public Vector2 Direction { get; private set; }
+        private float _speed;
 
-    public void Tick()
-    {
-        transform.position += (Vector3) (Direction * _speed * Time.deltaTime);
-    }
+        public void SetDirection(Vector2 dir)
+        {
+            Direction = dir.normalized;
+        }
 
-    public void SetSpeed(float speed)
-    {
-        _speed = speed;
+        public void Tick()
+        {
+            transform.position += (Vector3)(Direction * _speed * Time.deltaTime);
+        }
+
+        public void SetSpeed(float speed)
+        {
+            _speed = speed;
+        }
     }
 }

@@ -1,4 +1,11 @@
-public interface IRewardChoiceApplier
+
+using Game.Gameplay.Rewards.Runtime;
+
+namespace Game.Gameplay.Rewards.Services
 {
-    void Apply(RewardChoiceData choice);
+    public interface IRewardChoiceApplier
+    {
+        void Apply(RewardChoiceData choice);
+    }
+
 }

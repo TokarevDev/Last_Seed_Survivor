@@ -117,7 +117,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 76937f7cbdf899d49a068151b89b9fcb, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Projectiles.Projectile
   _renderer: {fileID: 819541854137012721}
   _hitMask:
     serializedVersion: 2
@@ -138,7 +138,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9ac07078318055d4b8103de8ae034bbf, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileMovement
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Projectiles.ProjectileMovement
 --- !u!114 &42125714198785050
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,7 +150,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 275e07818c493b14b891291662dc7c2e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ProjectileBounce
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Combat.Projectiles.ProjectileBounce
 --- !u!50 &471556870561792477
 Rigidbody2D:
   serializedVersion: 5

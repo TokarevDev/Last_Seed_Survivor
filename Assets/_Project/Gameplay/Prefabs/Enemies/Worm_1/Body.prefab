@@ -103,7 +103,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3b24d11c34a7446ebc54dd035a7a9c78, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormInnerSymbolAnimator
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.WormInnerSymbolAnimator
   _target: {fileID: 0}
   _playOnEnable: 1
   _animateScale: 1
@@ -217,7 +217,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 874e54277aee4420ad6e1661f9794fd3, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CocoonVisualController
+  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.Worm.CocoonVisualController
   _renderer: {fileID: 1164691023492560560}
   _legendarySparks: {fileID: 0}
   _legendaryLightning: {fileID: 0}
@@ -284,7 +284,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d1904cb7d09ac64997cf4ea1db1beb5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSegment
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.WormSegment
   <Type>k__BackingField: 2
   <VisualRoot>k__BackingField: {fileID: 4215410630257425220}
   _cocoonVisual: {fileID: 4766994331834915942}
@@ -301,7 +301,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e2486f12e2890634d93f8976e3052a4a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSegmentDamageReceiver
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.Combat.WormSegmentDamageReceiver
 --- !u!58 &7052561087905209129
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -474,7 +474,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4d1904cb7d09ac64997cf4ea1db1beb5, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSegment
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.WormSegment
   <Type>k__BackingField: 2
   <VisualRoot>k__BackingField: {fileID: 9216055945229163284}
   _cocoonVisual: {fileID: 4766994331834915942}
@@ -491,4 +491,4 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e2486f12e2890634d93f8976e3052a4a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WormSegmentDamageReceiver
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.Enemy.Worm.Combat.WormSegmentDamageReceiver

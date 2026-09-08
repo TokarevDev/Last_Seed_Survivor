@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace LastSeed.Core.Collections
+namespace Game.Core.Collections
 {
     public static class SortedSearch
     {

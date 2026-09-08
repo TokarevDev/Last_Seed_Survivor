@@ -1,6 +1,8 @@
 using System;
 
-namespace LastSeed.Core.Collections
+using Game.Core.Pooling;
+
+namespace Game.Core.Collections
 {
     public enum ActivationRequestResult
     {
