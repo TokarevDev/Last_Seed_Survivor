@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LastSeed.Core.Combat;
 using NUnit.Framework;
 
@@ -73,6 +74,56 @@ namespace LastSeed.Tests
             health.ApplyDamage(-5);
 
             Assert.That(health.CurrentHp, Is.EqualTo(10));
+        }
+
+        [Test]
+        public void ApplyDamage_WhenDepleted_RaisesChangedBeforeDepletedWithSamePayload()
+        {
+            Health health = new();
+            List<string> eventOrder = new();
+            HealthChange changedPayload = default;
+            HealthChange depletedPayload = default;
+            health.Changed += change =>
+            {
+                eventOrder.Add(nameof(health.Changed));
+                changedPayload = change;
+            };
+            health.Depleted += change =>
+            {
+                eventOrder.Add(nameof(health.Depleted));
+                depletedPayload = change;
+            };
+            health.Initialize(10);
+
+            health.ApplyDamage(10);
+
+            Assert.That(eventOrder, Is.EqualTo(new[]
+            {
+                nameof(health.Changed),
+                nameof(health.Depleted)
+            }));
+            Assert.That(depletedPayload.PreviousHp, Is.EqualTo(changedPayload.PreviousHp));
+            Assert.That(depletedPayload.CurrentHp, Is.EqualTo(changedPayload.CurrentHp));
+            Assert.That(depletedPayload.MaxHp, Is.EqualTo(changedPayload.MaxHp));
+            Assert.That(depletedPayload.AppliedDamage, Is.EqualTo(changedPayload.AppliedDamage));
+            Assert.That(depletedPayload.IsReset, Is.EqualTo(changedPayload.IsReset));
+        }
+
+        [Test]
+        public void Reset_AfterDepletion_AllowsExactlyOneDepletedEventInNextLifecycle()
+        {
+            Health health = new();
+            int depletedCount = 0;
+            health.Depleted += _ => depletedCount++;
+            health.Initialize(10);
+            health.ApplyDamage(10);
+
+            health.Reset(5);
+            health.ApplyDamage(5);
+            health.ApplyDamage(1);
+
+            Assert.That(depletedCount, Is.EqualTo(2));
+            Assert.That(health.CurrentHp, Is.Zero);
         }
     }
 }
