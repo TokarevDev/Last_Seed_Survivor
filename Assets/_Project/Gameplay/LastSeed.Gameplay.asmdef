@@ -4,8 +4,7 @@
   "references": [
     "LastSeed.Core",
     "UniTask",
-    "LastSeed.DOTween.Modules",
-    "Unity.TextMeshPro"
+    "LastSeed.DOTween.Modules"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

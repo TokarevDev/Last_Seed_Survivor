@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using LastSeed.Core.Collections;
 using UnityEngine;
 
-public sealed class WormSectionHpPresenter : MonoBehaviour
+public sealed class WormSectionHpPresenter : MonoBehaviour, IWormSectionHealthPresentation
 {
     [SerializeField] private WormSectionHpView _viewPrefab;
     [SerializeField] private Transform _root;

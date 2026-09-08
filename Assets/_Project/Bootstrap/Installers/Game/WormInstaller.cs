@@ -40,6 +40,9 @@ namespace LastSeed.Bootstrap.Installers
             Container.Bind<WormController>().FromInstance(_wormController).AsSingle();
             Container.Bind<WormCombatController>().FromInstance(_wormCombatController).AsSingle();
             Container.Bind<WormSectionHpPresenter>().FromInstance(_sectionHpPresenter).AsSingle();
+            Container.Bind<IWormSectionHealthPresentation>()
+                .FromInstance(_sectionHpPresenter)
+                .AsSingle();
             Container.Bind<WormPressureDirector>().FromInstance(_wormPressureDirector).AsSingle();
             Container.BindInstance(new WormSpawnSettings(
                 _sectionCount,

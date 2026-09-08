@@ -12,7 +12,7 @@ public sealed class WormSpawnLifecycle
     private readonly WormAdaptiveHpController _adaptiveHpController;
     private readonly WormController _wormController;
     private readonly WormCombatController _wormCombat;
-    private readonly WormSectionHpPresenter _hpPresenter;
+    private readonly IWormSectionHealthPresentation _hpPresentation;
     private readonly IWormFaceBurstPresentation _faceBurstPresenter;
     private readonly List<WormSegment> _activeSegments = new();
     private readonly List<WormSection> _activeSections = new();
@@ -26,7 +26,7 @@ public sealed class WormSpawnLifecycle
         WormAdaptiveHpController adaptiveHpController,
         WormController wormController,
         WormCombatController wormCombat,
-        WormSectionHpPresenter hpPresenter,
+        IWormSectionHealthPresentation hpPresentation,
         IWormFaceBurstPresentation faceBurstPresenter)
     {
         _segmentPool = segmentPool ?? throw new ArgumentNullException(nameof(segmentPool));
@@ -36,7 +36,8 @@ public sealed class WormSpawnLifecycle
             throw new ArgumentNullException(nameof(adaptiveHpController));
         _wormController = wormController ?? throw new ArgumentNullException(nameof(wormController));
         _wormCombat = wormCombat ?? throw new ArgumentNullException(nameof(wormCombat));
-        _hpPresenter = hpPresenter ?? throw new ArgumentNullException(nameof(hpPresenter));
+        _hpPresentation = hpPresentation ??
+            throw new ArgumentNullException(nameof(hpPresentation));
         _faceBurstPresenter = faceBurstPresenter ??
             throw new ArgumentNullException(nameof(faceBurstPresenter));
     }
@@ -131,7 +132,7 @@ public sealed class WormSpawnLifecycle
         _wormController.Init(segments);
         _faceBurstPresenter.Bind(head.FaceVisual);
         _wormCombat.Init(head, tail, sections);
-        _hpPresenter.BindSections(sections);
+        _hpPresentation.BindSections(sections);
     }
 
     private void CommitSpawn(
@@ -158,7 +159,7 @@ public sealed class WormSpawnLifecycle
 
     private void UnbindGameplayAndPresentation()
     {
-        _hpPresenter.Clear();
+        _hpPresentation.Clear();
         _wormCombat.Clear();
         _faceBurstPresenter.Unbind();
         _wormController.ClearWorm();
