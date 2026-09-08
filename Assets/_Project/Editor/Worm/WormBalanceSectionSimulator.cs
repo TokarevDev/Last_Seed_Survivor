@@ -6,6 +6,7 @@ using UnityEngine;
 
 internal static class WormBalanceSectionSimulator
 {
+    private static readonly IRandomSource RandomSource = new UnityRandomSource();
     private const int ThousandHp = 1000;
     private const int TenThousandHp = 10000;
     private const int MillionHp = 1000000;
@@ -36,7 +37,8 @@ internal static class WormBalanceSectionSimulator
             {
                 cocoonProfile = WormCocoonRules.RollCocoonProfile(
                     settings.RewardDatabase.CocoonProfiles,
-                    progress);
+                    progress,
+                    RandomSource);
                 sectionsWithoutCocoon = 0;
             }
             else

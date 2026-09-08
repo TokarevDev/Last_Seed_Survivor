@@ -64,7 +64,8 @@ public static class WormCocoonRules
 
     public static CocoonRewardProfile RollCocoonProfile(
         IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        float sectionProgress)
+        float sectionProgress,
+        IRandomSource randomSource)
     {
         sectionProgress = Mathf.Clamp01(sectionProgress);
 
@@ -75,6 +76,7 @@ public static class WormCocoonRules
         if (TryRollFixedSpawnChanceProfile(
                 profiles,
                 sectionProgress,
+                randomSource,
                 out CocoonRewardProfile fixedChanceProfile))
         {
             return fixedChanceProfile;
@@ -98,7 +100,7 @@ public static class WormCocoonRules
         if (totalWeight <= 0f)
             return CocoonRewardProfile.Default;
 
-        float roll = Random.value * totalWeight;
+        float roll = randomSource.NextUnitFloat() * totalWeight;
         float current = 0f;
 
         for (int i = 0; i < profiles.Count; i++)
@@ -123,6 +125,7 @@ public static class WormCocoonRules
     private static bool TryRollFixedSpawnChanceProfile(
         IReadOnlyList<CocoonRewardProfile> profiles,
         float sectionProgress,
+        IRandomSource randomSource,
         out CocoonRewardProfile selected)
     {
         selected = null;
@@ -140,7 +143,7 @@ public static class WormCocoonRules
             if (!profile.UseFixedSpawnChance)
                 continue;
 
-            if (Random.value >= profile.FixedSpawnChance)
+            if (randomSource.NextUnitFloat() >= profile.FixedSpawnChance)
                 continue;
 
             selected = profile;

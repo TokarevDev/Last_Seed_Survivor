@@ -5,6 +5,7 @@ public static class WormSectionBuilder
 {
     public static List<WormSection> BuildSections(
         List<WormSegment> segments,
+        IRandomSource randomSource,
         IReadOnlyList<CocoonRewardProfile> cocoonProfiles = null)
     {
         List<WormSection> sections = new();
@@ -31,6 +32,7 @@ public static class WormSectionBuilder
                     sectionIndex,
                     totalSections,
                     cocoonProfiles,
+                    randomSource,
                     ref sectionsWithoutCocoon);
 
                 buffer.Clear();
@@ -46,6 +48,7 @@ public static class WormSectionBuilder
                 sectionIndex,
                 totalSections,
                 cocoonProfiles,
+                randomSource,
                 ref sectionsWithoutCocoon);
         }
 
@@ -58,6 +61,7 @@ public static class WormSectionBuilder
         int sectionIndex,
         int totalSections,
         IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+        IRandomSource randomSource,
         ref int sectionsWithoutCocoon)
     {
         WormSection section = new();
@@ -73,6 +77,7 @@ public static class WormSectionBuilder
             sectionIndex,
             totalSections,
             cocoonProfiles,
+            randomSource,
             ref sectionsWithoutCocoon);
 
         sections.Add(section);
@@ -84,6 +89,7 @@ public static class WormSectionBuilder
         int sectionIndex,
         int totalSections,
         IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
+        IRandomSource randomSource,
         ref int sectionsWithoutCocoon)
     {
         if (buffer.Count == 0)
@@ -113,7 +119,8 @@ public static class WormSectionBuilder
 
         CocoonRewardProfile profile = RollCocoonProfile(
             cocoonProfiles,
-            sectionProgress);
+            sectionProgress,
+            randomSource);
         cocoonSegment.EnableCocoon(profile);
 
         section.SetCocoon(profile);
@@ -134,9 +141,13 @@ public static class WormSectionBuilder
 
     private static CocoonRewardProfile RollCocoonProfile(
         IReadOnlyList<CocoonRewardProfile> cocoonProfiles,
-        float sectionProgress)
+        float sectionProgress,
+        IRandomSource randomSource)
     {
-        return WormCocoonRules.RollCocoonProfile(cocoonProfiles, sectionProgress);
+        return WormCocoonRules.RollCocoonProfile(
+            cocoonProfiles,
+            sectionProgress,
+            randomSource);
     }
 
     private static int CountGameplaySections(List<WormSegment> segments)

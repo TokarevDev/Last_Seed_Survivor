@@ -14,6 +14,7 @@ public sealed class WormSpawnLifecycle
     private readonly WormCombatController _wormCombat;
     private readonly IWormSectionHealthPresentation _hpPresentation;
     private readonly IWormFaceBurstPresentation _faceBurstPresenter;
+    private readonly IRandomSource _randomSource;
     private readonly List<WormSegment> _activeSegments = new();
     private readonly List<WormSection> _activeSections = new();
 
@@ -27,7 +28,8 @@ public sealed class WormSpawnLifecycle
         WormController wormController,
         WormCombatController wormCombat,
         IWormSectionHealthPresentation hpPresentation,
-        IWormFaceBurstPresentation faceBurstPresenter)
+        IWormFaceBurstPresentation faceBurstPresenter,
+        IRandomSource randomSource)
     {
         _segmentPool = segmentPool ?? throw new ArgumentNullException(nameof(segmentPool));
         _wormFactory = wormFactory ?? throw new ArgumentNullException(nameof(wormFactory));
@@ -40,6 +42,7 @@ public sealed class WormSpawnLifecycle
             throw new ArgumentNullException(nameof(hpPresentation));
         _faceBurstPresenter = faceBurstPresenter ??
             throw new ArgumentNullException(nameof(faceBurstPresenter));
+        _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
     }
 
     public bool IsSpawned { get; private set; }
@@ -105,7 +108,7 @@ public sealed class WormSpawnLifecycle
         out WormSegment tail)
     {
         List<WormPatternEntry> pattern =
-            WormPatternBuilder.BuildPattern(_settings.SectionCount);
+            WormPatternBuilder.BuildPattern(_settings.SectionCount, _randomSource);
 
         return _wormFactory.CreateSegments(pattern, out head, out tail);
     }
@@ -116,7 +119,7 @@ public sealed class WormSpawnLifecycle
         float currentTime)
     {
         List<WormSection> sections =
-            WormSectionBuilder.BuildSections(segments, cocoonProfiles);
+            WormSectionBuilder.BuildSections(segments, _randomSource, cocoonProfiles);
 
         _adaptiveHpController.InitializeSections(sections, currentTime);
         return sections;

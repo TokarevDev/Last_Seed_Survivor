@@ -18,7 +18,9 @@ public static class WormPatternBuilder
         return Mathf.Max(1, sectionCount) * WormCocoonRules.SectionSize;
     }
 
-    public static List<WormPatternEntry> BuildPattern(int sectionCount)
+    public static List<WormPatternEntry> BuildPattern(
+        int sectionCount,
+        IRandomSource randomSource)
     {
         int bodySegmentCount = GetBodySegmentCount(sectionCount);
 
@@ -33,7 +35,7 @@ public static class WormPatternBuilder
              groupIndex < bodySegmentCount && remainingBodySegments > 0;
              groupIndex++)
         {
-            int bodyCount = Random.Range(4, 6);
+            int bodyCount = randomSource.NextInt(4, 6);
 
             for (int i = 0; i < bodyCount && remainingBodySegments > 0; i++)
             {

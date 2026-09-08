@@ -25,5 +25,13 @@ namespace LastSeed.Tests
             Calls++;
             return _values.Count > 0 ? _values.Dequeue() : _fallback;
         }
+
+        public int NextInt(int minInclusive, int maxExclusive)
+        {
+            float value = NextUnitFloat();
+            int range = maxExclusive - minInclusive;
+            int offset = System.Math.Min(range - 1, (int)(value * range));
+            return minInclusive + System.Math.Max(0, offset);
+        }
     }
 }
