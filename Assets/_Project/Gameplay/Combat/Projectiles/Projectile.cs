@@ -31,6 +31,7 @@ public sealed class Projectile : MonoBehaviour
 
     private ProjectilePool _pool;
     private IScreenBounds _screenBounds;
+    private IRandomSource _randomSource;
     private bool _active;
     private Quaternion _visualRotationOffset = Quaternion.identity;
 
@@ -76,10 +77,14 @@ public sealed class Projectile : MonoBehaviour
         UpdateVisualRotation();
     }
 
-    public void Init(ProjectilePool pool, IScreenBounds screenBounds)
+    public void Init(
+        ProjectilePool pool,
+        IScreenBounds screenBounds,
+        IRandomSource randomSource)
     {
         _pool = pool;
         _screenBounds = screenBounds;
+        _randomSource = randomSource;
         _bounce?.Init(screenBounds);
     }
 
@@ -244,7 +249,8 @@ public sealed class Projectile : MonoBehaviour
 
     private int RollDamage(out DamageKind damageKind, out bool isCritical)
     {
-        isCritical = _criticalChance > 0f && Random.value < _criticalChance;
+        isCritical = _criticalChance > 0f &&
+            _randomSource.NextUnitFloat() < _criticalChance;
         damageKind = isCritical ? DamageKind.Critical : DamageKind.Normal;
 
         if (!isCritical)

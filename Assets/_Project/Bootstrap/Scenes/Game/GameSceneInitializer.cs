@@ -7,6 +7,7 @@ namespace LastSeed.Bootstrap.Gameplay
     public sealed class GameSceneInitializer : IInitializable
     {
         private readonly Camera _worldCamera;
+        private readonly IRandomSource _randomSource;
         private readonly ScreenBoundsService _screenBoundsService;
         private readonly PlayerMovementController _playerMovementController;
         private readonly PoolRegistry _projectilePoolRegistry;
@@ -15,6 +16,7 @@ namespace LastSeed.Bootstrap.Gameplay
 
         public GameSceneInitializer(
             Camera worldCamera,
+            IRandomSource randomSource,
             ScreenBoundsService screenBoundsService,
             PlayerMovementController playerMovementController,
             PoolRegistry projectilePoolRegistry,
@@ -22,6 +24,7 @@ namespace LastSeed.Bootstrap.Gameplay
             PlayerWeaponController playerWeaponController)
         {
             _worldCamera = worldCamera;
+            _randomSource = randomSource;
             _screenBoundsService = screenBoundsService;
             _playerMovementController = playerMovementController;
             _projectilePoolRegistry = projectilePoolRegistry;
@@ -35,7 +38,7 @@ namespace LastSeed.Bootstrap.Gameplay
 
             _screenBoundsService.Recalculate(_worldCamera);
             _playerMovementController.Initialize(_screenBoundsService);
-            _projectilePoolRegistry.Init(_screenBoundsService);
+            _projectilePoolRegistry.Init(_screenBoundsService, _randomSource);
             _acaciaThornRuntimeInitializer.Initialize(_screenBoundsService);
             _playerWeaponController.Initialize();
         }
@@ -44,6 +47,9 @@ namespace LastSeed.Bootstrap.Gameplay
         {
             if (_worldCamera == null)
                 throw new InvalidOperationException("Game world camera is not configured.");
+
+            if (_randomSource == null)
+                throw new InvalidOperationException("Random source is not configured.");
 
             if (_playerMovementController == null)
                 throw new InvalidOperationException("Player movement controller is not configured.");

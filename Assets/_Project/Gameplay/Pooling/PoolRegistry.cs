@@ -7,10 +7,11 @@ public sealed class PoolRegistry : MonoBehaviour
 
     private readonly Dictionary<int, ProjectilePool> _pools = new();
     private IScreenBounds _screenBounds;
+    private IRandomSource _randomSource;
 
-    public bool IsInitialized => _screenBounds != null;
+    public bool IsInitialized => _screenBounds != null && _randomSource != null;
 
-    public void Init(IScreenBounds screenBounds)
+    public void Init(IScreenBounds screenBounds, IRandomSource randomSource)
     {
         if (screenBounds == null)
         {
@@ -18,7 +19,14 @@ public sealed class PoolRegistry : MonoBehaviour
             return;
         }
 
+        if (randomSource == null)
+        {
+            Debug.LogError("PoolRegistry: random source is null.", this);
+            return;
+        }
+
         _screenBounds = screenBounds;
+        _randomSource = randomSource;
     }
 
     public ProjectilePool GetPool(Projectile projectilePrefab)
@@ -60,10 +68,16 @@ public sealed class PoolRegistry : MonoBehaviour
             return null;
         }
 
+        if (_randomSource == null)
+        {
+            Debug.LogError("PoolRegistry: random source is not initialized.", this);
+            return null;
+        }
+
         var pool = Instantiate(_poolPrefab, transform);
         pool.name = $"Pool_{prefab.name}";
 
-        pool.SetPrefab(prefab, _screenBounds);
+        pool.SetPrefab(prefab, _screenBounds, _randomSource);
 
         _pools.Add(key, pool);
         return pool;

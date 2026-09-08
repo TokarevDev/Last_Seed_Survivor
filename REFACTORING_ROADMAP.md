@@ -102,6 +102,7 @@ Installers are introduced only when their domain is migrated. Empty speculative 
 - [x] Separate player input/application logic from the player Unity view through a pure runtime movement model and controller.
 - [x] Extract player weapon initialization, ticking, cleanup, and reset commands into a constructor-injected service.
 - [x] Move Acacia Thorn pool setup and prewarm ownership to an explicit Bootstrap initializer; the weapon now consumes only the pooled spawn contract.
+- [x] Route projectile critical-hit rolls through the scene-scoped random contract instead of direct Unity random calls.
 - [x] Remove the obsolete `PlayerController` and `PlayerShooter` scene behaviours and their cross-domain serialized references.
 - [x] Pass frame time explicitly from the named gameplay loop into weapon runtime ticking.
 - [x] Preserve scene-owned movement tuning and ScriptableObject weapon balance configuration.

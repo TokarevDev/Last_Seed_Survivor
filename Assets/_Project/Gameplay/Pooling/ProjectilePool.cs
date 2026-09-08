@@ -9,17 +9,22 @@ public sealed class ProjectilePool : MonoBehaviour,
 
     private Projectile _prefab;
     private IScreenBounds _screenBounds;
+    private IRandomSource _randomSource;
     private ObjectPool<Projectile> _pool;
     private bool _initialized;
 
     public bool IsInitialized => _initialized;
 
-    public void SetPrefab(Projectile prefab, IScreenBounds screenBounds)
+    public void SetPrefab(
+        Projectile prefab,
+        IScreenBounds screenBounds,
+        IRandomSource randomSource)
     {
         if (_initialized) return;
 
         _prefab = prefab;
         _screenBounds = screenBounds;
+        _randomSource = randomSource;
         _pool = new ObjectPool<Projectile>(CreateNew, Deactivate);
         _pool.Prewarm(_prewarmCount);
         _initialized = true;
@@ -48,7 +53,7 @@ public sealed class ProjectilePool : MonoBehaviour,
     private Projectile CreateNew()
     {
         var projectile = Instantiate(_prefab, transform);
-        projectile.Init(this, _screenBounds);
+        projectile.Init(this, _screenBounds, _randomSource);
         return projectile;
     }
 

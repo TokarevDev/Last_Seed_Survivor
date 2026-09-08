@@ -10,6 +10,7 @@ namespace LastSeed.Bootstrap.Gameplay
         private readonly PoolRegistry _projectilePoolRegistry;
         private readonly PlayerWeaponLoadout _loadout;
         private readonly IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
+        private readonly IRandomSource _randomSource;
         private readonly IConfigurablePooledSpawnService<
             AcaciaThornProjectilePoolSetup,
             AcaciaThornProjectileSpawnRequest> _pool;
@@ -19,6 +20,7 @@ namespace LastSeed.Bootstrap.Gameplay
             PoolRegistry projectilePoolRegistry,
             PlayerWeaponLoadout loadout,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
+            IRandomSource randomSource,
             IConfigurablePooledSpawnService<
                 AcaciaThornProjectilePoolSetup,
                 AcaciaThornProjectileSpawnRequest> pool)
@@ -29,6 +31,7 @@ namespace LastSeed.Bootstrap.Gameplay
             _loadout = loadout ?? throw new ArgumentNullException(nameof(loadout));
             _runtimeStatsPublisher = runtimeStatsPublisher ??
                 throw new ArgumentNullException(nameof(runtimeStatsPublisher));
+            _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
             _pool = pool ?? throw new ArgumentNullException(nameof(pool));
         }
 
@@ -54,6 +57,7 @@ namespace LastSeed.Bootstrap.Gameplay
             _weapon.Init(
                 _loadout.FirePoint,
                 _runtimeStatsPublisher,
+                _randomSource,
                 _pool);
         }
     }

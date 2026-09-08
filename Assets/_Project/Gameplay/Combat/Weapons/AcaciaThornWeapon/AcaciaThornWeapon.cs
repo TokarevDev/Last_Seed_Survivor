@@ -15,6 +15,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     private float _currentCooldown;
     private bool _initialized;
     private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
+    private IRandomSource _randomSource;
     private IPooledSpawnService<AcaciaThornProjectileSpawnRequest> _pool;
     private readonly CooldownBurstCycle _fireCycle = new();
 
@@ -24,6 +25,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
     public void Init(
         Transform firePoint,
         IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
+        IRandomSource randomSource,
         IPooledSpawnService<AcaciaThornProjectileSpawnRequest> pool)
     {
         if (_initialized)
@@ -43,6 +45,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
 
         _runtimeStatsPublisher = runtimeStatsPublisher ??
             throw new ArgumentNullException(nameof(runtimeStatsPublisher));
+        _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
         _pool = pool;
         _firePoint = firePoint;
         ApplyRuntimeLimits();
@@ -213,7 +216,7 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
             (double)_runtimeState.DamageMultiplier;
 
         isCritical = _runtimeState.CriticalChance > 0f &&
-            UnityEngine.Random.value < _runtimeState.CriticalChance;
+            _randomSource.NextUnitFloat() < _runtimeState.CriticalChance;
         damageKind = isCritical ? DamageKind.Critical : DamageKind.Normal;
 
         if (isCritical)
