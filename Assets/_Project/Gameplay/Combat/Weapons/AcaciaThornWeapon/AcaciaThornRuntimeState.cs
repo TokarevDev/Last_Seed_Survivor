@@ -1,15 +1,11 @@
-
 using Game.Core.Combat;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
     using System;
-    using UnityEngine;
 
     public sealed class AcaciaThornRuntimeState
     {
-        private const float FloatEpsilon = 0.0001f;
-
         public const float DefaultMaxFireRateBonus = 3f;
         public const float DefaultMaxProjectileSpeedBonus = 2f;
         public const float MaxDamageMultiplier = 100000f;
@@ -20,36 +16,44 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         public const float MaxCriticalChance = 1f;
         public const float MaxCriticalDamageMultiplier = 100f;
 
-        private SalvoProgressionState _salvo = new(DefaultMaxSalvoExtraShots, MaxSalvoExtraShots);
-        private CappedBonusState _fireRateBonus = new(DefaultMaxFireRateBonus);
-        private CappedBonusState _projectileSpeedBonus = new(DefaultMaxProjectileSpeedBonus);
-        private CriticalHitProgressionState _criticalHit = new(
+        private static readonly WeaponProgressionLimits DefaultProgressionLimits = new(
+            MaxDamageMultiplier,
+            DefaultMaxFireRateBonus,
+            DefaultMaxSalvoExtraShots,
+            DefaultMaxProjectileSpeedBonus,
             MaxCriticalChance,
             MaxCriticalDamageMultiplier);
-        private DamageMultiplierProgressionState _damageMultiplier = new(MaxDamageMultiplier);
+
+        private static readonly WeaponProgressionLimits HardProgressionLimits = new(
+            MaxDamageMultiplier,
+            DefaultMaxFireRateBonus,
+            MaxSalvoExtraShots,
+            DefaultMaxProjectileSpeedBonus,
+            MaxCriticalChance,
+            MaxCriticalDamageMultiplier);
+
+        private WeaponProgressionState _progression = new(
+            DefaultProgressionLimits,
+            HardProgressionLimits);
 
         public bool IsUnlocked { get; private set; }
         public int BaseDamage { get; private set; } = 1;
-        public float DamageMultiplier => _damageMultiplier.Value;
-        public float FireRateBonus => _fireRateBonus.Value;
-        public int SalvoExtraShots => _salvo.ExtraShots;
-        public float ProjectileSpeedBonus => _projectileSpeedBonus.Value;
-        public float CriticalChance => _criticalHit.Chance;
-        public float CriticalDamageMultiplier => _criticalHit.DamageMultiplier;
-        public float MaxFireRateBonus => _fireRateBonus.Limit;
-        public float MaxProjectileSpeedBonus => _projectileSpeedBonus.Limit;
+        public float DamageMultiplier => _progression.DamageMultiplier;
+        public float FireRateBonus => _progression.FireRateBonus;
+        public int SalvoExtraShots => _progression.SalvoExtraShots;
+        public float ProjectileSpeedBonus => _progression.ProjectileSpeedBonus;
+        public float CriticalChance => _progression.CriticalChance;
+        public float CriticalDamageMultiplier => _progression.CriticalDamageMultiplier;
+        public float MaxFireRateBonus => _progression.MaxFireRateBonus;
+        public float MaxProjectileSpeedBonus => _progression.MaxProjectileSpeedBonus;
 
         public bool CanUnlock => !IsUnlocked;
 
         public void ResetProgression(int baseDamage)
         {
             IsUnlocked = false;
-            BaseDamage = Mathf.Max(1, baseDamage);
-            _damageMultiplier.Reset();
-            _fireRateBonus.Reset();
-            _salvo.Reset();
-            _projectileSpeedBonus.Reset();
-            _criticalHit.Reset();
+            BaseDamage = Math.Max(1, baseDamage);
+            _progression.Reset();
         }
 
         public void SetProgressionLimits(
@@ -61,70 +65,45 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
             float criticalDamageMultiplier,
             float maxCriticalDamageMultiplier)
         {
-            _damageMultiplier.SetLimit(Mathf.Clamp(
+            _progression.SetLimits(new WeaponProgressionLimits(
                 maxDamageMultiplier,
-                1f,
-                MaxDamageMultiplier));
-
-            _fireRateBonus.SetLimit(Mathf.Clamp(
                 maxFireRateBonus,
-                0f,
-                DefaultMaxFireRateBonus));
-
-            _salvo.SetLimit(maxSalvoExtraShots);
-
-            _projectileSpeedBonus.SetLimit(Mathf.Clamp(
+                maxSalvoExtraShots,
                 maxProjectileSpeedBonus,
-                0f,
-                DefaultMaxProjectileSpeedBonus));
-
-            _criticalHit.SetLimits(
-                Mathf.Clamp(maxCriticalChance, 0f, MaxCriticalChance),
-                Mathf.Clamp(
-                    maxCriticalDamageMultiplier,
-                    1f,
-                    MaxCriticalDamageMultiplier));
-            _criticalHit.SetDamageMultiplier(criticalDamageMultiplier);
-
+                maxCriticalChance,
+                maxCriticalDamageMultiplier));
+            _progression.SetCriticalDamageMultiplier(criticalDamageMultiplier);
         }
 
-        public bool CanApplyDamageMultiplier(float multiplier)
-        {
-            return IsUnlocked && _damageMultiplier.CanApply(multiplier);
-        }
+        public bool CanApplyDamageMultiplier(float multiplier) =>
+            IsUnlocked && _progression.CanApplyDamageMultiplier(multiplier);
 
-        public bool CanApplyFireRateBonus(float bonus)
-        {
-            return IsUnlocked && _fireRateBonus.CanApply(bonus);
-        }
+        public bool CanApplyFireRateBonus(float bonus) =>
+            IsUnlocked && _progression.CanApplyFireRateBonus(bonus);
 
-        public bool CanApplySalvoShots(int extraShots)
-        {
-            return IsUnlocked && _salvo.CanApply(extraShots);
-        }
+        public bool CanApplySalvoShots(int extraShots) =>
+            IsUnlocked && _progression.CanApplySalvoShots(extraShots);
 
         public bool CanApplySalvoShots(
             int extraShots,
             int maxSalvoExtraShotsAfterApply)
         {
-            return IsUnlocked && _salvo.CanApply(extraShots, maxSalvoExtraShotsAfterApply);
+            return IsUnlocked && _progression.CanApplySalvoShots(
+                extraShots,
+                maxSalvoExtraShotsAfterApply);
         }
 
-        public bool CanApplyProjectileSpeedBonus(float bonus)
-        {
-            return IsUnlocked && _projectileSpeedBonus.CanApply(bonus);
-        }
+        public bool CanApplyProjectileSpeedBonus(float bonus) =>
+            IsUnlocked && _progression.CanApplyProjectileSpeedBonus(bonus);
 
-        public bool CanApplyCriticalChance(float chanceBonus)
-        {
-            return IsUnlocked && _criticalHit.CanApplyChance(chanceBonus);
-        }
+        public bool CanApplyCriticalChance(float chanceBonus) =>
+            IsUnlocked && _progression.CanApplyCriticalChance(chanceBonus);
 
         public bool CanApplyCriticalDamageBonus(float damageBonus)
         {
             return IsUnlocked
                 && CriticalChance > 0f
-                && _criticalHit.CanApplyDamage(damageBonus);
+                && _progression.CanApplyCriticalDamageBonus(damageBonus);
         }
 
         public void Unlock(int baseDamage)
@@ -135,62 +114,43 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
         public void SetBaseDamage(int baseDamage)
         {
-            BaseDamage = Mathf.Max(BaseDamage, Mathf.Max(1, baseDamage));
+            BaseDamage = Math.Max(BaseDamage, Math.Max(1, baseDamage));
         }
 
-        public float ApplyDamageMultiplier(float multiplier)
-        {
-            return _damageMultiplier.Apply(multiplier);
-        }
+        public float ApplyDamageMultiplier(float multiplier) =>
+            _progression.ApplyDamageMultiplier(multiplier);
 
-        public float AddFireRateBonus(float bonus)
-        {
-            return _fireRateBonus.Add(bonus);
-        }
+        public float AddFireRateBonus(float bonus) =>
+            _progression.AddFireRateBonus(bonus);
 
-        public int AddSalvoShots(int extraShots)
-        {
-            return _salvo.Add(extraShots);
-        }
+        public int AddSalvoShots(int extraShots) =>
+            _progression.AddSalvoShots(extraShots);
 
         public void ExpandSalvoExtraShotLimit(int maxSalvoExtraShots)
         {
-            _salvo.ExpandLimit(maxSalvoExtraShots);
+            _progression.ExpandSalvoExtraShotLimit(maxSalvoExtraShots);
         }
 
-        public float AddProjectileSpeedBonus(float bonus)
-        {
-            return _projectileSpeedBonus.Add(bonus);
-        }
+        public float AddProjectileSpeedBonus(float bonus) =>
+            _progression.AddProjectileSpeedBonus(bonus);
 
-        public float AddCriticalChance(float chanceBonus)
-        {
-            return _criticalHit.AddChance(chanceBonus);
-        }
+        public float AddCriticalChance(float chanceBonus) =>
+            _progression.AddCriticalChance(chanceBonus);
 
-        public float AddCriticalDamageBonus(float damageBonus)
-        {
-            return _criticalHit.AddDamage(damageBonus);
-        }
+        public float AddCriticalDamageBonus(float damageBonus) =>
+            _progression.AddCriticalDamageBonus(damageBonus);
 
-        public static int ClampDamage(double rawDamage)
-        {
-            return WeaponDamageClamp.Clamp(rawDamage);
-        }
+        public static int ClampDamage(double rawDamage) =>
+            WeaponDamageClamp.Clamp(rawDamage);
 
         public AcaciaThornRuntimeState Clone()
         {
             return new AcaciaThornRuntimeState
             {
-                _damageMultiplier = _damageMultiplier.Clone(),
-                _salvo = _salvo.Clone(),
-                _fireRateBonus = _fireRateBonus.Clone(),
-                _projectileSpeedBonus = _projectileSpeedBonus.Clone(),
-                _criticalHit = _criticalHit.Clone(),
+                _progression = _progression.Clone(),
                 IsUnlocked = IsUnlocked,
-                BaseDamage = BaseDamage,
+                BaseDamage = BaseDamage
             };
         }
     }
-
 }

@@ -148,10 +148,10 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
             if (_config == null || _runtimeState == null)
                 return;
 
-            _runtimeState.SetFireRateBonusLimit(_config.MaxFireRateBonus);
-            _runtimeState.SetProjectileSpeedBonusLimit(_config.MaxProjectileSpeedBonus);
             _runtimeState.SetProgressionLimits(
                 _config.MaxDamageMultiplier,
+                _config.MaxFireRateBonus,
+                _config.MaxProjectileSpeedBonus,
                 _config.MaxCriticalChance,
                 _config.MaxCriticalDamageMultiplier,
                 _config.MaxPenetrationBonus,

@@ -210,8 +210,8 @@ requests, scene restart while ad callback is pending.
 
 ### Stage 3 — common weapon runtime and typed spawn boundary
 
-1. Extract `WeaponProgressionState`, `WeaponProgressionLimits`, and derived stat calculator
-   from `WeaponRuntimeState`.
+1. In progress: `WeaponProgressionState` and `WeaponProgressionLimits` are extracted from
+   `WeaponRuntimeState` and shared by both weapons; the derived stat calculator remains.
 2. Create a common `WeaponFireCycle` state machine for cooldown/prepare/salvo transitions.
 3. Separate `IShotPatternBuilder`, `IProjectileSpawnSink<TRequest>`, damage calculation,
    and type-specific shot creation.

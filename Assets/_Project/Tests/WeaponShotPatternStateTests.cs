@@ -7,15 +7,13 @@ namespace Game.Tests
     public sealed class WeaponShotPatternStateTests
     {
         [Test]
-        public void SetLimits_RestrictsParallelAndSalvoProgression()
+        public void SetParallelLimit_RestrictsParallelProgression()
         {
             WeaponShotPatternState state = new();
-            state.SetLimits(maxParallelProjectiles: 2, maxSalvoExtraShots: 1);
+            state.SetParallelLimit(maxParallelProjectiles: 2);
 
             Assert.That(state.AddParallelProjectiles(3, 0.7f), Is.EqualTo(1));
-            Assert.That(state.AddSalvoShots(3, 0.15f), Is.EqualTo(1));
             Assert.That(state.CanAddParallelProjectiles, Is.False);
-            Assert.That(state.CanAddSalvoShots, Is.False);
         }
 
         [Test]
@@ -37,14 +35,11 @@ namespace Game.Tests
         {
             WeaponShotPatternState state = new();
             state.AddParallelProjectiles(2, 1f);
-            state.AddSalvoShots(2, 0.1f);
 
             state.Reset();
 
             Assert.That(state.ParallelProjectileCount, Is.EqualTo(1));
             Assert.That(state.ParallelSpacing, Is.EqualTo(0.5f));
-            Assert.That(state.SalvoExtraShots, Is.Zero);
-            Assert.That(state.SalvoInterval, Is.EqualTo(0.2f));
         }
     }
 }

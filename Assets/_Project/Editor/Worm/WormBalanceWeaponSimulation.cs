@@ -22,10 +22,10 @@ namespace Game.Editor.Worm
             if (config == null)
                 return state;
 
-            state.SetFireRateBonusLimit(config.MaxFireRateBonus);
-            state.SetProjectileSpeedBonusLimit(config.MaxProjectileSpeedBonus);
             state.SetProgressionLimits(
                 config.MaxDamageMultiplier,
+                config.MaxFireRateBonus,
+                config.MaxProjectileSpeedBonus,
                 config.MaxCriticalChance,
                 config.MaxCriticalDamageMultiplier,
                 config.MaxPenetrationBonus,
