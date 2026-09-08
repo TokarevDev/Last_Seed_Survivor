@@ -27,7 +27,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
         private float _currentShotCooldown;
 
         private readonly List<ShotSpawnData> _shots = new();
-        private readonly ProjectileShotPatternBuilder _shotPatternBuilder = new();
+        private IShotPatternBuilder _shotPatternBuilder;
         private readonly PreparedActionTimer _preparedAttack = new();
         private readonly CooldownBurstCycle _fireCycle = new();
 
@@ -42,6 +42,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
         public void Init(
             IPooledSpawnService<ProjectileSpawnRequest> pool,
             Transform firePoint,
+            IShotPatternBuilder shotPatternBuilder,
             IWeaponAttackCyclePublisher attackCyclePublisher,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
         {
@@ -49,6 +50,8 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
             _firePoint = firePoint != null
                 ? firePoint
                 : throw new ArgumentNullException(nameof(firePoint));
+            _shotPatternBuilder = shotPatternBuilder ??
+                throw new ArgumentNullException(nameof(shotPatternBuilder));
             _attackCyclePublisher = attackCyclePublisher ??
                 throw new ArgumentNullException(nameof(attackCyclePublisher));
             _runtimeStatsPublisher = runtimeStatsPublisher ??

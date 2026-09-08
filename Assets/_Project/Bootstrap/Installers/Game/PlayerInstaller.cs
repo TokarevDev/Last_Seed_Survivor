@@ -5,6 +5,7 @@ using Zenject;
 using Game.Bootstrap.Scenes.Game;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern;
 using Game.Gameplay.Player;
 
 namespace Game.Bootstrap.Installers.Game
@@ -28,6 +29,7 @@ namespace Game.Bootstrap.Installers.Game
             Container.Bind<PlayerMover>().FromInstance(_playerMover).AsSingle();
             Container.Bind<ProjectileWeapon>().FromInstance(_projectileWeapon).AsSingle();
             Container.Bind<AcaciaThornWeapon>().FromInstance(_acaciaThornWeapon).AsSingle();
+            Container.Bind<IShotPatternBuilder>().To<ProjectileShotPatternBuilder>().AsSingle();
             Container.BindInstance(new PlayerWeaponLoadout(_firePoint, _startWeaponConfig)).AsSingle();
             Container.Bind<PlayerMovementController>().AsSingle();
             Container.Bind<PlayerWeaponController>().AsSingle();

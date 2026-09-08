@@ -7,7 +7,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern
     using System.Collections.Generic;
     using UnityEngine;
 
-    public sealed class ProjectileShotPatternBuilder
+    public sealed class ProjectileShotPatternBuilder : IShotPatternBuilder
     {
         public void Build(
             Vector3 origin,

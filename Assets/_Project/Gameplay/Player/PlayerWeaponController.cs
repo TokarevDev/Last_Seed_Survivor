@@ -3,6 +3,7 @@ using Game.Gameplay.Combat;
 using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern;
 using Game.Gameplay.Pooling;
 using Game.Gameplay.Signals;
 
@@ -16,6 +17,7 @@ namespace Game.Gameplay.Player
         private readonly PoolRegistry _poolRegistry;
         private readonly PlayerWeaponLoadout _loadout;
         private readonly ICombatSessionState _combatSessionState;
+        private readonly IShotPatternBuilder _shotPatternBuilder;
         private readonly IWeaponAttackCyclePublisher _attackCyclePublisher;
         private readonly IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
         private bool _initialized;
@@ -26,6 +28,7 @@ namespace Game.Gameplay.Player
             PoolRegistry poolRegistry,
             PlayerWeaponLoadout loadout,
             ICombatSessionState combatSessionState,
+            IShotPatternBuilder shotPatternBuilder,
             IWeaponAttackCyclePublisher attackCyclePublisher,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
         {
@@ -35,6 +38,8 @@ namespace Game.Gameplay.Player
             _poolRegistry = poolRegistry ?? throw new ArgumentNullException(nameof(poolRegistry));
             _loadout = loadout ?? throw new ArgumentNullException(nameof(loadout));
             _combatSessionState = combatSessionState ?? throw new ArgumentNullException(nameof(combatSessionState));
+            _shotPatternBuilder = shotPatternBuilder ??
+                throw new ArgumentNullException(nameof(shotPatternBuilder));
             _attackCyclePublisher = attackCyclePublisher ??
                 throw new ArgumentNullException(nameof(attackCyclePublisher));
             _runtimeStatsPublisher = runtimeStatsPublisher ??
@@ -61,6 +66,7 @@ namespace Game.Gameplay.Player
             _mainWeapon.Init(
                 pool,
                 _loadout.FirePoint,
+                _shotPatternBuilder,
                 _attackCyclePublisher,
                 _runtimeStatsPublisher);
             _mainWeapon.ApplyConfig(config);

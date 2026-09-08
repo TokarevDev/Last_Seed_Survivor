@@ -213,8 +213,8 @@ requests, scene restart while ad callback is pending.
 1. Completed: `WeaponProgressionState`, `WeaponProgressionLimits`, and the shared derived
    stat calculator are extracted into Core and used by both weapons.
 2. Create a common `WeaponFireCycle` state machine for cooldown/prepare/salvo transitions.
-3. Separate `IShotPatternBuilder`, `IProjectileSpawnSink<TRequest>`, damage calculation,
-   and type-specific shot creation.
+3. In progress: `IShotPatternBuilder` is an explicit injected strategy and damage
+   calculation is shared; the dedicated spawn sink and type-specific shot creation remain.
 4. Make both existing weapons thin Unity adapters over the same application lifecycle.
 5. Bind both projectile pools in Bootstrap; weapons never construct concrete pools.
 6. Publish one immutable weapon-state snapshot after committed mutations.
