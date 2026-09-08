@@ -219,8 +219,9 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
         private CriticalDamageRoll BuildDamage()
         {
-            double rawDamage = Mathf.Max(1, _runtimeState.BaseDamage) *
-                (double)_runtimeState.DamageMultiplier;
+            double rawDamage = WeaponDerivedStatsCalculator.CalculateRawDamage(
+                _runtimeState.BaseDamage,
+                _runtimeState.DamageMultiplier);
 
             return CriticalDamageResolver.Roll(
                 rawDamage,
@@ -237,31 +238,33 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         private float GetProjectileSpeed()
         {
             return Mathf.Max(
-                0.1f,
+                WeaponDerivedStatsCalculator.MinimumProjectileSpeedMultiplier,
                 _config.Speed * GetProjectileSpeedMultiplier());
         }
 
         private float GetSalvoInterval()
         {
-            return Mathf.Max(
-                0.01f,
-                _config.SalvoInterval / GetProjectileSpeedMultiplier());
+            return WeaponDerivedStatsCalculator.CalculateSalvoInterval(
+                _config.SalvoInterval,
+                GetProjectileSpeedMultiplier());
         }
 
         private float GetProjectileSpeedMultiplier()
         {
-            return Mathf.Max(0.1f, 1f + _runtimeState.ProjectileSpeedBonus);
+            return WeaponDerivedStatsCalculator.CalculateProjectileSpeedMultiplier(
+                _runtimeState.ProjectileSpeedBonus);
         }
 
         private void RebuildCooldown(bool resetTimer)
         {
-            float cappedFireRateBonus = Mathf.Min(
+            float cappedFireRateBonus = Math.Min(
                 _runtimeState.FireRateBonus,
                 _config.MaxFireRateBonus);
 
-            _currentCooldown = Mathf.Max(
+            _currentCooldown = WeaponDerivedStatsCalculator.CalculateCooldown(
+                _config.Cooldown,
                 _config.MinCooldown,
-                _config.Cooldown / (1f + cappedFireRateBonus));
+                cappedFireRateBonus);
 
             if (resetTimer)
                 _fireCycle.Reset();

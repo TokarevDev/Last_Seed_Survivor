@@ -1,4 +1,5 @@
 
+using Game.Core.Combat;
 using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Projectiles.Configs;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
@@ -88,14 +89,15 @@ namespace Game.Gameplay.Enemy.Worm.Balance
             int baseDamage,
             WeaponRuntimeState runtimeState)
         {
-            double rawDamage = Mathf.Max(1, baseDamage) * (double)runtimeState.DamageMultiplier;
-            int damage = WeaponRuntimeState.ClampDamage(rawDamage);
+            int damage = WeaponDerivedStatsCalculator.CalculateDamage(
+                baseDamage,
+                runtimeState.DamageMultiplier);
 
             float criticalChance = Mathf.Clamp01(runtimeState.CriticalChance);
             float criticalBonus = Mathf.Max(0f, runtimeState.CriticalDamageMultiplier - 1f);
             float expectedCriticalMultiplier = 1f + criticalChance * criticalBonus;
 
-            return WeaponRuntimeState.ClampDamage(damage * (double)expectedCriticalMultiplier);
+            return WeaponDamageClamp.Clamp(damage * (double)expectedCriticalMultiplier);
         }
 
         private static int EstimateProjectilesPerShot(WeaponRuntimeState runtimeState)
@@ -174,14 +176,15 @@ namespace Game.Gameplay.Enemy.Worm.Balance
             int baseDamage,
             AcaciaThornRuntimeState runtimeState)
         {
-            double rawDamage = Mathf.Max(1, baseDamage) * (double)runtimeState.DamageMultiplier;
-            int damage = AcaciaThornRuntimeState.ClampDamage(rawDamage);
+            int damage = WeaponDerivedStatsCalculator.CalculateDamage(
+                baseDamage,
+                runtimeState.DamageMultiplier);
 
             float criticalChance = Mathf.Clamp01(runtimeState.CriticalChance);
             float criticalBonus = Mathf.Max(0f, runtimeState.CriticalDamageMultiplier - 1f);
             float expectedCriticalMultiplier = 1f + criticalChance * criticalBonus;
 
-            return AcaciaThornRuntimeState.ClampDamage(damage * (double)expectedCriticalMultiplier);
+            return WeaponDamageClamp.Clamp(damage * (double)expectedCriticalMultiplier);
         }
 
         private static float EstimateShotCycleTime(
@@ -193,9 +196,10 @@ namespace Game.Gameplay.Enemy.Worm.Balance
                 runtimeState.FireRateBonus,
                 config.MaxFireRateBonus);
 
-            float shotCooldown = Mathf.Max(
+            float shotCooldown = WeaponDerivedStatsCalculator.CalculateCooldown(
+                config.FireRate,
                 config.MinShotCooldown,
-                config.FireRate / (1f + fireRateBonus));
+                fireRateBonus);
 
             float salvoTime = Mathf.Max(0, salvoShots - 1) *
                 Mathf.Max(0.01f, runtimeState.SalvoInterval);
@@ -212,9 +216,10 @@ namespace Game.Gameplay.Enemy.Worm.Balance
                 runtimeState.FireRateBonus,
                 config.MaxFireRateBonus);
 
-            float cooldown = Mathf.Max(
+            float cooldown = WeaponDerivedStatsCalculator.CalculateCooldown(
+                config.Cooldown,
                 config.MinCooldown,
-                config.Cooldown / (1f + fireRateBonus));
+                fireRateBonus);
 
             float salvoTime = Mathf.Max(0, salvoShots - 1) *
                 Mathf.Max(0.01f, config.SalvoInterval);

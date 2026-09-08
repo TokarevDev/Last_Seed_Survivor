@@ -1,4 +1,5 @@
 
+using Game.Core.Combat;
 using Game.Core.Pooling;
 using Game.Core.Timing;
 using Game.Gameplay.Combat.Projectiles;
@@ -92,13 +93,14 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
         {
             if (_config == null) return;
 
-            float cappedFireRateBonus = Mathf.Min(
+            float cappedFireRateBonus = Math.Min(
                 _runtimeState.FireRateBonus,
                 _config.MaxFireRateBonus);
 
-            _currentShotCooldown = Mathf.Max(
+            _currentShotCooldown = WeaponDerivedStatsCalculator.CalculateCooldown(
+                _config.FireRate,
                 _config.MinShotCooldown,
-                _config.FireRate / (1f + cappedFireRateBonus));
+                cappedFireRateBonus);
 
             if (resetFiringCycle)
             {
@@ -231,9 +233,9 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         private float GetSalvoInterval()
         {
-            return Mathf.Max(
-                0.01f,
-                _runtimeState.SalvoInterval / GetProjectileSpeedMultiplier());
+            return WeaponDerivedStatsCalculator.CalculateSalvoInterval(
+                _runtimeState.SalvoInterval,
+                GetProjectileSpeedMultiplier());
         }
 
         private void Fire()
@@ -279,7 +281,8 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         private float GetProjectileSpeedMultiplier()
         {
-            return Mathf.Max(0.1f, 1f + _runtimeState.ProjectileSpeedBonus);
+            return WeaponDerivedStatsCalculator.CalculateProjectileSpeedMultiplier(
+                _runtimeState.ProjectileSpeedBonus);
         }
 
         private int BuildProjectileDamage()
@@ -287,8 +290,9 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
             if (_config == null || _config.Projectile == null || _runtimeState == null)
                 return 0;
 
-            return WeaponRuntimeState.ClampDamage(
-                _config.Projectile.Damage * (double)_runtimeState.DamageMultiplier);
+            return WeaponDerivedStatsCalculator.CalculateDamage(
+                _config.Projectile.Damage,
+                _runtimeState.DamageMultiplier);
         }
 
         private void PublishRuntimeStatsChanged()
