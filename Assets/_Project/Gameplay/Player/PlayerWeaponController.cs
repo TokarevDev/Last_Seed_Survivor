@@ -18,6 +18,7 @@ namespace Game.Gameplay.Player
         private readonly PlayerWeaponLoadout _loadout;
         private readonly ICombatSessionState _combatSessionState;
         private readonly IShotPatternBuilder _shotPatternBuilder;
+        private readonly ProjectileSpawnRequestFactory _spawnRequestFactory;
         private readonly IWeaponAttackCyclePublisher _attackCyclePublisher;
         private readonly IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
         private bool _initialized;
@@ -29,6 +30,7 @@ namespace Game.Gameplay.Player
             PlayerWeaponLoadout loadout,
             ICombatSessionState combatSessionState,
             IShotPatternBuilder shotPatternBuilder,
+            ProjectileSpawnRequestFactory spawnRequestFactory,
             IWeaponAttackCyclePublisher attackCyclePublisher,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
         {
@@ -40,6 +42,8 @@ namespace Game.Gameplay.Player
             _combatSessionState = combatSessionState ?? throw new ArgumentNullException(nameof(combatSessionState));
             _shotPatternBuilder = shotPatternBuilder ??
                 throw new ArgumentNullException(nameof(shotPatternBuilder));
+            _spawnRequestFactory = spawnRequestFactory ??
+                throw new ArgumentNullException(nameof(spawnRequestFactory));
             _attackCyclePublisher = attackCyclePublisher ??
                 throw new ArgumentNullException(nameof(attackCyclePublisher));
             _runtimeStatsPublisher = runtimeStatsPublisher ??
@@ -67,6 +71,7 @@ namespace Game.Gameplay.Player
                 pool,
                 _loadout.FirePoint,
                 _shotPatternBuilder,
+                _spawnRequestFactory,
                 _attackCyclePublisher,
                 _runtimeStatsPublisher);
             _mainWeapon.ApplyConfig(config);

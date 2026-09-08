@@ -1,7 +1,6 @@
 using System;
 
 using Game.Core.Pooling;
-using Game.Core.Random;
 using Game.Core.World;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
@@ -17,7 +16,7 @@ namespace Game.Bootstrap.Scenes.Game
         private readonly PoolRegistry _projectilePoolRegistry;
         private readonly PlayerWeaponLoadout _loadout;
         private readonly IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
-        private readonly IRandomSource _randomSource;
+        private readonly AcaciaThornProjectileSpawnRequestFactory _spawnRequestFactory;
         private readonly IConfigurablePooledSpawnService<
             AcaciaThornProjectilePoolSetup,
             AcaciaThornProjectileSpawnRequest> _pool;
@@ -27,7 +26,7 @@ namespace Game.Bootstrap.Scenes.Game
             PoolRegistry projectilePoolRegistry,
             PlayerWeaponLoadout loadout,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
-            IRandomSource randomSource,
+            AcaciaThornProjectileSpawnRequestFactory spawnRequestFactory,
             IConfigurablePooledSpawnService<
                 AcaciaThornProjectilePoolSetup,
                 AcaciaThornProjectileSpawnRequest> pool)
@@ -38,7 +37,8 @@ namespace Game.Bootstrap.Scenes.Game
             _loadout = loadout ?? throw new ArgumentNullException(nameof(loadout));
             _runtimeStatsPublisher = runtimeStatsPublisher ??
                 throw new ArgumentNullException(nameof(runtimeStatsPublisher));
-            _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
+            _spawnRequestFactory = spawnRequestFactory ??
+                throw new ArgumentNullException(nameof(spawnRequestFactory));
             _pool = pool ?? throw new ArgumentNullException(nameof(pool));
         }
 
@@ -64,7 +64,7 @@ namespace Game.Bootstrap.Scenes.Game
             _weapon.Init(
                 _loadout.FirePoint,
                 _runtimeStatsPublisher,
-                _randomSource,
+                _spawnRequestFactory,
                 _pool);
         }
     }

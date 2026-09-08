@@ -1,7 +1,6 @@
 
 using Game.Core.Combat;
 using Game.Core.Pooling;
-using Game.Core.Random;
 using Game.Core.Timing;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
 using Game.Gameplay.Signals;
@@ -22,7 +21,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         private float _currentCooldown;
         private bool _initialized;
         private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
-        private IRandomSource _randomSource;
+        private AcaciaThornProjectileSpawnRequestFactory _spawnRequestFactory;
         private IPooledSpawnService<AcaciaThornProjectileSpawnRequest> _pool;
         private readonly CooldownBurstCycle _fireCycle = new();
 
@@ -32,7 +31,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         public void Init(
             Transform firePoint,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
-            IRandomSource randomSource,
+            AcaciaThornProjectileSpawnRequestFactory spawnRequestFactory,
             IPooledSpawnService<AcaciaThornProjectileSpawnRequest> pool)
         {
             if (_initialized)
@@ -52,7 +51,8 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
             _runtimeStatsPublisher = runtimeStatsPublisher ??
                 throw new ArgumentNullException(nameof(runtimeStatsPublisher));
-            _randomSource = randomSource ?? throw new ArgumentNullException(nameof(randomSource));
+            _spawnRequestFactory = spawnRequestFactory ??
+                throw new ArgumentNullException(nameof(spawnRequestFactory));
             _pool = pool;
             _firePoint = firePoint;
             ApplyRuntimeLimits();
@@ -199,47 +199,12 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
             direction.Normalize();
 
-            Vector3 position = _firePoint.position +
-                (Vector3)(direction * Mathf.Max(0f, _config.SpawnOffset));
-
-            CriticalDamageRoll damageRoll = BuildDamage();
-            AcaciaThornProjectileSpawnRequest request = new(
-                position,
-                direction,
-                damageRoll.Damage,
-                damageRoll.DamageKind,
-                damageRoll.IsCritical,
-                GetProjectileSpeed(),
-                _config.LifeTime,
-                _config.BounceCount,
-                GetSplitCount(),
-                true);
+            AcaciaThornProjectileSpawnRequest request = _spawnRequestFactory.Create(
+                _config,
+                _runtimeState,
+                _firePoint.position,
+                direction);
             _pool.Spawn(in request);
-        }
-
-        private CriticalDamageRoll BuildDamage()
-        {
-            double rawDamage = WeaponDerivedStatsCalculator.CalculateRawDamage(
-                _runtimeState.BaseDamage,
-                _runtimeState.DamageMultiplier);
-
-            return CriticalDamageResolver.Roll(
-                rawDamage,
-                _runtimeState.CriticalChance,
-                _runtimeState.CriticalDamageMultiplier,
-                _randomSource);
-        }
-
-        private int GetSplitCount()
-        {
-            return Mathf.Max(0, _config.BaseSplitCount);
-        }
-
-        private float GetProjectileSpeed()
-        {
-            return Mathf.Max(
-                WeaponDerivedStatsCalculator.MinimumProjectileSpeedMultiplier,
-                _config.Speed * GetProjectileSpeedMultiplier());
         }
 
         private float GetSalvoInterval()

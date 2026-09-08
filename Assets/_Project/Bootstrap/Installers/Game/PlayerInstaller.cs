@@ -30,6 +30,8 @@ namespace Game.Bootstrap.Installers.Game
             Container.Bind<ProjectileWeapon>().FromInstance(_projectileWeapon).AsSingle();
             Container.Bind<AcaciaThornWeapon>().FromInstance(_acaciaThornWeapon).AsSingle();
             Container.Bind<IShotPatternBuilder>().To<ProjectileShotPatternBuilder>().AsSingle();
+            Container.Bind<ProjectileSpawnRequestFactory>().AsSingle();
+            Container.Bind<AcaciaThornProjectileSpawnRequestFactory>().AsSingle();
             Container.BindInstance(new PlayerWeaponLoadout(_firePoint, _startWeaponConfig)).AsSingle();
             Container.Bind<PlayerMovementController>().AsSingle();
             Container.Bind<PlayerWeaponController>().AsSingle();

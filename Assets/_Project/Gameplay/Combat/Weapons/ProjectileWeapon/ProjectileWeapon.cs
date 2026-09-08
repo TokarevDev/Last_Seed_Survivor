@@ -2,7 +2,6 @@
 using Game.Core.Combat;
 using Game.Core.Pooling;
 using Game.Core.Timing;
-using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Pooling;
@@ -28,6 +27,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         private readonly List<ShotSpawnData> _shots = new();
         private IShotPatternBuilder _shotPatternBuilder;
+        private ProjectileSpawnRequestFactory _spawnRequestFactory;
         private readonly PreparedActionTimer _preparedAttack = new();
         private readonly CooldownBurstCycle _fireCycle = new();
 
@@ -43,6 +43,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
             IPooledSpawnService<ProjectileSpawnRequest> pool,
             Transform firePoint,
             IShotPatternBuilder shotPatternBuilder,
+            ProjectileSpawnRequestFactory spawnRequestFactory,
             IWeaponAttackCyclePublisher attackCyclePublisher,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
         {
@@ -52,6 +53,8 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
                 : throw new ArgumentNullException(nameof(firePoint));
             _shotPatternBuilder = shotPatternBuilder ??
                 throw new ArgumentNullException(nameof(shotPatternBuilder));
+            _spawnRequestFactory = spawnRequestFactory ??
+                throw new ArgumentNullException(nameof(spawnRequestFactory));
             _attackCyclePublisher = attackCyclePublisher ??
                 throw new ArgumentNullException(nameof(attackCyclePublisher));
             _runtimeStatsPublisher = runtimeStatsPublisher ??
@@ -260,26 +263,11 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         private void Spawn(ShotSpawnData shot)
         {
-            ProjectileRuntimeStats stats = BuildProjectileStats();
-            ProjectileSpawnRequest request = new(
-                _config.Projectile,
-                stats,
-                shot.Position,
-                shot.Rotation);
+            ProjectileSpawnRequest request = _spawnRequestFactory.Create(
+                _config,
+                _runtimeState,
+                in shot);
             _pool.Spawn(in request);
-        }
-
-        private ProjectileRuntimeStats BuildProjectileStats()
-        {
-            int finalDamage = BuildProjectileDamage();
-
-            return new ProjectileRuntimeStats(
-                finalDamage,
-                _runtimeState.PenetrationBonus,
-                _runtimeState.CriticalChance,
-                _runtimeState.CriticalDamageMultiplier,
-                GetProjectileSpeedMultiplier()
-            );
         }
 
         private float GetProjectileSpeedMultiplier()
