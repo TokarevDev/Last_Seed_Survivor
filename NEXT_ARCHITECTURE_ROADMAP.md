@@ -219,7 +219,8 @@ requests, scene restart while ad callback is pending.
 4. Make both existing weapons thin Unity adapters over the same application lifecycle.
 5. Completed: both projectile pools are owned by Bootstrap composition; weapon views
    consume only typed spawn sinks and never construct or reference concrete pools.
-6. Publish one immutable weapon-state snapshot after committed mutations.
+6. Completed: each committed weapon mutation publishes one immutable runtime-stat
+   snapshot containing source, activation state, derived values, and progression values.
 
 Playtest: initial fire, delayed animation release, salvo, critical hit, reset, unlock,
 both weapon types active, extreme configured limits, and pool exhaustion/rollback.

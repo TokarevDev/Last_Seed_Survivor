@@ -9,14 +9,15 @@ namespace Game.Gameplay.Signals
     public sealed class WeaponRuntimeStatsChangedSignal
     {
         public WeaponRuntimeStatsChangedSignal(
-            WeaponRuntimeStatsSource source,
+            in WeaponRuntimeStatsSnapshot snapshot,
             float occurredAt)
         {
-            Source = source;
+            Snapshot = snapshot;
             OccurredAt = occurredAt;
         }
 
-        public WeaponRuntimeStatsSource Source { get; }
+        public WeaponRuntimeStatsSnapshot Snapshot { get; }
+        public WeaponRuntimeStatsSource Source => Snapshot.Source;
         public float OccurredAt { get; }
     }
 }

@@ -239,7 +239,26 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
         private void PublishRuntimeStatsChanged()
         {
-            _runtimeStatsPublisher?.Publish(WeaponRuntimeStatsSource.AcaciaThorn);
+            if (_runtimeStatsPublisher == null)
+                return;
+
+            bool isActive = _config != null && _runtimeState.IsUnlocked;
+            WeaponRuntimeStatsSnapshot snapshot = new(
+                WeaponRuntimeStatsSource.AcaciaThorn,
+                isActive,
+                isActive
+                    ? WeaponDerivedStatsCalculator.CalculateDamage(
+                        _runtimeState.BaseDamage,
+                        _runtimeState.DamageMultiplier)
+                    : 0,
+                isActive ? _currentCooldown : 0f,
+                isActive ? GetProjectileSpeedMultiplier() : 1f,
+                isActive ? 1 + _runtimeState.SalvoExtraShots : 0,
+                isActive ? 1 : 0,
+                0,
+                isActive ? _runtimeState.CriticalChance : 0f,
+                isActive ? _runtimeState.CriticalDamageMultiplier : 1f);
+            _runtimeStatsPublisher.Publish(in snapshot);
         }
 
 #if UNITY_EDITOR

@@ -265,7 +265,24 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         private void PublishRuntimeStatsChanged()
         {
-            _runtimeStatsPublisher?.Publish(WeaponRuntimeStatsSource.MainProjectile);
+            if (_runtimeStatsPublisher == null)
+                return;
+
+            bool isActive = _config != null &&
+                _config.Projectile != null &&
+                _runtimeState != null;
+            WeaponRuntimeStatsSnapshot snapshot = new(
+                WeaponRuntimeStatsSource.MainProjectile,
+                isActive,
+                isActive ? BuildProjectileDamage() : 0,
+                isActive ? _currentShotCooldown : 0f,
+                isActive ? GetProjectileSpeedMultiplier() : 1f,
+                isActive ? 1 + _runtimeState.SalvoExtraShots : 0,
+                isActive ? _runtimeState.ParallelProjectileCount : 0,
+                isActive ? _runtimeState.PenetrationBonus : 0,
+                isActive ? _runtimeState.CriticalChance : 0f,
+                isActive ? _runtimeState.CriticalDamageMultiplier : 1f);
+            _runtimeStatsPublisher.Publish(in snapshot);
         }
     }
 

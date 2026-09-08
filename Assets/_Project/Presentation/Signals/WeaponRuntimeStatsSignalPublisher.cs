@@ -20,10 +20,10 @@ namespace Game.Presentation.Signals
                 throw new ArgumentNullException(nameof(gameTimeProvider));
         }
 
-        public void Publish(WeaponRuntimeStatsSource source)
+        public void Publish(in WeaponRuntimeStatsSnapshot snapshot)
         {
             _signalBus.Fire(new WeaponRuntimeStatsChangedSignal(
-                source,
+                in snapshot,
                 _gameTimeProvider.Time));
         }
     }
