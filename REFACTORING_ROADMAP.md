@@ -111,6 +111,7 @@ Installers are introduced only when their domain is migrated. Empty speculative 
 - [x] Make the main weapon's shot-pattern builder an explicit constructor-owned dependency instead of constructing a concrete strategy inside the Unity view.
 - [x] Move main-projectile and Acacia Thorn spawn-request construction into dedicated typed factories; weapon views retain firing lifecycle only.
 - [x] Drive both weapons through the same engine-independent `WeaponFireCycle` with explicit cooldown, optional preparation, burst, cancellation, and reset stages.
+- [x] Hide concrete pools behind typed projectile spawn sinks; weapon views submit immutable requests and issue lifecycle-level clear commands through the abstraction.
 - [x] Route worm pattern and cocoon generation through the same scene-scoped random contract.
 - [x] Remove the obsolete `PlayerController` and `PlayerShooter` scene behaviours and their cross-domain serialized references.
 - [x] Pass frame time explicitly from the named gameplay loop into weapon runtime ticking.

@@ -3,6 +3,7 @@ using Game.Core.Pooling;
 using Game.Core.Random;
 using Game.Core.World;
 using Game.Gameplay.Combat.Projectiles;
+using Game.Gameplay.Combat.Weapons.Runtime;
 
 namespace Game.Gameplay.Pooling
 {
@@ -10,7 +11,8 @@ namespace Game.Gameplay.Pooling
 
     [DisallowMultipleComponent]
     public sealed class ProjectilePool : MonoBehaviour,
-        IPooledSpawnService<ProjectileSpawnRequest>
+        IPooledSpawnService<ProjectileSpawnRequest>,
+        IProjectileSpawnSink<ProjectileSpawnRequest>
     {
         [SerializeField] private int _prewarmCount = 40;
 
@@ -21,6 +23,7 @@ namespace Game.Gameplay.Pooling
         private bool _initialized;
 
         public bool IsInitialized => _initialized;
+        public bool IsReady => _initialized;
 
         public void SetPrefab(
             Projectile prefab,
@@ -53,6 +56,11 @@ namespace Game.Gameplay.Pooling
         }
 
         public void ReleaseAll()
+        {
+            ReleaseAllActive();
+        }
+
+        public void Clear()
         {
             ReleaseAllActive();
         }

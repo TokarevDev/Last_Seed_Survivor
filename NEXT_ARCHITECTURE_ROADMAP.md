@@ -214,10 +214,11 @@ requests, scene restart while ad callback is pending.
    stat calculator are extracted into Core and used by both weapons.
 2. Completed: both weapons use the common `WeaponFireCycle` state machine for
    cooldown, optional preparation, salvo transitions, cancellation, and reset.
-3. In progress: `IShotPatternBuilder`, shared damage calculation, and type-specific
-   spawn-request factories are separated; the dedicated spawn sink remains.
+3. Completed: shot-pattern strategy, shared damage calculation, type-specific request
+   factories, and the narrow `IProjectileSpawnSink<TRequest>` boundary are separated.
 4. Make both existing weapons thin Unity adapters over the same application lifecycle.
-5. Bind both projectile pools in Bootstrap; weapons never construct concrete pools.
+5. Completed: both projectile pools are owned by Bootstrap composition; weapon views
+   consume only typed spawn sinks and never construct or reference concrete pools.
 6. Publish one immutable weapon-state snapshot after committed mutations.
 
 Playtest: initial fire, delayed animation release, salvo, critical hit, reset, unlock,

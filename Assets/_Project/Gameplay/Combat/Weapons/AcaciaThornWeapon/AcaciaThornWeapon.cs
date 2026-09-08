@@ -1,7 +1,7 @@
 
 using Game.Core.Combat;
-using Game.Core.Pooling;
 using Game.Core.Timing;
+using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
 using Game.Gameplay.Signals;
 
@@ -22,7 +22,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         private bool _initialized;
         private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
         private AcaciaThornProjectileSpawnRequestFactory _spawnRequestFactory;
-        private IPooledSpawnService<AcaciaThornProjectileSpawnRequest> _pool;
+        private IProjectileSpawnSink<AcaciaThornProjectileSpawnRequest> _spawnSink;
         private readonly WeaponFireCycle _fireCycle = new();
 
         public AcaciaThornWeaponConfig Config => _config;
@@ -32,7 +32,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
             Transform firePoint,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
             AcaciaThornProjectileSpawnRequestFactory spawnRequestFactory,
-            IPooledSpawnService<AcaciaThornProjectileSpawnRequest> pool)
+            IProjectileSpawnSink<AcaciaThornProjectileSpawnRequest> spawnSink)
         {
             if (_initialized)
                 return;
@@ -40,10 +40,10 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
             if (_config == null)
                 throw new InvalidOperationException("Acacia Thorn weapon config is missing.");
 
-            if (pool == null)
-                throw new ArgumentNullException(nameof(pool));
+            if (spawnSink == null)
+                throw new ArgumentNullException(nameof(spawnSink));
 
-            if (!pool.IsInitialized)
+            if (!spawnSink.IsReady)
                 throw new InvalidOperationException("Acacia Thorn projectile pool is not initialized.");
 
             if (firePoint == null)
@@ -53,7 +53,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
                 throw new ArgumentNullException(nameof(runtimeStatsPublisher));
             _spawnRequestFactory = spawnRequestFactory ??
                 throw new ArgumentNullException(nameof(spawnRequestFactory));
-            _pool = pool;
+            _spawnSink = spawnSink;
             _firePoint = firePoint;
             ApplyRuntimeLimits();
             _runtimeState.SetBaseDamage(_config.Damage);
@@ -65,7 +65,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
         public void Tick(float deltaTime)
         {
-            if (!_initialized || !_runtimeState.IsUnlocked || !_pool.IsInitialized)
+            if (!_initialized || !_runtimeState.IsUnlocked || !_spawnSink.IsReady)
                 return;
 
             WeaponFireCycleStep step = _fireCycle.Advance(deltaTime);
@@ -148,7 +148,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
         public void ClearTransientState()
         {
-            _pool.ReleaseAll();
+            _spawnSink?.Clear();
             _fireCycle.CancelTransient();
         }
 
@@ -204,7 +204,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
                 _runtimeState,
                 _firePoint.position,
                 direction);
-            _pool.Spawn(in request);
+            _spawnSink.Spawn(in request);
         }
 
         private float GetSalvoInterval()

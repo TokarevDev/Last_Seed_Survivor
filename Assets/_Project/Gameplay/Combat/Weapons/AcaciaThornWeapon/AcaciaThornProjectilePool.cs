@@ -2,6 +2,7 @@
 using Game.Core.Combat;
 using Game.Core.Pooling;
 using Game.Core.World;
+using Game.Gameplay.Combat.Weapons.Runtime;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
@@ -11,7 +12,8 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
     public sealed class AcaciaThornProjectilePool :
         IConfigurablePooledSpawnService<
             AcaciaThornProjectilePoolSetup,
-            AcaciaThornProjectileSpawnRequest>
+            AcaciaThornProjectileSpawnRequest>,
+        IProjectileSpawnSink<AcaciaThornProjectileSpawnRequest>
     {
         private ObjectPool<AcaciaThornProjectile> _pool;
 
@@ -21,6 +23,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         private bool _initialized;
 
         public bool IsInitialized => _initialized;
+        public bool IsReady => _initialized;
 
         public void Initialize(in AcaciaThornProjectilePoolSetup setup)
         {
@@ -102,6 +105,11 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         }
 
         public void ReleaseAll()
+        {
+            ReleaseAllActive();
+        }
+
+        public void Clear()
         {
             ReleaseAllActive();
         }

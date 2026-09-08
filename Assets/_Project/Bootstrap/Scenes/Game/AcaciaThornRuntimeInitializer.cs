@@ -17,9 +17,7 @@ namespace Game.Bootstrap.Scenes.Game
         private readonly PlayerWeaponLoadout _loadout;
         private readonly IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
         private readonly AcaciaThornProjectileSpawnRequestFactory _spawnRequestFactory;
-        private readonly IConfigurablePooledSpawnService<
-            AcaciaThornProjectilePoolSetup,
-            AcaciaThornProjectileSpawnRequest> _pool;
+        private readonly AcaciaThornProjectilePool _pool;
 
         public AcaciaThornRuntimeInitializer(
             AcaciaThornWeapon weapon,
@@ -27,9 +25,7 @@ namespace Game.Bootstrap.Scenes.Game
             PlayerWeaponLoadout loadout,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher,
             AcaciaThornProjectileSpawnRequestFactory spawnRequestFactory,
-            IConfigurablePooledSpawnService<
-                AcaciaThornProjectilePoolSetup,
-                AcaciaThornProjectileSpawnRequest> pool)
+            AcaciaThornProjectilePool pool)
         {
             _weapon = weapon ?? throw new ArgumentNullException(nameof(weapon));
             _projectilePoolRegistry = projectilePoolRegistry ??

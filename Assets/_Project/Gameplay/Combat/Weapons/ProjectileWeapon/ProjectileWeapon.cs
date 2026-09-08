@@ -1,6 +1,5 @@
 
 using Game.Core.Combat;
-using Game.Core.Pooling;
 using Game.Core.Timing;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern;
 using Game.Gameplay.Combat.Weapons.Runtime;
@@ -20,7 +19,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
         [SerializeField][Min(1)] private int _maxShots = 200;
 
         private WeaponConfig _config;
-        private IPooledSpawnService<ProjectileSpawnRequest> _pool;
+        private IProjectileSpawnSink<ProjectileSpawnRequest> _spawnSink;
         private Transform _firePoint;
 
         private float _currentShotCooldown;
@@ -39,14 +38,14 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
         public int CurrentProjectileDamage => BuildProjectileDamage();
 
         public void Init(
-            IPooledSpawnService<ProjectileSpawnRequest> pool,
+            IProjectileSpawnSink<ProjectileSpawnRequest> spawnSink,
             Transform firePoint,
             IShotPatternBuilder shotPatternBuilder,
             ProjectileSpawnRequestFactory spawnRequestFactory,
             IWeaponAttackCyclePublisher attackCyclePublisher,
             IWeaponRuntimeStatsPublisher runtimeStatsPublisher)
         {
-            _pool = pool ?? throw new ArgumentNullException(nameof(pool));
+            _spawnSink = spawnSink ?? throw new ArgumentNullException(nameof(spawnSink));
             _firePoint = firePoint != null
                 ? firePoint
                 : throw new ArgumentNullException(nameof(firePoint));
@@ -75,7 +74,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         public void Tick(float deltaTime)
         {
-            if (_pool == null || !_pool.IsInitialized || _firePoint == null || _config == null)
+            if (_spawnSink == null || !_spawnSink.IsReady || _firePoint == null || _config == null)
                 return;
 
             WeaponFireCycleStep step = _fireCycle.Advance(
@@ -198,7 +197,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
             if (!_fireCycle.IsPreparationActive)
                 return;
 
-            if (_pool == null || _firePoint == null || _config == null || _runtimeState == null)
+            if (_spawnSink == null || _firePoint == null || _config == null || _runtimeState == null)
                 return;
 
             _fireCycle.CompletePreparation(preparedAttackElapsed, _currentShotCooldown);
@@ -245,7 +244,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
                 _config,
                 _runtimeState,
                 in shot);
-            _pool.Spawn(in request);
+            _spawnSink.Spawn(in request);
         }
 
         private float GetProjectileSpeedMultiplier()
