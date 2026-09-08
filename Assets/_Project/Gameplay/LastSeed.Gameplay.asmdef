@@ -3,8 +3,7 @@
   "rootNamespace": "LastSeed.Gameplay",
   "references": [
     "LastSeed.Core",
-    "UniTask",
-    "LastSeed.DOTween.Modules"
+    "UniTask"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

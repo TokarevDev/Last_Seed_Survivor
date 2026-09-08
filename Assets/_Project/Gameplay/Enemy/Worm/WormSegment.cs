@@ -26,7 +26,7 @@ public sealed class WormSegment : MonoBehaviour
     private WormSegmentVisualRig _visualRig;
 
     public Transform CachedTransform { get; private set; }
-    public WormFaceVisualController FaceVisual { get; private set; }
+    public IWormFaceBurstView FaceVisual { get; private set; }
     public WormSection Section { get; internal set; }
     public int Index { get; set; }
 
@@ -43,7 +43,7 @@ public sealed class WormSegment : MonoBehaviour
         TryGetComponent(out Collider2D cachedCollider);
 
         if (Type == WormSegmentType.Head)
-            FaceVisual = GetComponentInChildren<WormFaceVisualController>(true);
+            FaceVisual = GetComponentInChildren<WormFaceBurstView>(true);
 
         SpriteRenderer anchorRenderer = VisualRoot != null
             ? VisualRoot.GetComponentInChildren<SpriteRenderer>()

@@ -2,7 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 
 [DisallowMultipleComponent]
-public sealed class WormFaceVisualController : MonoBehaviour, IWormFaceBurstView
+public sealed class WormFaceVisualController : WormFaceBurstView
 {
     private const string IdleVisualName = "Visual_Idle";
     private const string AngryVisualName = "Visual_Engry";
@@ -74,7 +74,7 @@ public sealed class WormFaceVisualController : MonoBehaviour, IWormFaceBurstView
         KillSequences();
     }
 
-    public void SetBoostActive(bool active)
+    public override void SetBoostActive(bool active)
     {
         if (_initialized && _boostActive == active)
         {
