@@ -105,6 +105,7 @@ Installers are introduced only when their domain is migrated. Empty speculative 
 - [x] Route projectile critical-hit rolls through the scene-scoped random contract instead of direct Unity random calls.
 - [x] Centralize projectile critical-hit resolution in one deterministic, payload-returning service.
 - [x] Move shared damage clamping and critical-roll calculation into the engine-independent Core assembly.
+- [x] Move engine-independent weapon progression states into Core while keeping ScriptableObject-backed shot modifiers in Gameplay.
 - [x] Route worm pattern and cocoon generation through the same scene-scoped random contract.
 - [x] Remove the obsolete `PlayerController` and `PlayerShooter` scene behaviours and their cross-domain serialized references.
 - [x] Pass frame time explicitly from the named gameplay loop into weapon runtime ticking.
