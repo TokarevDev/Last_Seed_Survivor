@@ -103,6 +103,7 @@ Installers are introduced only when their domain is migrated. Empty speculative 
 - [x] Extract player weapon initialization, ticking, cleanup, and reset commands into a constructor-injected service.
 - [x] Move Acacia Thorn pool setup and prewarm ownership to an explicit Bootstrap initializer; the weapon now consumes only the pooled spawn contract.
 - [x] Route projectile critical-hit rolls through the scene-scoped random contract instead of direct Unity random calls.
+- [x] Centralize projectile critical-hit resolution in one deterministic, payload-returning service.
 - [x] Route worm pattern and cocoon generation through the same scene-scoped random contract.
 - [x] Remove the obsolete `PlayerController` and `PlayerShooter` scene behaviours and their cross-domain serialized references.
 - [x] Pass frame time explicitly from the named gameplay loop into weapon runtime ticking.

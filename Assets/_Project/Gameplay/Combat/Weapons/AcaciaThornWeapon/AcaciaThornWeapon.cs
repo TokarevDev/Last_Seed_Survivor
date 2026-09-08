@@ -195,13 +195,13 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
         Vector3 position = _firePoint.position +
             (Vector3)(direction * Mathf.Max(0f, _config.SpawnOffset));
 
-        int damage = BuildDamage(out DamageKind damageKind, out bool isCritical);
+        CriticalDamageRoll damageRoll = BuildDamage();
         AcaciaThornProjectileSpawnRequest request = new(
             position,
             direction,
-            damage,
-            damageKind,
-            isCritical,
+            damageRoll.Damage,
+            damageRoll.DamageKind,
+            damageRoll.IsCritical,
             GetProjectileSpeed(),
             _config.LifeTime,
             _config.BounceCount,
@@ -210,19 +210,16 @@ public sealed class AcaciaThornWeapon : MonoBehaviour
         _pool.Spawn(in request);
     }
 
-    private int BuildDamage(out DamageKind damageKind, out bool isCritical)
+    private CriticalDamageRoll BuildDamage()
     {
         double rawDamage = Mathf.Max(1, _runtimeState.BaseDamage) *
             (double)_runtimeState.DamageMultiplier;
 
-        isCritical = _runtimeState.CriticalChance > 0f &&
-            _randomSource.NextUnitFloat() < _runtimeState.CriticalChance;
-        damageKind = isCritical ? DamageKind.Critical : DamageKind.Normal;
-
-        if (isCritical)
-            rawDamage *= _runtimeState.CriticalDamageMultiplier;
-
-        return AcaciaThornRuntimeState.ClampDamage(rawDamage);
+        return CriticalDamageResolver.Roll(
+            rawDamage,
+            _runtimeState.CriticalChance,
+            _runtimeState.CriticalDamageMultiplier,
+            _randomSource);
     }
 
     private int GetSplitCount()

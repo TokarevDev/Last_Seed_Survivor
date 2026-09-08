@@ -249,14 +249,14 @@ public sealed class Projectile : MonoBehaviour
 
     private int RollDamage(out DamageKind damageKind, out bool isCritical)
     {
-        isCritical = _criticalChance > 0f &&
-            _randomSource.NextUnitFloat() < _criticalChance;
-        damageKind = isCritical ? DamageKind.Critical : DamageKind.Normal;
-
-        if (!isCritical)
-            return _damage;
-
-        return WeaponRuntimeState.ClampDamage(_damage * (double)_criticalDamageMultiplier);
+        CriticalDamageRoll roll = CriticalDamageResolver.Roll(
+            _damage,
+            _criticalChance,
+            _criticalDamageMultiplier,
+            _randomSource);
+        damageKind = roll.DamageKind;
+        isCritical = roll.IsCritical;
+        return roll.Damage;
     }
 
     private void ReleaseSelf()
