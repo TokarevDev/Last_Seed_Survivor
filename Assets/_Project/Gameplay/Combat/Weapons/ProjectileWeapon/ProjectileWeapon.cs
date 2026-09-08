@@ -28,8 +28,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
         private readonly List<ShotSpawnData> _shots = new();
         private IShotPatternBuilder _shotPatternBuilder;
         private ProjectileSpawnRequestFactory _spawnRequestFactory;
-        private readonly PreparedActionTimer _preparedAttack = new();
-        private readonly CooldownBurstCycle _fireCycle = new();
+        private readonly WeaponFireCycle _fireCycle = new();
 
         private WeaponRuntimeState _runtimeState;
         private IWeaponAttackCyclePublisher _attackCyclePublisher;
@@ -79,19 +78,15 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
             if (_pool == null || !_pool.IsInitialized || _firePoint == null || _config == null)
                 return;
 
-            if (_fireCycle.IsBurstActive)
-            {
-                TickFireCycle(deltaTime);
-                return;
-            }
+            WeaponFireCycleStep step = _fireCycle.Advance(
+                deltaTime,
+                _currentShotCooldown);
 
-            if (_preparedAttack.IsActive)
-            {
-                TickPreparedAttack(deltaTime);
-                return;
-            }
-
-            if (_fireCycle.Advance(deltaTime) == CooldownBurstCycleStep.CycleReady)
+            if (step == WeaponFireCycleStep.BurstActionReady)
+                FireSalvoShot();
+            else if (step == WeaponFireCycleStep.PreparationReady)
+                ReleasePreparedAttack(_currentShotCooldown);
+            else if (step == WeaponFireCycleStep.CycleReady)
                 StartAttackCycle();
         }
 
@@ -114,8 +109,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
                 return;
             }
 
-            if (!_preparedAttack.IsActive)
-                _fireCycle.LimitCooldown(_currentShotCooldown);
+            _fireCycle.LimitCooldown(_currentShotCooldown);
         }
 
         public void ForceRebuild()
@@ -126,8 +120,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         public void ClearTransientState()
         {
-            _preparedAttack.Reset();
-            _fireCycle.CancelBurst();
+            _fireCycle.CancelTransient();
         }
 
         public void ResetRuntimeState()
@@ -169,13 +162,12 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         private void ResetFiringCycle()
         {
-            _preparedAttack.Reset();
             _fireCycle.Reset();
         }
 
         private void StartAttackCycle()
         {
-            _preparedAttack.Begin();
+            _fireCycle.BeginPreparation();
 
             if (_attackCyclePublisher == null)
             {
@@ -198,35 +190,21 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         public void ReleasePreparedAttack()
         {
-            ReleasePreparedAttack(_preparedAttack.Elapsed);
+            ReleasePreparedAttack(_fireCycle.PreparationElapsed);
         }
 
         public void ReleasePreparedAttack(float preparedAttackElapsed)
         {
-            if (!_preparedAttack.IsActive)
+            if (!_fireCycle.IsPreparationActive)
                 return;
 
             if (_pool == null || _firePoint == null || _config == null || _runtimeState == null)
                 return;
 
-            _preparedAttack.TryComplete(preparedAttackElapsed, _currentShotCooldown);
+            _fireCycle.CompletePreparation(preparedAttackElapsed, _currentShotCooldown);
             _fireCycle.BeginBurst(1 + Mathf.Max(0, _runtimeState.SalvoExtraShots));
 
             FireSalvoShot();
-        }
-
-        private void TickPreparedAttack(float deltaTime)
-        {
-            _preparedAttack.Advance(deltaTime);
-
-            if (_preparedAttack.HasReached(_currentShotCooldown))
-                ReleasePreparedAttack(_currentShotCooldown);
-        }
-
-        private void TickFireCycle(float deltaTime)
-        {
-            if (_fireCycle.Advance(deltaTime) == CooldownBurstCycleStep.BurstActionReady)
-                FireSalvoShot();
         }
 
         private void FireSalvoShot()
@@ -234,7 +212,7 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
             Fire();
             _fireCycle.CommitBurstAction(
                 GetSalvoInterval(),
-                _currentShotCooldown - _preparedAttack.LastCompletionDelay);
+                _currentShotCooldown);
         }
 
         private float GetSalvoInterval()

@@ -23,7 +23,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         private IWeaponRuntimeStatsPublisher _runtimeStatsPublisher;
         private AcaciaThornProjectileSpawnRequestFactory _spawnRequestFactory;
         private IPooledSpawnService<AcaciaThornProjectileSpawnRequest> _pool;
-        private readonly CooldownBurstCycle _fireCycle = new();
+        private readonly WeaponFireCycle _fireCycle = new();
 
         public AcaciaThornWeaponConfig Config => _config;
         public AcaciaThornRuntimeState RuntimeState => _runtimeState;
@@ -68,15 +68,15 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
             if (!_initialized || !_runtimeState.IsUnlocked || !_pool.IsInitialized)
                 return;
 
-            CooldownBurstCycleStep step = _fireCycle.Advance(deltaTime);
+            WeaponFireCycleStep step = _fireCycle.Advance(deltaTime);
 
-            if (step == CooldownBurstCycleStep.BurstActionReady)
+            if (step == WeaponFireCycleStep.BurstActionReady)
             {
                 FireSalvoShot();
                 return;
             }
 
-            if (step == CooldownBurstCycleStep.CycleReady)
+            if (step == WeaponFireCycleStep.CycleReady)
                 StartSalvo();
         }
 
@@ -149,7 +149,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         public void ClearTransientState()
         {
             _pool.ReleaseAll();
-            _fireCycle.CancelBurst();
+            _fireCycle.CancelTransient();
         }
 
         public void ResetRuntimeState()

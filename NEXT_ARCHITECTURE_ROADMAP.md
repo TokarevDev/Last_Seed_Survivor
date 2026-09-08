@@ -212,7 +212,8 @@ requests, scene restart while ad callback is pending.
 
 1. Completed: `WeaponProgressionState`, `WeaponProgressionLimits`, and the shared derived
    stat calculator are extracted into Core and used by both weapons.
-2. Create a common `WeaponFireCycle` state machine for cooldown/prepare/salvo transitions.
+2. Completed: both weapons use the common `WeaponFireCycle` state machine for
+   cooldown, optional preparation, salvo transitions, cancellation, and reset.
 3. In progress: `IShotPatternBuilder`, shared damage calculation, and type-specific
    spawn-request factories are separated; the dedicated spawn sink remains.
 4. Make both existing weapons thin Unity adapters over the same application lifecycle.
