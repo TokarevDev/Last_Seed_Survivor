@@ -97,7 +97,7 @@ namespace Game.Gameplay.Rewards.Services
                         rollContext,
                         weaponDpsBias);
 
-                    if (roll > currentWeight)
+                    if (roll >= currentWeight)
                         continue;
 
                     selected = entry;
@@ -181,7 +181,7 @@ namespace Game.Gameplay.Rewards.Services
                     rollContext,
                     weaponDpsBias);
 
-                if (roll > currentWeight)
+                if (roll >= currentWeight)
                     continue;
 
                 selected = entry;

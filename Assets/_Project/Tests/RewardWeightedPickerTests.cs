@@ -49,5 +49,31 @@ namespace Game.Tests
             Assert.That(taken, Is.False);
             Assert.That(selected, Is.Null);
         }
+
+        [Test]
+        public void TryTakeFromRarity_WhenRollIsOnWeightBoundary_SelectsNextEntry()
+        {
+            var first = new RewardModifierEntry();
+            var second = new RewardModifierEntry();
+            var pool = new List<RewardModifierEntry> { first, second };
+            var pools = new Dictionary<RewardRarity, List<RewardModifierEntry>>
+            {
+                { RewardRarity.Common, pool }
+            };
+
+            bool taken = RewardWeightedPicker.TryTakeFromRarity(
+                pools,
+                RewardRarity.Common,
+                new HashSet<RewardModifierCategory>(),
+                new HashSet<int>(),
+                RewardPickMode.Any,
+                out RewardModifierEntry selected,
+                default,
+                new TestRandomSource(values: new[] { 0.5f }));
+
+            Assert.That(taken, Is.True);
+            Assert.That(selected, Is.SameAs(second));
+            Assert.That(pool, Is.EqualTo(new[] { first }));
+        }
     }
 }

@@ -346,7 +346,8 @@ resolution/aspect changes, navigation, and input lock restoration.
 
 ### Stage 10 — test, profiling, and release hardening
 
-1. Add deterministic domain tests for reward distributions and weapon fire cycles.
+1. Completed: deterministic domain tests cover reward weighting boundaries, rarity
+   rolls, choice composition, and named weapon fire-cycle stages.
 2. Add PlayMode scenarios for reward, revive, spawn/reset, pooling, and popup stack.
 3. Add Bootstrap -> Lobby -> Game -> Lobby integration coverage.
 4. In progress: reusable idle/blink sequences avoid recreation across UI enable cycles,
