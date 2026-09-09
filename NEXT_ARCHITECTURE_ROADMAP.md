@@ -275,8 +275,9 @@ revive during pause, path completion, death, and all cocoon variants.
 
 ### Stage 6 — payload-first domain events
 
-1. Define immutable `WormSectionHealthChanged`, `WormSectionDestroyed`,
-   `RewardUserIntent`, and weapon progression payloads.
+1. Completed: immutable `WormSectionHealthChanged`, `WormSectionDestroyed`,
+   `RewardUserIntent`, and weapon runtime/progression snapshots carry typed state across
+   their boundaries; reward UI actions are translated into one intent stream.
 2. Capture old/new values and identity before pooled reset/unbind.
 3. Keep local domain events inside aggregate ownership; translate once to scene SignalBus.
 4. Remove duplicate publishers and subscriptions only after every consumer is migrated.

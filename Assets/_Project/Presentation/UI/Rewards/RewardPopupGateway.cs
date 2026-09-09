@@ -6,7 +6,7 @@ namespace Game.Presentation.UI.Rewards
 {
     using System;
 
-    public sealed class RewardPopupGateway
+    public sealed class RewardPopupGateway : IDisposable
     {
         private readonly RewardPopupView _popup;
         private readonly PopupRoot _popupRoot;
@@ -24,31 +24,13 @@ namespace Game.Presentation.UI.Rewards
             _requestLifecycle = requestLifecycle ??
                 throw new ArgumentNullException(nameof(requestLifecycle));
             _stateFactory = stateFactory ?? throw new ArgumentNullException(nameof(stateFactory));
+            _popup.Selected += HandleSelected;
+            _popup.RerollRequested += HandleRerollRequested;
+            _popup.AdRerollRequested += HandleAdRerollRequested;
+            _popup.TakeAllRequested += HandleTakeAllRequested;
         }
 
-        public event Action<RewardChoiceData> Selected
-        {
-            add => _popup.Selected += value;
-            remove => _popup.Selected -= value;
-        }
-
-        public event Action RerollRequested
-        {
-            add => _popup.RerollRequested += value;
-            remove => _popup.RerollRequested -= value;
-        }
-
-        public event Action AdRerollRequested
-        {
-            add => _popup.AdRerollRequested += value;
-            remove => _popup.AdRerollRequested -= value;
-        }
-
-        public event Action TakeAllRequested
-        {
-            add => _popup.TakeAllRequested += value;
-            remove => _popup.TakeAllRequested -= value;
-        }
+        public event Action<RewardUserIntent> Intent;
 
         public event Action<PopupView> Hidden
         {
@@ -82,6 +64,35 @@ namespace Game.Presentation.UI.Rewards
         public void Close()
         {
             _popup.Close();
+        }
+
+        public void Dispose()
+        {
+            _popup.Selected -= HandleSelected;
+            _popup.RerollRequested -= HandleRerollRequested;
+            _popup.AdRerollRequested -= HandleAdRerollRequested;
+            _popup.TakeAllRequested -= HandleTakeAllRequested;
+            Intent = null;
+        }
+
+        private void HandleSelected(RewardChoiceData choice)
+        {
+            Intent?.Invoke(RewardUserIntent.Select(choice));
+        }
+
+        private void HandleRerollRequested()
+        {
+            Intent?.Invoke(RewardUserIntent.Reroll());
+        }
+
+        private void HandleAdRerollRequested()
+        {
+            Intent?.Invoke(RewardUserIntent.AdReroll());
+        }
+
+        private void HandleTakeAllRequested()
+        {
+            Intent?.Invoke(RewardUserIntent.TakeAll());
         }
     }
 

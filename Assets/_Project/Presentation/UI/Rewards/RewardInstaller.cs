@@ -53,7 +53,7 @@ namespace Game.Presentation.UI.Rewards
             Container.Bind<RewardRequestLifecycle>().AsSingle();
             Container.Bind<RewardRequestCoordinator>().AsSingle();
             Container.Bind<RewardPopupStateFactory>().AsSingle();
-            Container.Bind<RewardPopupGateway>().AsSingle();
+            Container.BindInterfacesAndSelfTo<RewardPopupGateway>().AsSingle();
             Container.Bind<RewardAdOperation>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardRollService>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardApplyService>().AsSingle();

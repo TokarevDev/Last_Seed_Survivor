@@ -46,10 +46,7 @@ namespace Game.Presentation.UI.Rewards
                 throw new ArgumentNullException(nameof(requestCoordinator));
             _requestLifecycle = requestLifecycle
                 ?? throw new ArgumentNullException(nameof(requestLifecycle));
-            _popupGateway.Selected += HandleSelected;
-            _popupGateway.RerollRequested += HandleRerollRequested;
-            _popupGateway.AdRerollRequested += HandleAdRerollRequested;
-            _popupGateway.TakeAllRequested += HandleTakeAllRequested;
+            _popupGateway.Intent += HandleIntent;
             _popupGateway.Hidden += HandlePopupHidden;
         }
 
@@ -58,10 +55,7 @@ namespace Game.Presentation.UI.Rewards
             if (_isDisposed)
                 return;
 
-            _popupGateway.Selected -= HandleSelected;
-            _popupGateway.RerollRequested -= HandleRerollRequested;
-            _popupGateway.AdRerollRequested -= HandleAdRerollRequested;
-            _popupGateway.TakeAllRequested -= HandleTakeAllRequested;
+            _popupGateway.Intent -= HandleIntent;
             _popupGateway.Hidden -= HandlePopupHidden;
 
             _rewardAdOperation.Cancel();
@@ -117,6 +111,27 @@ namespace Game.Presentation.UI.Rewards
 
             _requestLifecycle.MarkShouldOpenNext();
             _applyService.Apply(choice);
+        }
+
+        private void HandleIntent(RewardUserIntent intent)
+        {
+            switch (intent.Type)
+            {
+                case RewardUserIntentType.Select:
+                    HandleSelected(intent.Choice);
+                    break;
+                case RewardUserIntentType.Reroll:
+                    HandleRerollRequested();
+                    break;
+                case RewardUserIntentType.AdReroll:
+                    HandleAdRerollRequested();
+                    break;
+                case RewardUserIntentType.TakeAll:
+                    HandleTakeAllRequested();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void HandleRerollRequested()
