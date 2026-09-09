@@ -26,12 +26,43 @@ namespace Game.Tests
         public void Rent_WhenInitializationFails_RollsItemBack()
         {
             ObjectPool<TestItem> pool = CreatePool();
+            TestItem failedItem = null;
 
             Assert.Throws<InvalidOperationException>(() =>
-                pool.Rent(_ => throw new InvalidOperationException("Initialization failed.")));
+                pool.Rent(item =>
+                {
+                    failedItem = item;
+                    throw new InvalidOperationException("Initialization failed.");
+                }));
 
             Assert.That(pool.ActiveCount, Is.Zero);
             Assert.That(pool.AvailableCount, Is.EqualTo(1));
+
+            TestItem nextRent = pool.Rent();
+
+            Assert.That(nextRent, Is.SameAs(failedItem));
+            Assert.That(pool.ActiveCount, Is.EqualTo(1));
+            Assert.That(pool.AvailableCount, Is.Zero);
+        }
+
+        [Test]
+        public void RepeatedFailedInitialization_DoesNotLeaveStaleActiveIdentity()
+        {
+            const int IterationCount = 128;
+            ObjectPool<TestItem> pool = CreatePool();
+
+            for (int iteration = 0; iteration < IterationCount; iteration++)
+            {
+                Assert.Throws<InvalidOperationException>(() =>
+                    pool.Rent(_ => throw new InvalidOperationException("Expected failure.")));
+                Assert.That(pool.ActiveCount, Is.Zero);
+                Assert.That(pool.AvailableCount, Is.EqualTo(1));
+            }
+
+            TestItem item = pool.Rent();
+
+            Assert.That(pool.Return(item), Is.True);
+            Assert.That(pool.Return(item), Is.False);
         }
 
         [Test]

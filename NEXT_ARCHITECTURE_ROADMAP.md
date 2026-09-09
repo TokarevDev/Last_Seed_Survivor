@@ -322,20 +322,25 @@ resolution/aspect changes, navigation, and input lock restoration.
 ### Stage 8 — pooling and identity registries
 
 1. Define a common pooled lifecycle contract and typed `EntityLease<T>`/owner mapping.
-2. Migrate remaining HP views and repeated VFX where profiling shows churn.
+2. Completed for current churn sources: worm HP views and damage popups reuse pooled
+   instances; migrate additional repeated VFX only when profiling demonstrates churn.
 3. Map damageable entity/view/lifecycle owner in one registry; consumers must not scan
    concrete subtype pools.
-4. Verify transactional rent -> initialize -> register -> activate and reverse rollback.
-5. Add stress tests for duplicate return, partial initialization failure, scene teardown,
-   and stale identity removal.
+4. Completed: `ObjectPool<T>` owns transactional rent/initialize rollback and worm spawn
+   performs named-stage reverse cleanup when later registration or binding fails.
+5. In progress: duplicate return, repeated partial initialization failure, and stale
+   active-index removal are covered; add scene-teardown stress coverage with the broader
+   PlayMode lifecycle suite.
 
 ### Stage 9 — async/platform lifecycle
 
-1. Add cancellation-bound application operations before introducing more async work.
+1. Completed for current async work: scene navigation and pool prewarming require owner
+   tokens, while callback-based rewarded ads use an explicitly cancellable operation.
 2. Completed: shared `RewardedAdOperation` invalidates late or superseded callbacks;
    reward and revive flows cancel it at their owning lifecycle boundary.
-3. Add UniTask only where it improves scene loading, popup transitions, prewarming, or
-   platform calls; every operation receives an owner lifetime token.
+3. Completed for current usage: UniTask is limited to scene loading/navigation and pool
+   prewarming, and entry points pass `destroyCancellationToken`; navigator cleanup uses
+   a non-cancellable completion only after an engine load has already started.
 4. Add persistence/analytics as optional interfaces with no-op implementations.
 
 ### Stage 10 — test, profiling, and release hardening
