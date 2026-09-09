@@ -45,6 +45,7 @@ namespace Game.Presentation.UI.Revive
         private bool _isRevivePopupClosePending;
         private bool _isReviveRollbackPending;
         private RevivalPopupViewModel _revivalPopupViewModel;
+        private RewardedAdOperation _rewardedAdOperation;
         private ISceneNavigator<GameSceneId> _sceneNavigator;
         private SignalBus _signalBus;
         private bool _isSubscribedToSignals;
@@ -64,6 +65,9 @@ namespace Game.Presentation.UI.Revive
         private void Awake()
         {
             _remainingRevives = _maxReviveAttempts;
+
+            if (_rewardedAdService != null)
+                _rewardedAdOperation = new RewardedAdOperation(_rewardedAdService);
         }
 
         private void OnEnable()
@@ -82,6 +86,7 @@ namespace Game.Presentation.UI.Revive
                 _revivalPopup.Intent -= HandleRevivalPopupIntent;
 
             _popupRoot?.ReleaseGameplayLock();
+            _rewardedAdOperation?.Cancel();
             _isRevivePopupClosePending = false;
             _isReviveRollbackPending = false;
         }
@@ -174,7 +179,10 @@ namespace Game.Presentation.UI.Revive
                 return;
             }
 
-            _rewardedAdService.ShowRewardedAd(CompleteRewardedAd);
+            _rewardedAdOperation ??= new RewardedAdOperation(_rewardedAdService);
+
+            if (!_rewardedAdOperation.TryBegin(CompleteRewardedAd))
+                SetPopupWaiting(false);
         }
 
         private void CompleteRewardedAd(bool rewardGranted)

@@ -332,7 +332,8 @@ resolution/aspect changes, navigation, and input lock restoration.
 ### Stage 9 — async/platform lifecycle
 
 1. Add cancellation-bound application operations before introducing more async work.
-2. Wrap ad callbacks so late completion cannot mutate a disposed scene/session.
+2. Completed: shared `RewardedAdOperation` invalidates late or superseded callbacks;
+   reward and revive flows cancel it at their owning lifecycle boundary.
 3. Add UniTask only where it improves scene loading, popup transitions, prewarming, or
    platform calls; every operation receives an owner lifetime token.
 4. Add persistence/analytics as optional interfaces with no-op implementations.

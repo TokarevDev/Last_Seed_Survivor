@@ -7,13 +7,13 @@ using Game.Presentation.UI.Rewards;
 
 namespace Game.Tests
 {
-    public sealed class RewardAdOperationTests
+    public sealed class RewardedAdOperationTests
     {
         [Test]
         public void TryBegin_WhenAdCompletes_ForwardsResultAndClearsPending()
         {
             DelayedRewardedAdService adService = new();
-            RewardAdOperation operation = new(adService);
+            RewardedAdOperation operation = new(adService);
             bool? result = null;
 
             bool started = operation.TryBegin(value => result = value);
@@ -28,7 +28,7 @@ namespace Game.Tests
         public void TryBegin_WhenAdIsDenied_ForwardsDenialAndClearsPending()
         {
             DelayedRewardedAdService adService = new();
-            RewardAdOperation operation = new(adService);
+            RewardedAdOperation operation = new(adService);
             bool? result = null;
 
             operation.TryBegin(value => result = value);
@@ -41,7 +41,7 @@ namespace Game.Tests
         [Test]
         public void TryBegin_WhenServiceThrows_RollsBackPendingState()
         {
-            RewardAdOperation operation = new(new ThrowingRewardedAdService());
+            RewardedAdOperation operation = new(new ThrowingRewardedAdService());
 
             Assert.Throws<InvalidOperationException>(() => operation.TryBegin(_ => { }));
             Assert.That(operation.IsPending, Is.False);
@@ -51,7 +51,7 @@ namespace Game.Tests
         public void Cancel_InvalidatesLateCallback()
         {
             DelayedRewardedAdService adService = new();
-            RewardAdOperation operation = new(adService);
+            RewardedAdOperation operation = new(adService);
             bool wasCalled = false;
 
             operation.TryBegin(_ => wasCalled = true);
@@ -66,7 +66,7 @@ namespace Game.Tests
         public void PreviousCallback_CannotCompleteNewOperation()
         {
             DelayedRewardedAdService adService = new();
-            RewardAdOperation operation = new(adService);
+            RewardedAdOperation operation = new(adService);
             bool newOperationCompleted = false;
 
             operation.TryBegin(_ => { });

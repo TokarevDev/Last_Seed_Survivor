@@ -3,6 +3,7 @@ using Game.Gameplay.Rewards;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
 using Game.Gameplay.Rewards.Services;
+using Game.Infrastructure.Advertising;
 using Game.Presentation.UI.Common.Popups;
 
 namespace Game.Presentation.UI.Rewards
@@ -15,7 +16,7 @@ namespace Game.Presentation.UI.Rewards
         private readonly IRewardChoiceApplier _applyService;
         private readonly RewardGrantedActionService _grantedActionService;
         private readonly RewardPopupGateway _popupGateway;
-        private readonly RewardAdOperation _rewardAdOperation;
+        private readonly RewardedAdOperation _rewardedAdOperation;
         private readonly RewardAttemptState _attempts;
         private readonly RewardRequestCoordinator _requestCoordinator;
         private readonly RewardRequestLifecycle _requestLifecycle;
@@ -27,7 +28,7 @@ namespace Game.Presentation.UI.Rewards
             IRewardChoiceApplier applyService,
             RewardGrantedActionService grantedActionService,
             RewardPopupGateway popupGateway,
-            RewardAdOperation rewardAdOperation,
+            RewardedAdOperation rewardedAdOperation,
             RewardAttemptState attempts,
             RewardRequestCoordinator requestCoordinator,
             RewardRequestLifecycle requestLifecycle)
@@ -39,8 +40,8 @@ namespace Game.Presentation.UI.Rewards
                 throw new ArgumentNullException(nameof(grantedActionService));
             _popupGateway = popupGateway ??
                 throw new ArgumentNullException(nameof(popupGateway));
-            _rewardAdOperation = rewardAdOperation
-                ?? throw new ArgumentNullException(nameof(rewardAdOperation));
+            _rewardedAdOperation = rewardedAdOperation
+                ?? throw new ArgumentNullException(nameof(rewardedAdOperation));
             _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
             _requestCoordinator = requestCoordinator ??
                 throw new ArgumentNullException(nameof(requestCoordinator));
@@ -58,7 +59,7 @@ namespace Game.Presentation.UI.Rewards
             _popupGateway.Intent -= HandleIntent;
             _popupGateway.Hidden -= HandlePopupHidden;
 
-            _rewardAdOperation.Cancel();
+            _rewardedAdOperation.Cancel();
             _requestCoordinator.Reset();
             _isDisposed = true;
         }
@@ -80,7 +81,7 @@ namespace Game.Presentation.UI.Rewards
 
         private bool StartActiveRequest()
         {
-            _rewardAdOperation.Cancel();
+            _rewardedAdOperation.Cancel();
 
             if (!RollCurrentChoices())
             {
@@ -101,12 +102,12 @@ namespace Game.Presentation.UI.Rewards
         {
             _requestCoordinator.Reset();
             _attempts.Reset();
-            _rewardAdOperation.Cancel();
+            _rewardedAdOperation.Cancel();
         }
 
         private void HandleSelected(RewardChoiceData choice)
         {
-            if (_rewardAdOperation.IsPending)
+            if (_rewardedAdOperation.IsPending)
                 return;
 
             _requestLifecycle.MarkShouldOpenNext();
@@ -136,7 +137,7 @@ namespace Game.Presentation.UI.Rewards
 
         private void HandleRerollRequested()
         {
-            if (!_attempts.HasFreeReroll || _rewardAdOperation.IsPending)
+            if (!_attempts.HasFreeReroll || _rewardedAdOperation.IsPending)
                 return;
 
             if (!RollCurrentChoices())
@@ -154,11 +155,11 @@ namespace Game.Presentation.UI.Rewards
             if (_attempts.HasFreeReroll || !_attempts.HasAdReroll)
                 return;
 
-            if (_rewardAdOperation.IsPending)
+            if (_rewardedAdOperation.IsPending)
                 return;
 
             _popupGateway.SetInteractable(false);
-            if (!_rewardAdOperation.TryBegin(CompleteAdRerollReward))
+            if (!_rewardedAdOperation.TryBegin(CompleteAdRerollReward))
                 _popupGateway.SetInteractable(true);
         }
 
@@ -170,11 +171,11 @@ namespace Game.Presentation.UI.Rewards
             if (!RewardAdRerollPolicy.CanOfferTakeAll(_requestLifecycle.RollContext))
                 return;
 
-            if (!_attempts.HasTakeAll || _rewardAdOperation.IsPending)
+            if (!_attempts.HasTakeAll || _rewardedAdOperation.IsPending)
                 return;
 
             _popupGateway.SetInteractable(false);
-            if (!_rewardAdOperation.TryBegin(CompleteTakeAllReward))
+            if (!_rewardedAdOperation.TryBegin(CompleteTakeAllReward))
                 _popupGateway.SetInteractable(true);
         }
 
@@ -236,7 +237,7 @@ namespace Game.Presentation.UI.Rewards
 
         private bool CompleteCurrentPopupRequest()
         {
-            _rewardAdOperation.Cancel();
+            _rewardedAdOperation.Cancel();
             return _requestCoordinator.CompleteActive();
         }
 
@@ -271,7 +272,7 @@ namespace Game.Presentation.UI.Rewards
         {
             return _popupGateway.Show(
                 animateChoiceChanges,
-                _rewardAdOperation.IsPending);
+                _rewardedAdOperation.IsPending);
         }
 
     }

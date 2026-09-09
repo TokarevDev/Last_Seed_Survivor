@@ -1,17 +1,14 @@
-
-using Game.Infrastructure.Advertising;
-
-namespace Game.Presentation.UI.Rewards
+namespace Game.Infrastructure.Advertising
 {
     using System;
 
-    public sealed class RewardAdOperation
+    public sealed class RewardedAdOperation
     {
         private readonly IRewardedAdService _rewardedAdService;
 
         private int _version;
 
-        public RewardAdOperation(IRewardedAdService rewardedAdService)
+        public RewardedAdOperation(IRewardedAdService rewardedAdService)
         {
             _rewardedAdService = rewardedAdService
                 ?? throw new ArgumentNullException(nameof(rewardedAdService));
@@ -70,5 +67,4 @@ namespace Game.Presentation.UI.Rewards
             _version++;
         }
     }
-
 }
