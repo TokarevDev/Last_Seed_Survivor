@@ -260,12 +260,15 @@ burst-disable point, revive target, and editor point migration.
 3. Completed: `WormController.Tick` returns an optional immutable
    `WormPathCompletion` containing final distance, normalized progress, and reason;
    the presentation adapter publishes it once as `WormPathCompletedSignal`.
-4. Split `WormSegment` into pooled entity adapter, damage adapter, cocoon view, and visual
-   rig references without repeated component discovery.
-5. Extract chain layout calculations from `WormSegmentChainPresenter`; retain Transform
-   application in the presenter.
-6. Replace HP-view instantiate/destroy with `ObjectPool<WormSectionHpView>` and symmetric
-   section-to-view registry cleanup.
+4. Completed: `WormSegment` is the pooled entity adapter and delegates damage binding,
+   cocoon presentation, pooled visibility/liveness, and visual-chain operations to
+   focused collaborators; required hierarchy discovery is cached once during `Awake`.
+5. Completed: chain ranges, spacing, distances, positions, and look angles are calculated
+   by `WormSegmentPoseCalculator`; presenters retain only cached state and Transform/view
+   application.
+6. Completed: `WormSectionHpViewPool` wraps `ObjectPool<WormSectionHpView>`, while
+   `WormSectionHpPresenter` owns a symmetric section-to-view dictionary and rolls back
+   subscriptions and rented views on partial binding failure.
 
 Playtest: spawn rollback failure, repeated reset, multiple simultaneous destroyed gaps,
 revive during pause, path completion, death, and all cocoon variants.
