@@ -34,29 +34,21 @@ namespace Game.Tests.PlayMode
 {
     public sealed class GameplaySceneStartupTests
     {
-        private const int InitializationFrameCount = 2;
+        private readonly PlayModeFlowFixture _flow = new();
 
         [UnityTest]
         public IEnumerator GameplayScene_WhenLoadedDirectly_ResolvesRequiredRuntimeDependencies()
         {
-            AsyncOperation sceneLoadOperation = SceneManager.LoadSceneAsync(
-                GameSceneNames.Gameplay,
-                LoadSceneMode.Single);
-
-            Assert.That(sceneLoadOperation, Is.Not.Null);
-            yield return sceneLoadOperation;
-
-            for (int frameIndex = 0; frameIndex < InitializationFrameCount; frameIndex++)
-                yield return null;
+            yield return _flow.LoadScene(GameSceneNames.Gameplay);
 
             Scene gameplayScene = SceneManager.GetActiveScene();
-            SceneContext sceneContext = FindInScene<SceneContext>(gameplayScene);
+            SceneContext sceneContext = _flow.GetActiveSceneContext();
 
             Assert.That(gameplayScene.name, Is.EqualTo(GameSceneNames.Gameplay));
             Assert.That(ProjectContext.HasInstance, Is.True);
             Assert.That(sceneContext, Is.Not.Null);
-            Assert.That(FindInScene<PlayerInputSnapshotProvider>(gameplayScene), Is.Not.Null);
-            Assert.That(FindInScene<GameplayUpdateDriver>(gameplayScene), Is.Not.Null);
+            Assert.That(_flow.FindInActiveScene<PlayerInputSnapshotProvider>(), Is.Not.Null);
+            Assert.That(_flow.FindInActiveScene<GameplayUpdateDriver>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IRandomSource>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<ITimeScaleController>(), Is.Not.Null);
             Assert.That(sceneContext.Container.Resolve<IGameTimeProvider>(), Is.Not.Null);
@@ -170,26 +162,7 @@ namespace Game.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown()
         {
-            if (ProjectContext.HasInstance)
-                UnityEngine.Object.Destroy(ProjectContext.Instance.gameObject);
-
-            yield return null;
-        }
-
-        private static TComponent FindInScene<TComponent>(Scene scene)
-            where TComponent : Component
-        {
-            GameObject[] rootObjects = scene.GetRootGameObjects();
-
-            for (int rootIndex = 0; rootIndex < rootObjects.Length; rootIndex++)
-            {
-                TComponent component = rootObjects[rootIndex].GetComponentInChildren<TComponent>(true);
-
-                if (component != null)
-                    return component;
-            }
-
-            return null;
+            yield return _flow.TearDown();
         }
 
         private static void AssertCombatSessionSignals(DiContainer sceneContainer)
