@@ -13,6 +13,11 @@ namespace Game.Presentation.UI.Rewards.Visuals
         [SerializeField] private RewardIconProfile _fallbackIconProfile;
         [SerializeField] private List<RewardCategoryVisualRule> _rules = new();
 
+#if UNITY_EDITOR
+        public RewardIconProfile EditorFallbackIconProfile => _fallbackIconProfile;
+        public IReadOnlyList<RewardCategoryVisualRule> EditorRules => _rules;
+#endif
+
         public RewardPresentationData GetPresentation(RewardModifierCategory category)
         {
             for (int i = 0; i < _rules.Count; i++)
