@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2dd12eb24bd05f84ca7a80fb7950abaf, type: 3}
   m_Name:
-  m_EditorClassIdentifier: Game.Presentation::Game.Presentation.UI.Rewards.RewardInstaller
+  m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.RewardsInstaller
   _database: {fileID: 11400000, guid: bafb328ff8286024f9f6854a598d8d25, type: 2}
   _popup: {fileID: 656578156}
   _popupRoot: {fileID: 1474514291}

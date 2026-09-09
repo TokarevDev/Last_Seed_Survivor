@@ -9,7 +9,6 @@ using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Rewards;
 using Game.Gameplay.Rewards.Data;
 using Game.Presentation.UI.Revive;
-using Game.Presentation.UI.Rewards;
 using Game.Presentation.Worm;
 
 namespace Game.Editor.Worm
@@ -38,11 +37,11 @@ namespace Game.Editor.Worm
         private const float PreviousTakeAllMinTotalDpsGainRatio = 1.15f;
         private const float DefaultTakeAllMinTotalDpsGainRatio = 0.9f;
         private const float PreviousTakeAllMinHeadPathProgress = 0.7f;
-        private const string RewardDatabasePath = "Assets/_Project/App/Gameplay/Rewards/RewardDatabase_Main.asset";
-        private const string HpConfigPath = "Assets/_Project/App/Gameplay/Enemy/Worm/Balance/WormHpScalingConfig_Default.asset";
-        private const string PressureConfigPath = "Assets/_Project/App/Gameplay/Enemy/Worm/Balance/WormPressureConfig_Default.asset";
-        private const string MainWeaponConfigPath = "Assets/_Project/App/Gameplay/Combat/Weapons/ProjectileWeapon/Configs/MainWeaponConfig_Default.asset";
-        private const string AcaciaThornConfigPath = "Assets/_Project/App/Gameplay/Combat/Weapons/AcaciaThornWeapon/Configs/AcaciaThornWeaponConfig_Default.asset";
+        private const string RewardDatabasePath = "Assets/_Project/Gameplay/Rewards/RewardDatabase_Main.asset";
+        private const string HpConfigPath = "Assets/_Project/Gameplay/Enemy/Worm/Balance/WormHpScalingConfig_Default.asset";
+        private const string PressureConfigPath = "Assets/_Project/Gameplay/Enemy/Worm/Balance/WormPressureConfig_Default.asset";
+        private const string MainWeaponConfigPath = "Assets/_Project/Gameplay/Combat/Weapons/ProjectileWeapon/Configs/MainWeaponConfig_Default.asset";
+        private const string AcaciaThornConfigPath = "Assets/_Project/Gameplay/Combat/Weapons/AcaciaThornWeapon/Configs/AcaciaThornWeaponConfig_Default.asset";
 
         [SerializeField] private RewardDatabase _rewardDatabase;
         [SerializeField] private WormHpScalingConfig _hpConfig;
@@ -440,17 +439,17 @@ namespace Game.Editor.Worm
             if (pressureDirector != null && (force || _pressureConfig == null))
                 _pressureConfig = pressureDirector.EditorConfig;
 
-            RewardInstaller rewardInstaller = FindOpenSceneObject<RewardInstaller>();
-            if (rewardInstaller != null)
+            RewardsInstaller rewardsInstaller = FindOpenSceneObject<RewardsInstaller>();
+            if (rewardsInstaller != null)
             {
                 if (force || _freeRerollAttemptsPerSession <= 0)
-                    _freeRerollAttemptsPerSession = rewardInstaller.EditorFreeRerollAttemptsPerSession;
+                    _freeRerollAttemptsPerSession = rewardsInstaller.EditorFreeRerollAttemptsPerSession;
 
                 if (force || _adRerollAttemptsPerSession <= 0)
-                    _adRerollAttemptsPerSession = rewardInstaller.EditorAdRerollAttemptsPerSession;
+                    _adRerollAttemptsPerSession = rewardsInstaller.EditorAdRerollAttemptsPerSession;
 
                 if (force || _takeAllAttemptsPerSession <= 0)
-                    _takeAllAttemptsPerSession = rewardInstaller.EditorTakeAllAttemptsPerSession;
+                    _takeAllAttemptsPerSession = rewardsInstaller.EditorTakeAllAttemptsPerSession;
             }
 
             WormReviveFlowController reviveFlow = FindOpenSceneObject<WormReviveFlowController>();

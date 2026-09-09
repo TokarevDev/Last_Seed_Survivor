@@ -4,8 +4,9 @@ using Game.Gameplay.Rewards.Runtime;
 using Game.Gameplay.Rewards.Services;
 using Game.Infrastructure.Advertising;
 using Game.Presentation.UI.Common.Popups;
+using Game.Presentation.UI.Rewards;
 
-namespace Game.Presentation.UI.Rewards
+namespace Game.Bootstrap.Installers.Game
 {
     using System;
     using UnityEngine;
@@ -13,7 +14,7 @@ namespace Game.Presentation.UI.Rewards
     using Zenject;
 
     [DisallowMultipleComponent]
-    public sealed class RewardInstaller : MonoInstaller
+    public sealed class RewardsInstaller : MonoInstaller
     {
         [Header("Refs")]
         [SerializeField] private RewardDatabase _database;
