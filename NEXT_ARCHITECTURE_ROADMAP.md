@@ -296,11 +296,17 @@ protection.
 
 ### Stage 7 — popup state and MVVM
 
-1. Split `PopupRoot` into registry, stack/navigation state, input-lock owner, and view host.
+1. Completed: `PopupRegistry`, `QueuedActivationState<PopupView>`, and `PopupModalLock`
+   own registration, queued navigation, and input/time-scale ownership respectively;
+   `PopupRoot` remains the serialized scene view host and SignalBus adapter.
 2. Add ViewModels for reward, revive, victory, HUD, lobby, and navigation.
 3. Views expose typed user intent and render immutable state only.
-4. Split reward button content binding, cached references, and tween factory.
-5. Split reward popup timeline orchestration from concrete animation clips.
+4. Completed: `RewardButtonContentPresenter` owns content/style binding and
+   `RewardButtonAnimator` owns cached RectTransform/icon state plus tween creation;
+   `RewardButtonView` remains the serialized input/view adapter.
+5. Completed: `RewardPopupAnimator`, `RewardPopupAnimatedLayout`, and
+   `RewardPopupRefreshAnimationBuilder` own timeline composition, while
+   `RewardPopupAudioPlayer` isolates concrete clip playback.
 6. Standardize tween lifecycle (`Play`, `Cancel`, `Restore`) and pool/disable cleanup.
 
 Playtest: rapid clicks, close during transition, nested popup request, timescale zero,
