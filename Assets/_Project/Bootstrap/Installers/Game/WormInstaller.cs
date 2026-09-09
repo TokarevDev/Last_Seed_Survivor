@@ -71,6 +71,7 @@ namespace Game.Bootstrap.Installers.Game
             Container.Bind<WormCombatBurstController>().AsSingle();
             Container.Bind<WormLifecycleController>().AsSingle();
             Container.Bind<WormForwardMotionController>().AsSingle();
+            Container.Bind<WormMovementCoordinator>().AsSingle();
             Container.Bind<WormFrameSimulation>().AsSingle();
             Container.Bind<WormPathProgressState>().AsSingle();
             Container.Bind<WormCombatBurstSignalPublisher>().AsSingle();

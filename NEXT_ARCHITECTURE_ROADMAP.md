@@ -253,9 +253,10 @@ burst-disable point, revive target, and editor point migration.
    asset identity and creates immutable `WormMovementRuntimeConfig`,
    `WormPresentationConfig`, and `WormReviveConfig` snapshots once at composition;
    `WormController` does not read mutable balance assets during its runtime loop.
-2. In progress: `WormLifecycleController` now owns symmetric init/clear cancellation,
-   collection replacement, cache reset, rollback reset, and movement-state reset.
-   Extract `WormMovementCoordinator` next for named forward/rollback/revive states.
+2. Completed: `WormLifecycleController` owns symmetric init/clear cancellation,
+   collection replacement, cache reset, rollback reset, and movement-state reset;
+   `WormMovementCoordinator` owns the explicit forward/section-rollback/revive state
+   priority while `WormFrameSimulation` preserves movement -> render -> completion order.
 3. Replace `WormController.PathCompleted` with a payload containing final distance,
    normalized progress, and completion reason; publish once at the adapter boundary.
 4. Split `WormSegment` into pooled entity adapter, damage adapter, cocoon view, and visual
