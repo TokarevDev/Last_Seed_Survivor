@@ -2,14 +2,12 @@ namespace Game.Gameplay.Enemy.Worm.Movement
 {
     public readonly struct WormFrameResult
     {
-        public WormFrameResult(bool pathCompleted, float headPathProgressNormalized)
+        public WormFrameResult(WormPathCompletion? pathCompletion)
         {
-            PathCompleted = pathCompleted;
-            HeadPathProgressNormalized = headPathProgressNormalized;
+            PathCompletion = pathCompletion;
         }
 
-        public bool PathCompleted { get; }
-        public float HeadPathProgressNormalized { get; }
+        public WormPathCompletion? PathCompletion { get; }
     }
 
 }

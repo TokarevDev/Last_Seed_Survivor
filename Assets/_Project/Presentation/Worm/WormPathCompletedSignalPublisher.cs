@@ -18,11 +18,11 @@ namespace Game.Presentation.Worm
 
         public void Publish(in WormFrameResult result)
         {
-            if (!result.PathCompleted)
+            if (!result.PathCompletion.HasValue)
                 return;
 
-            _signalBus.Fire(new WormPathCompletedSignal(
-                result.HeadPathProgressNormalized));
+            WormPathCompletion completion = result.PathCompletion.Value;
+            _signalBus.Fire(new WormPathCompletedSignal(completion));
         }
     }
 

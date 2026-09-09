@@ -138,9 +138,13 @@ namespace Game.Gameplay.Enemy.Worm
                 unscaledDeltaTime);
 
             bool pathCompleted = _frameSimulation.Tick(context);
-            return new WormFrameResult(
-                pathCompleted,
-                pathCompleted ? HeadPathProgressNormalized : 0f);
+            WormPathCompletion? completion = pathCompleted
+                ? new WormPathCompletion(
+                    _pathProgress.HeadDistance,
+                    HeadPathProgressNormalized,
+                    WormPathCompletionReason.ReachedRailEnd)
+                : null;
+            return new WormFrameResult(completion);
         }
 
         private bool TryGetCatchUpTargetDistance(out float targetDistance)

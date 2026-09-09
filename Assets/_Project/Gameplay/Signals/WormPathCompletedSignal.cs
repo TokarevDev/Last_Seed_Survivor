@@ -1,12 +1,14 @@
+using Game.Gameplay.Enemy.Worm.Movement;
+
 namespace Game.Gameplay.Signals
 {
     public sealed class WormPathCompletedSignal
     {
-        public WormPathCompletedSignal(float headPathProgressNormalized)
+        public WormPathCompletedSignal(in WormPathCompletion completion)
         {
-            HeadPathProgressNormalized = headPathProgressNormalized;
+            Completion = completion;
         }
 
-        public float HeadPathProgressNormalized { get; }
+        public WormPathCompletion Completion { get; }
     }
 }

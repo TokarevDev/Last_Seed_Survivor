@@ -257,8 +257,9 @@ burst-disable point, revive target, and editor point migration.
    collection replacement, cache reset, rollback reset, and movement-state reset;
    `WormMovementCoordinator` owns the explicit forward/section-rollback/revive state
    priority while `WormFrameSimulation` preserves movement -> render -> completion order.
-3. Replace `WormController.PathCompleted` with a payload containing final distance,
-   normalized progress, and completion reason; publish once at the adapter boundary.
+3. Completed: `WormController.Tick` returns an optional immutable
+   `WormPathCompletion` containing final distance, normalized progress, and reason;
+   the presentation adapter publishes it once as `WormPathCompletedSignal`.
 4. Split `WormSegment` into pooled entity adapter, damage adapter, cocoon view, and visual
    rig references without repeated component discovery.
 5. Extract chain layout calculations from `WormSegmentChainPresenter`; retain Transform
