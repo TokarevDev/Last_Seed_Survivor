@@ -100,3 +100,13 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# Repository hygiene: local planning, recovery, generated art, and Rider project layers
+/ARCHITECTURE.md
+/*ROADMAP*.md
+/[Aa]ssets/_Recovery/
+/[Aa]ssets/_Recovery.meta
+/GeneratedAssets/
+/gameplay*.png
+*.csproj.DotSettings
+/TestResults-*.xml

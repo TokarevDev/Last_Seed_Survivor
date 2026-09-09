@@ -6,23 +6,21 @@ Portfolio hub: https://tokarevdev.github.io
 
 Gameplay video: https://youtube.com/shorts/HiQBlYjienI?feature=share
 
-Architecture notes: ./ARCHITECTURE.md
-
 Development period: Mar 2026 - present.
 
 Status: closed test passed. Android release preparation continues with modular combat, pooled runtime systems, and deterministic balance tooling ready for review.
 
 ## Quick Review
 
-This repository is public as a portfolio/code review sample. Unity vendor packages and imported assets are present, but the portfolio-relevant code lives under `Assets/_Project/App/`.
+This repository is public as a portfolio/code review sample. Unity vendor packages and imported assets are present, but the portfolio-relevant code lives under `Assets/_Project/`.
 
 Start here:
 
-- Main project code: `Assets/_Project/App/`
-- Bootstrap and scene startup: `Assets/_Project/App/Bootstrap/`
-- Combat, weapons, projectiles, and rewards: `Assets/_Project/App/Gameplay/Combat/`
-- Segmented enemy systems and balance tooling: `Assets/_Project/App/Gameplay/Enemy/Worm/`
-- Presentation/UI gameplay flow: `Assets/_Project/App/Presentation/`
+- Main project code: `Assets/_Project/`
+- Bootstrap and scene startup: `Assets/_Project/Bootstrap/`
+- Combat, weapons, projectiles, and rewards: `Assets/_Project/Gameplay/Combat/`
+- Segmented enemy systems and balance tooling: `Assets/_Project/Gameplay/Enemy/Worm/`
+- Presentation/UI gameplay flow: `Assets/_Project/Presentation/`
 
 ## Overview
 
@@ -107,13 +105,13 @@ Architecture principles used:
 
 ## Code Review Map
 
-- Main project code: `Assets/_Project/App/`
-- Bootstrap and scene startup: `Assets/_Project/App/Bootstrap/`
-- Gameplay combat, weapons, projectiles, and rewards: `Assets/_Project/App/Gameplay/Combat/`
-- Segmented enemy systems and balance tooling: `Assets/_Project/App/Gameplay/Enemy/Worm/`
-- Presentation/UI-related gameplay flow: `Assets/_Project/App/Presentation/`
+- Main project code: `Assets/_Project/`
+- Bootstrap and scene startup: `Assets/_Project/Bootstrap/`
+- Gameplay combat, weapons, projectiles, and rewards: `Assets/_Project/Gameplay/Combat/`
+- Segmented enemy systems and balance tooling: `Assets/_Project/Gameplay/Enemy/Worm/`
+- Presentation/UI-related gameplay flow: `Assets/_Project/Presentation/`
 
-Unity vendor packages and imported assets are present in the repository, but the portfolio-relevant code lives under `Assets/_Project/App/`.
+Unity vendor packages and imported assets are present in the repository, but the portfolio-relevant code lives under `Assets/_Project/`.
 
 ## Tech Stack
 
@@ -130,6 +128,8 @@ Unity 6, C#, UGUI, ScriptableObjects, Input System, Physics2D, DOTween, URP, cus
 ## Repository Notes
 
 The repository is public as a portfolio/code review sample. Some visual assets, final balancing, gameplay media, and release materials may change while the project is still in development.
+
+Privacy policy: [`docs/legal/privacy-policy.html`](docs/legal/privacy-policy.html)
 
 ## Author
 
