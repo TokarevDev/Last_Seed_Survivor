@@ -1,10 +1,7 @@
 
-using Game.Infrastructure.Navigation;
-
 namespace Game.Presentation.UI.Common.Popups
 {
     using System;
-    using Cysharp.Threading.Tasks;
     using UnityEngine;
     using UnityEngine.UI;
     using Zenject;
@@ -22,18 +19,14 @@ namespace Game.Presentation.UI.Common.Popups
         [SerializeField, Min(0f)] private float _restartAnimationDuration = 0.55f;
         [SerializeField, Range(0.5f, 1f)] private float _restartAnimationTargetScale = 0.92f;
 
-        public event Action AcceptRequested;
-
-        public event Action DoubleRewardRequested;
-
         private bool _restartRequested;
         private PopupScaleFadeAnimator _animator;
-        private ISceneNavigator<GameSceneId> _sceneNavigator;
+        private SignalBus _signalBus;
 
         [Inject]
-        public void Construct(ISceneNavigator<GameSceneId> sceneNavigator)
+        public void Construct(SignalBus signalBus)
         {
-            _sceneNavigator = sceneNavigator;
+            _signalBus = signalBus;
         }
 
         private void OnEnable()
@@ -67,19 +60,19 @@ namespace Game.Presentation.UI.Common.Popups
 
         private void HandleAcceptClicked()
         {
-            AcceptRequested?.Invoke();
-
-            RequestLobbyReturn(_closeOnAccept);
+            RequestCompletion(_closeOnAccept, VictoryPopupIntent.Accept);
         }
 
         private void HandleDoubleRewardClicked()
         {
-            DoubleRewardRequested?.Invoke();
-
-            RequestLobbyReturn(_closeOnDoubleReward);
+            RequestCompletion(
+                _closeOnDoubleReward,
+                VictoryPopupIntent.DoubleReward);
         }
 
-        private void RequestLobbyReturn(bool closeOnComplete)
+        private void RequestCompletion(
+            bool closeOnComplete,
+            VictoryPopupIntent intent)
         {
             if (_restartRequested)
                 return;
@@ -91,25 +84,8 @@ namespace Game.Presentation.UI.Common.Popups
                 if (closeOnComplete)
                     RequestClose();
 
-                NavigateToLobbyAsync().Forget();
+                _signalBus.Fire(new VictoryPopupIntentSignal(intent));
             });
-        }
-
-        private async UniTask NavigateToLobbyAsync()
-        {
-            try
-            {
-                await _sceneNavigator.TryNavigateAsync(
-                    GameSceneId.Lobby,
-                    destroyCancellationToken);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception exception)
-            {
-                Debug.LogException(exception, this);
-            }
         }
 
         private void PlayRestartAnimation(Action onComplete)

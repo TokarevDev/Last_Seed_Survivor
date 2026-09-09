@@ -303,8 +303,9 @@ protection.
    boundaries; add equivalent focused models only where victory, HUD, lobby, and
    navigation currently pass mutable or fragmented state.
 3. In progress: revive now exposes one `RevivalPopupIntent` stream and renders immutable
-   state; migrate remaining views at their application boundaries without adding proxy
-   abstractions around already-typed APIs.
+   state; victory emits `VictoryPopupIntentSignal` after its visual transition and its
+   controller owns scene navigation. Migrate remaining views at their application
+   boundaries without adding proxy abstractions around already-typed APIs.
 4. Completed: `RewardButtonContentPresenter` owns content/style binding and
    `RewardButtonAnimator` owns cached RectTransform/icon state plus tween creation;
    `RewardButtonView` remains the serialized input/view adapter.

@@ -23,6 +23,7 @@ namespace Game.Bootstrap.Installers.Game
             Container.DeclareSignal<WeaponRuntimeStatsChangedSignal>();
             Container.DeclareSignal<WeaponAttackCycleStartedSignal>();
             Container.DeclareSignal<ShowPopupRequestedSignal>();
+            Container.DeclareSignal<VictoryPopupIntentSignal>();
 
             Container.BindInterfacesAndSelfTo<WeaponRuntimeStatsSignalPublisher>().AsSingle();
             Container.BindInterfacesAndSelfTo<WeaponAttackCycleSignalPublisher>().AsSingle();
