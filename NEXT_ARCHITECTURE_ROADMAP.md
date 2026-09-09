@@ -278,9 +278,15 @@ revive during pause, path completion, death, and all cocoon variants.
 1. Completed: immutable `WormSectionHealthChanged`, `WormSectionDestroyed`,
    `RewardUserIntent`, and weapon runtime/progression snapshots carry typed state across
    their boundaries; reward UI actions are translated into one intent stream.
-2. Capture old/new values and identity before pooled reset/unbind.
-3. Keep local domain events inside aggregate ownership; translate once to scene SignalBus.
-4. Remove duplicate publishers and subscriptions only after every consumer is migrated.
+2. Completed: `HealthChange` captures previous/current/max HP and applied damage before
+   section reset, and `WormSectionDestroyed` retains section identity plus that final
+   snapshot after pooled segments are released or the section is reused.
+3. Completed: section health/destruction events stay within aggregate and presentation
+   ownership; `WormCombatSignalPublisher` translates only high-level combat requests
+   and progress into scene SignalBus payloads.
+4. Completed: completion, combat-burst, damage, reward, and destruction-progress flows
+   each have one adapter publisher; obsolete per-consumer publishers/subscriptions are
+   absent after migration.
 5. Add subscription lifecycle tests for enable/disable, reset, and scene unload.
 
 Playtest: damage/reward/death ordering, pooled reuse, scene reload, and duplicate-event
