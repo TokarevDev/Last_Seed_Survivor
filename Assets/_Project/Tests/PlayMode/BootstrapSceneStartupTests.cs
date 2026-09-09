@@ -11,23 +11,15 @@ namespace Game.Tests.PlayMode
 {
     public sealed class BootstrapSceneStartupTests
     {
-        private const float LobbyLoadTimeoutSeconds = 10f;
+        private readonly PlayModeFlowFixture _flow = new();
 
         [UnityTest]
         public IEnumerator BootstrapScene_LoadsLobbyThroughApplicationEntryPoint()
         {
-            AsyncOperation bootstrapLoad = SceneManager.LoadSceneAsync(
+            yield return _flow.LoadSceneAndWaitFor(
                 GameSceneNames.Bootstrap,
-                LoadSceneMode.Single);
-
-            Assert.That(bootstrapLoad, Is.Not.Null);
-            yield return bootstrapLoad;
-
-            float deadline = Time.realtimeSinceStartup + LobbyLoadTimeoutSeconds;
-
-            yield return new WaitUntil(() =>
-                SceneManager.GetActiveScene().name == GameSceneNames.Lobby
-                || Time.realtimeSinceStartup >= deadline);
+                GameSceneNames.Lobby,
+                "waiting for the application entry point");
 
             Assert.That(
                 SceneManager.GetActiveScene().name,
@@ -38,10 +30,7 @@ namespace Game.Tests.PlayMode
         [UnityTearDown]
         public IEnumerator TearDown()
         {
-            if (ProjectContext.HasInstance)
-                Object.Destroy(ProjectContext.Instance.gameObject);
-
-            yield return null;
+            yield return _flow.TearDown();
         }
     }
 }
