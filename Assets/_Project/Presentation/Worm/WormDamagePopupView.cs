@@ -32,6 +32,9 @@ namespace Game.Presentation.Worm
         private MeshRenderer _renderer;
         private Sequence _sequence;
         private TweenCallback _animationCompleteCallback;
+        private AnimationMode _cachedAnimationMode;
+        private float _cachedTargetScale;
+        private bool _hasCachedAnimation;
 
         private Action<WormDamagePopupView> _onComplete;
         private readonly char[] _damageTextBuffer = new char[DamageTextBufferSize];
@@ -66,10 +69,17 @@ namespace Game.Presentation.Worm
 
         private void OnDisable()
         {
-            _sequence?.Kill();
-            _sequence = null;
+            if (_sequence != null && _sequence.IsActive())
+                _sequence.Pause();
+
             _onComplete = null;
             IsCompleting = false;
+        }
+
+        private void OnDestroy()
+        {
+            _sequence?.Kill(false);
+            _sequence = null;
         }
 
         public void Show(
@@ -119,12 +129,18 @@ namespace Game.Presentation.Worm
 
         private void PlayAnimation(float targetScale, AnimationMode animationMode)
         {
-            _sequence?.Kill();
-
             IsCompleting = false;
             _text.alpha = 1f;
 
             transform.localScale = Vector3.zero;
+
+            if (CanReuseAnimation(targetScale, animationMode))
+            {
+                _sequence.Restart();
+                return;
+            }
+
+            _sequence?.Kill(false);
 
             _sequence = DOTween.Sequence();
 
@@ -143,7 +159,12 @@ namespace Game.Presentation.Worm
                     break;
             }
 
-            _sequence.OnComplete(_animationCompleteCallback);
+            _cachedAnimationMode = animationMode;
+            _cachedTargetScale = targetScale;
+            _hasCachedAnimation = true;
+            _sequence
+                .SetAutoKill(false)
+                .OnComplete(_animationCompleteCallback);
         }
 
         private void AppendNormalAnimation(float targetScale)
@@ -181,7 +202,8 @@ namespace Game.Presentation.Worm
 
         private void PlayFastFade()
         {
-            _sequence?.Kill();
+            _sequence?.Kill(false);
+            _hasCachedAnimation = false;
 
             IsCompleting = true;
             _sequence = DOTween.Sequence();
@@ -192,12 +214,22 @@ namespace Game.Presentation.Worm
 
         private void OnAnimationComplete()
         {
-            _sequence = null;
             IsCompleting = false;
 
             Action<WormDamagePopupView> onComplete = _onComplete;
             _onComplete = null;
             onComplete?.Invoke(this);
+        }
+
+        private bool CanReuseAnimation(
+            float targetScale,
+            AnimationMode animationMode)
+        {
+            return _hasCachedAnimation
+                   && _sequence != null
+                   && _sequence.IsActive()
+                   && _cachedAnimationMode == animationMode
+                   && Mathf.Approximately(_cachedTargetScale, targetScale);
         }
 
         private Color GetColor(DamageViewRequest request)

@@ -348,9 +348,10 @@ resolution/aspect changes, navigation, and input lock restoration.
 1. Add deterministic domain tests for reward distributions and weapon fire cycles.
 2. Add PlayMode scenarios for reward, revive, spawn/reset, pooling, and popup stack.
 3. Add Bootstrap -> Lobby -> Game -> Lobby integration coverage.
-4. In progress: reusable idle/blink sequences avoid recreation across UI enable cycles;
-   add measured allocation budgets for gameplay update, weapon fire, worm movement, and
-   popup idle before applying reuse to dynamic timelines.
+4. In progress: reusable idle/blink sequences avoid recreation across UI enable cycles,
+   and pooled damage popups reuse their sequence when animation mode and scale match.
+   Add measured allocation budgets for gameplay update, weapon fire, worm movement, and
+   popup idle before applying reuse to other dynamic timelines.
 5. Profile CPU, GC, pool growth, retained Unity objects, tween counts, and scene unload.
 6. Add build-time validation for required references, configs, signal declarations, and
    duplicate stable keys.
