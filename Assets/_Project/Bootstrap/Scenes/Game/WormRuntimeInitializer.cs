@@ -14,7 +14,7 @@ namespace Game.Bootstrap.Scenes.Game
     {
         private readonly WormController _wormController;
         private readonly WormCombatController _wormCombatController;
-        private readonly WormCombatBurstController _combatBurstController;
+        private readonly WormLifecycleController _lifecycleController;
         private readonly WormFrameSimulation _frameSimulation;
         private readonly WormRailTargetResolver _railTargetResolver;
         private readonly WormPathProgressState _pathProgress;
@@ -27,7 +27,7 @@ namespace Game.Bootstrap.Scenes.Game
         public WormRuntimeInitializer(
             WormController wormController,
             WormCombatController wormCombatController,
-            WormCombatBurstController combatBurstController,
+            WormLifecycleController lifecycleController,
             WormFrameSimulation frameSimulation,
             WormRailTargetResolver railTargetResolver,
             WormPathProgressState pathProgress,
@@ -41,8 +41,8 @@ namespace Game.Bootstrap.Scenes.Game
                 throw new ArgumentNullException(nameof(wormController));
             _wormCombatController = wormCombatController ??
                 throw new ArgumentNullException(nameof(wormCombatController));
-            _combatBurstController = combatBurstController ??
-                throw new ArgumentNullException(nameof(combatBurstController));
+            _lifecycleController = lifecycleController ??
+                throw new ArgumentNullException(nameof(lifecycleController));
             _frameSimulation = frameSimulation ??
                 throw new ArgumentNullException(nameof(frameSimulation));
             _railTargetResolver = railTargetResolver ??
@@ -64,7 +64,7 @@ namespace Game.Bootstrap.Scenes.Game
         public void Initialize()
         {
             _wormController.Configure(
-                _combatBurstController,
+                _lifecycleController,
                 _frameSimulation,
                 _railTargetResolver,
                 _pathProgress,

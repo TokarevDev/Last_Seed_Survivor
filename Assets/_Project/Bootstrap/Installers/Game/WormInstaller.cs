@@ -69,6 +69,7 @@ namespace Game.Bootstrap.Installers.Game
             Container.Bind<IWormHpScalingPolicy>().FromInstance(_hpScalingConfig).AsSingle();
             Container.Bind<IWeaponPowerProvider>().To<WeaponPowerProvider>().AsSingle();
             Container.Bind<WormCombatBurstController>().AsSingle();
+            Container.Bind<WormLifecycleController>().AsSingle();
             Container.Bind<WormForwardMotionController>().AsSingle();
             Container.Bind<WormFrameSimulation>().AsSingle();
             Container.Bind<WormPathProgressState>().AsSingle();

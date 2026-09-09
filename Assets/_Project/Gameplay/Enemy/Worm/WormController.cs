@@ -16,7 +16,7 @@ namespace Game.Gameplay.Enemy.Worm
         [SerializeField] private RailPath _rail;
         [SerializeField] private WormMovementConfig _movementConfig;
 
-        private WormCombatBurstController _combatBurstController;
+        private WormLifecycleController _lifecycleController;
         private WormFrameSimulation _frameSimulation;
         private WormRailTargetResolver _railTargetResolver;
         private WormPathProgressState _pathProgress;
@@ -33,10 +33,10 @@ namespace Game.Gameplay.Enemy.Worm
         public bool IsCatchingUpToCombatStart =>
             _pathProgress != null && _pathProgress.IsCatchingUp;
         public bool IsCombatBurstActive =>
-            _combatBurstController != null && _combatBurstController.IsActive;
+            _lifecycleController != null && _lifecycleController.IsCombatBurstActive;
 
         public void Configure(
-            WormCombatBurstController combatBurstController,
+            WormLifecycleController lifecycleController,
             WormFrameSimulation frameSimulation,
             WormRailTargetResolver railTargetResolver,
             WormPathProgressState pathProgress,
@@ -45,7 +45,7 @@ namespace Game.Gameplay.Enemy.Worm
             OrderedReferenceSet<WormSegment> segmentChain,
             WormSectionRollbackState<WormSegment> sectionRollbackState)
         {
-            _combatBurstController = combatBurstController;
+            _lifecycleController = lifecycleController;
             _frameSimulation = frameSimulation;
             _railTargetResolver = railTargetResolver;
             _pathProgress = pathProgress;
@@ -100,33 +100,22 @@ namespace Game.Gameplay.Enemy.Worm
 
         private void OnDestroy()
         {
-            _reviveSequence?.Cancel();
+            _lifecycleController?.CancelPendingOperations();
         }
 
         public void Init(List<WormSegment> segments)
         {
-            _reviveSequence.Cancel();
-            _segmentChain.ReplaceWith(segments);
-
-            _segmentChainPresenter.Reset();
-
-            _sectionRollbackState.Complete();
-            _combatBurstController.Reset(_runtimeMovementConfig.BaseSpeed);
-            ClearTargetDistanceCaches();
-            _pathProgress.Reset(TryGetCatchUpTargetDistance(out _));
+            _lifecycleController.Initialize(
+                segments,
+                _runtimeMovementConfig.BaseSpeed,
+                TryGetCatchUpTargetDistance(out _));
 
             UpdateSegments();
         }
 
         public void ClearWorm()
         {
-            _reviveSequence.Cancel();
-            _segmentChain.Clear();
-            _segmentChainPresenter.Reset();
-            _sectionRollbackState.Complete();
-            _combatBurstController.Reset(_runtimeMovementConfig.BaseSpeed);
-            _pathProgress.Reset();
-            ClearTargetDistanceCaches();
+            _lifecycleController.Clear(_runtimeMovementConfig.BaseSpeed);
         }
 
         public WormFrameResult Tick(
