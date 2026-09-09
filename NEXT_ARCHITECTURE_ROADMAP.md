@@ -287,7 +287,9 @@ revive during pause, path completion, death, and all cocoon variants.
 4. Completed: completion, combat-burst, damage, reward, and destruction-progress flows
    each have one adapter publisher; obsolete per-consumer publishers/subscriptions are
    absent after migration.
-5. Add subscription lifecycle tests for enable/disable, reset, and scene unload.
+5. Completed: aggregate observer removal is covered across reset/damage, reward intent
+   gateway disposal verifies all view subscriptions are removed idempotently, and
+   PlayMode scene-container tests exercise teardown without retained signal handlers.
 
 Playtest: damage/reward/death ordering, pooled reuse, scene reload, and duplicate-event
 protection.
