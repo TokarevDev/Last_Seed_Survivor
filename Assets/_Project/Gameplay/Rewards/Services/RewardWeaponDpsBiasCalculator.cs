@@ -110,11 +110,9 @@ namespace Game.Gameplay.Rewards.Services
             if (context == null)
                 return WeaponPowerSnapshot.Invalid;
 
-            return context.MainWeapon != null
-                ? WeaponPowerEstimator.Estimate(context.MainWeapon)
-                : WeaponPowerEstimator.Estimate(
-                    context.MainWeaponConfig,
-                    context.MainWeaponState);
+            return WeaponPowerEstimator.Estimate(
+                context.MainWeaponConfig,
+                context.MainWeaponState);
         }
 
         private static WeaponPowerSnapshot EstimateAcaciaPower(
@@ -123,11 +121,9 @@ namespace Game.Gameplay.Rewards.Services
             if (context == null)
                 return WeaponPowerSnapshot.Invalid;
 
-            return context.AcaciaThornWeapon != null
-                ? WeaponPowerEstimator.Estimate(context.AcaciaThornWeapon)
-                : WeaponPowerEstimator.Estimate(
-                    context.AcaciaThornConfig,
-                    context.AcaciaThornState);
+            return WeaponPowerEstimator.Estimate(
+                context.AcaciaThornConfig,
+                context.AcaciaThornState);
         }
 
         private static bool HasAdditionalWeaponUnlocked(RewardRuntimeContext context)

@@ -2,6 +2,7 @@
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Rewards.Services;
+using Game.Gameplay.Signals;
 
 namespace Game.Gameplay.Combat.Rewards.Effects
 {
@@ -30,6 +31,9 @@ namespace Game.Gameplay.Combat.Rewards.Effects
         [SerializeField] private float _projectileSpeedBonus = 0.25f;
         [SerializeField][Range(0f, 1f)] private float _criticalChanceBonus = 0.1f;
         [SerializeField][Min(0f)] private float _criticalDamageBonus = 0.5f;
+
+        public override WeaponRuntimeStatsSource AffectedWeapon =>
+            WeaponRuntimeStatsSource.AcaciaThorn;
 
         public override bool CanApply(RewardRuntimeContext context)
         {
@@ -75,61 +79,11 @@ namespace Game.Gameplay.Combat.Rewards.Effects
 
         public override void Apply(RewardRuntimeContext context)
         {
-            AcaciaThornWeapon weapon = context?.AcaciaThornWeapon;
-
-            if (weapon != null)
-            {
-                ApplyToWeapon(context, weapon);
-                return;
-            }
-
             ApplyToState(context, context?.AcaciaThornState);
         }
 
         public override void Apply(WeaponRuntimeState state)
         {
-        }
-
-        private void ApplyToWeapon(
-            RewardRuntimeContext context,
-            AcaciaThornWeapon weapon)
-        {
-            if (weapon == null)
-                return;
-
-            switch (_upgradeType)
-            {
-                case AcaciaThornUpgradeType.Unlock:
-                    weapon.Unlock(GetMainWeaponDamageSnapshot(context));
-                    break;
-
-                case AcaciaThornUpgradeType.DamageMultiplier:
-                    weapon.AddDamageMultiplier(_damageMultiplier);
-                    break;
-
-                case AcaciaThornUpgradeType.FireRateBonus:
-                    weapon.AddFireRateBonus(_fireRateBonus);
-                    break;
-
-                case AcaciaThornUpgradeType.ExtraSalvoShots:
-                    if (_extendsSalvoLimit)
-                        weapon.RuntimeState.ExpandSalvoExtraShotLimit(GetMaxSalvoExtraShotsAfterApply());
-
-                    weapon.AddSalvoShots(_extraSalvoShots);
-                    break;
-
-                case AcaciaThornUpgradeType.ProjectileSpeedBonus:
-                    weapon.AddProjectileSpeedBonus(_projectileSpeedBonus);
-                    break;
-
-                case AcaciaThornUpgradeType.CriticalChance:
-                    weapon.AddCriticalChance(_criticalChanceBonus);
-                    break;
-
-                case AcaciaThornUpgradeType.CriticalPower:
-                    weapon.AddCriticalDamageBonus(_criticalDamageBonus);
-                    break;
-            }
         }
 
         private void ApplyToState(

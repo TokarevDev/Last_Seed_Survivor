@@ -1,6 +1,7 @@
 
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Rewards.Services;
+using Game.Gameplay.Signals;
 
 namespace Game.Gameplay.Combat.Rewards.Effects
 {
@@ -8,6 +9,9 @@ namespace Game.Gameplay.Combat.Rewards.Effects
 
     public abstract class RewardEffect : ScriptableObject
     {
+        public virtual WeaponRuntimeStatsSource AffectedWeapon =>
+            WeaponRuntimeStatsSource.MainProjectile;
+
         public virtual bool CanApply(RewardRuntimeContext context)
         {
             return context != null && CanApply(context.MainWeaponState);

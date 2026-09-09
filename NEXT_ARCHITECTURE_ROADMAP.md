@@ -216,7 +216,8 @@ requests, scene restart while ad callback is pending.
    cooldown, optional preparation, salvo transitions, cancellation, and reset.
 3. Completed: shot-pattern strategy, shared damage calculation, type-specific request
    factories, and the narrow `IProjectileSpawnSink<TRequest>` boundary are separated.
-4. Make both existing weapons thin Unity adapters over the same application lifecycle.
+4. Completed: both weapon MonoBehaviours are thin adapters over shared fire-cycle,
+   progression, derived-stat, request-factory, spawn-sink, and mutation-commit boundaries.
 5. Completed: both projectile pools are owned by Bootstrap composition; weapon views
    consume only typed spawn sinks and never construct or reference concrete pools.
 6. Completed: each committed weapon mutation publishes one immutable runtime-stat

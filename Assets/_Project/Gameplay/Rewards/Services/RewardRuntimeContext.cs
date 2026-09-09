@@ -42,16 +42,26 @@ namespace Game.Gameplay.Rewards.Services
     {
         private readonly WeaponRuntimeState _mainWeaponState;
         private readonly AcaciaThornRuntimeState _acaciaThornState;
+        private readonly WeaponConfig _mainWeaponConfig;
+        private readonly AcaciaThornWeaponConfig _acaciaThornConfig;
         private readonly Func<int> _mainWeaponDamageProvider;
+        private readonly Func<WeaponRuntimeState> _mainWeaponStateProvider;
+        private readonly Func<AcaciaThornRuntimeState> _acaciaThornStateProvider;
+        private readonly Func<WeaponConfig> _mainWeaponConfigProvider;
+        private readonly Func<AcaciaThornWeaponConfig> _acaciaThornConfigProvider;
 
         public RewardRuntimeContext(
-            ProjectileWeapon mainWeapon,
-            AcaciaThornWeapon acaciaThornWeapon)
+            Func<WeaponRuntimeState> mainWeaponStateProvider,
+            Func<AcaciaThornRuntimeState> acaciaThornStateProvider,
+            Func<int> mainWeaponDamageProvider,
+            Func<WeaponConfig> mainWeaponConfigProvider,
+            Func<AcaciaThornWeaponConfig> acaciaThornConfigProvider)
         {
-            MainWeapon = mainWeapon;
-            AcaciaThornWeapon = acaciaThornWeapon;
-            MainWeaponConfig = mainWeapon != null ? mainWeapon.Config : null;
-            AcaciaThornConfig = acaciaThornWeapon != null ? acaciaThornWeapon.Config : null;
+            _mainWeaponStateProvider = mainWeaponStateProvider;
+            _acaciaThornStateProvider = acaciaThornStateProvider;
+            _mainWeaponDamageProvider = mainWeaponDamageProvider;
+            _mainWeaponConfigProvider = mainWeaponConfigProvider;
+            _acaciaThornConfigProvider = acaciaThornConfigProvider;
         }
 
         public RewardRuntimeContext(
@@ -64,19 +74,29 @@ namespace Game.Gameplay.Rewards.Services
             _mainWeaponState = mainWeaponState;
             _acaciaThornState = acaciaThornState;
             _mainWeaponDamageProvider = mainWeaponDamageProvider;
-            MainWeaponConfig = mainWeaponConfig;
-            AcaciaThornConfig = acaciaThornConfig;
+            _mainWeaponConfig = mainWeaponConfig;
+            _acaciaThornConfig = acaciaThornConfig;
         }
 
-        public ProjectileWeapon MainWeapon { get; }
-        public AcaciaThornWeapon AcaciaThornWeapon { get; }
-        public WeaponConfig MainWeaponConfig { get; }
-        public AcaciaThornWeaponConfig AcaciaThornConfig { get; }
+        public WeaponConfig MainWeaponConfig =>
+            _mainWeaponConfigProvider != null
+                ? _mainWeaponConfigProvider()
+                : _mainWeaponConfig;
+
+        public AcaciaThornWeaponConfig AcaciaThornConfig =>
+            _acaciaThornConfigProvider != null
+                ? _acaciaThornConfigProvider()
+                : _acaciaThornConfig;
+
         public WeaponRuntimeState MainWeaponState =>
-            _mainWeaponState ?? (MainWeapon != null ? MainWeapon.RuntimeState : null);
+            _mainWeaponStateProvider != null
+                ? _mainWeaponStateProvider()
+                : _mainWeaponState;
 
         public AcaciaThornRuntimeState AcaciaThornState =>
-            _acaciaThornState ?? (AcaciaThornWeapon != null ? AcaciaThornWeapon.RuntimeState : null);
+            _acaciaThornStateProvider != null
+                ? _acaciaThornStateProvider()
+                : _acaciaThornState;
 
         public int MainWeaponDamageSnapshot
         {
@@ -85,7 +105,7 @@ namespace Game.Gameplay.Rewards.Services
                 if (_mainWeaponDamageProvider != null)
                     return _mainWeaponDamageProvider();
 
-                return MainWeapon != null ? MainWeapon.CurrentProjectileDamage : 0;
+                return 0;
             }
         }
     }

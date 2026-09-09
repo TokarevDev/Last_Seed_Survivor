@@ -3,12 +3,14 @@ using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Rewards.Runtime;
+using Game.Gameplay.Signals;
 
 namespace Game.Gameplay.Rewards.Services
 {
     public sealed class RewardApplyService : IRewardChoiceApplier, IRewardRuntimeContextProvider
     {
         private readonly ProjectileWeapon _weapon;
+        private readonly AcaciaThornWeapon _acaciaThornWeapon;
         private readonly RewardRuntimeContext _context;
 
         public RewardApplyService(
@@ -16,7 +18,13 @@ namespace Game.Gameplay.Rewards.Services
             AcaciaThornWeapon acaciaThornWeapon)
         {
             _weapon = weapon;
-            _context = new RewardRuntimeContext(weapon, acaciaThornWeapon);
+            _acaciaThornWeapon = acaciaThornWeapon;
+            _context = new RewardRuntimeContext(
+                weapon != null ? () => weapon.RuntimeState : null,
+                acaciaThornWeapon != null ? () => acaciaThornWeapon.RuntimeState : null,
+                weapon != null ? () => weapon.CurrentProjectileDamage : null,
+                weapon != null ? () => weapon.Config : null,
+                acaciaThornWeapon != null ? () => acaciaThornWeapon.Config : null);
         }
 
         public WeaponRuntimeState RuntimeState => _weapon != null ? _weapon.RuntimeState : null;
@@ -34,7 +42,11 @@ namespace Game.Gameplay.Rewards.Services
                 return;
 
             choice.Effect.Apply(_context);
-            _weapon?.ForceRebuild();
+
+            if (choice.Effect.AffectedWeapon == WeaponRuntimeStatsSource.AcaciaThorn)
+                _acaciaThornWeapon?.ForceRebuild();
+            else
+                _weapon?.ForceRebuild();
         }
     }
 

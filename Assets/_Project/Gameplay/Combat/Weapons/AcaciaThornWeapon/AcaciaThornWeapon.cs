@@ -80,69 +80,12 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
                 StartSalvo();
         }
 
-        public void Unlock(int baseDamage)
+        public void ForceRebuild()
         {
-            if (!_runtimeState.CanUnlock)
+            if (_config == null)
                 return;
 
-            int fallbackBaseDamage = _config != null ? _config.Damage : 1;
-            _runtimeState.Unlock(Mathf.Max(fallbackBaseDamage, baseDamage));
-            _fireCycle.Reset();
-            PublishRuntimeStatsChanged();
-        }
-
-        public void AddDamageMultiplier(float multiplier)
-        {
-            if (!_runtimeState.CanApplyDamageMultiplier(multiplier))
-                return;
-
-            _runtimeState.ApplyDamageMultiplier(multiplier);
-            PublishRuntimeStatsChanged();
-        }
-
-        public void AddFireRateBonus(float bonus)
-        {
-            if (!_runtimeState.CanApplyFireRateBonus(bonus))
-                return;
-
-            _runtimeState.AddFireRateBonus(bonus);
             RebuildCooldown(resetTimer: false);
-            PublishRuntimeStatsChanged();
-        }
-
-        public void AddSalvoShots(int extraShots)
-        {
-            if (!_runtimeState.CanApplySalvoShots(extraShots))
-                return;
-
-            _runtimeState.AddSalvoShots(extraShots);
-            PublishRuntimeStatsChanged();
-        }
-
-        public void AddProjectileSpeedBonus(float bonus)
-        {
-            if (!_runtimeState.CanApplyProjectileSpeedBonus(bonus))
-                return;
-
-            _runtimeState.AddProjectileSpeedBonus(bonus);
-            PublishRuntimeStatsChanged();
-        }
-
-        public void AddCriticalChance(float chanceBonus)
-        {
-            if (!_runtimeState.CanApplyCriticalChance(chanceBonus))
-                return;
-
-            _runtimeState.AddCriticalChance(chanceBonus);
-            PublishRuntimeStatsChanged();
-        }
-
-        public void AddCriticalDamageBonus(float damageBonus)
-        {
-            if (!_runtimeState.CanApplyCriticalDamageBonus(damageBonus))
-                return;
-
-            _runtimeState.AddCriticalDamageBonus(damageBonus);
             PublishRuntimeStatsChanged();
         }
 
@@ -265,7 +208,10 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         [ContextMenu("Debug/Unlock Acacia Thorn")]
         private void DebugUnlockAcaciaThorn()
         {
-            Unlock(_config != null ? _config.Damage : 1);
+            if (_runtimeState.CanUnlock)
+                _runtimeState.Unlock(_config != null ? _config.Damage : 1);
+
+            ForceRebuild();
         }
 
         [ContextMenu("Debug/Fire Acacia Thorn Once")]
@@ -278,7 +224,10 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
             }
 
             if (!_runtimeState.IsUnlocked)
-                Unlock(_config != null ? _config.Damage : 1);
+            {
+                _runtimeState.Unlock(_config != null ? _config.Damage : 1);
+                ForceRebuild();
+            }
 
             Fire();
             _fireCycle.StartCooldown(_currentCooldown);
