@@ -20,8 +20,7 @@ namespace Game.Presentation.UI.Common.Popups
         [SerializeField, Min(0f)] private float _showAnimationDuration = 0.55f;
         [SerializeField, Range(0.5f, 1f)] private float _showAnimationStartScale = 0.92f;
 
-        public event Action ReviveRequested;
-        public event Action GiveUpRequested;
+        public event Action<RevivalPopupIntent> Intent;
 
         private bool _canRevive;
         private PopupScaleFadeAnimator _animator;
@@ -53,15 +52,13 @@ namespace Game.Presentation.UI.Common.Popups
             PlayShowAnimation();
         }
 
-        public void Bind(
-            int attemptsLeft,
-            float currentProgressNormalized,
-            float remainingLevelNormalized,
-            bool canRevive)
+        public void Render(RevivalPopupViewModel model)
         {
-            int currentPercent = Mathf.RoundToInt(Mathf.Clamp01(currentProgressNormalized) * 100f);
-            int remainingPercent = Mathf.RoundToInt(Mathf.Clamp01(remainingLevelNormalized) * 100f);
-            _canRevive = canRevive && attemptsLeft > 0;
+            int currentPercent = Mathf.RoundToInt(
+                Mathf.Clamp01(model.CurrentProgressNormalized) * 100f);
+            int remainingPercent = Mathf.RoundToInt(
+                Mathf.Clamp01(model.RemainingLevelNormalized) * 100f);
+            _canRevive = model.CanRevive && model.AttemptsLeft > 0;
 
             if (_remainingSlider != null)
                 _remainingSlider.SetValueWithoutNotify(currentPercent / 100f);
@@ -73,13 +70,12 @@ namespace Game.Presentation.UI.Common.Popups
                 _percentText.SetText("{0}%", currentPercent);
 
             if (_attemptsText != null)
-                _attemptsText.SetText(_attemptsFormat, Mathf.Max(0, attemptsLeft));
+                _attemptsText.SetText(_attemptsFormat, Mathf.Max(0, model.AttemptsLeft));
 
-            SetWaitingForAd(false);
-            ResetAnimationState();
+            SetWaiting(model.IsWaiting);
         }
 
-        public void SetWaitingForAd(bool isWaiting)
+        private void SetWaiting(bool isWaiting)
         {
             if (_reviveButton != null)
                 _reviveButton.interactable = !isWaiting && _canRevive;
@@ -93,12 +89,12 @@ namespace Game.Presentation.UI.Common.Popups
             if (!_canRevive)
                 return;
 
-            ReviveRequested?.Invoke();
+            Intent?.Invoke(RevivalPopupIntent.Revive);
         }
 
         private void HandleGiveUpClicked()
         {
-            GiveUpRequested?.Invoke();
+            Intent?.Invoke(RevivalPopupIntent.GiveUp);
         }
 
         public void PlayCloseAnimation(
@@ -107,7 +103,6 @@ namespace Game.Presentation.UI.Common.Popups
             Action onComplete)
         {
             EnsureAnimator();
-            SetWaitingForAd(true);
             _animator.PlayHide(duration, targetScale, onComplete);
         }
 
@@ -122,11 +117,6 @@ namespace Game.Presentation.UI.Common.Popups
             _animator ??= new PopupScaleFadeAnimator(this, _animatedContentRoot);
         }
 
-        private void ResetAnimationState()
-        {
-            EnsureAnimator();
-            _animator.CancelAndRestore();
-        }
     }
 
 }

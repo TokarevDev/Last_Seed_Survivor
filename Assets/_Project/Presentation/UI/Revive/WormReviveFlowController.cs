@@ -44,6 +44,7 @@ namespace Game.Presentation.UI.Revive
         private bool _isReviving;
         private bool _isRevivePopupClosePending;
         private bool _isReviveRollbackPending;
+        private RevivalPopupViewModel _revivalPopupViewModel;
         private ISceneNavigator<GameSceneId> _sceneNavigator;
         private SignalBus _signalBus;
         private bool _isSubscribedToSignals;
@@ -70,10 +71,7 @@ namespace Game.Presentation.UI.Revive
             SubscribeToSignals();
 
             if (_revivalPopup != null)
-            {
-                _revivalPopup.ReviveRequested += HandleReviveRequested;
-                _revivalPopup.GiveUpRequested += HandleGiveUpRequested;
-            }
+                _revivalPopup.Intent += HandleRevivalPopupIntent;
         }
 
         private void OnDisable()
@@ -81,10 +79,7 @@ namespace Game.Presentation.UI.Revive
             UnsubscribeFromSignals();
 
             if (_revivalPopup != null)
-            {
-                _revivalPopup.ReviveRequested -= HandleReviveRequested;
-                _revivalPopup.GiveUpRequested -= HandleGiveUpRequested;
-            }
+                _revivalPopup.Intent -= HandleRevivalPopupIntent;
 
             _popupRoot?.ReleaseGameplayLock();
             _isRevivePopupClosePending = false;
@@ -127,13 +122,30 @@ namespace Game.Presentation.UI.Revive
                 return;
             }
 
-            _revivalPopup.Bind(
+            _revivalPopupViewModel = new RevivalPopupViewModel(
                 _remainingRevives,
                 GetCurrentLevelProgressNormalized(),
                 GetCurrentRemainingLevelNormalized(),
-                _remainingRevives > 0);
+                _remainingRevives > 0,
+                false);
+            _revivalPopup.Render(_revivalPopupViewModel);
 
             _popupRoot.Show(_revivalPopup);
+        }
+
+        private void HandleRevivalPopupIntent(RevivalPopupIntent intent)
+        {
+            switch (intent)
+            {
+                case RevivalPopupIntent.Revive:
+                    HandleReviveRequested();
+                    break;
+                case RevivalPopupIntent.GiveUp:
+                    HandleGiveUpRequested();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(intent), intent, null);
+            }
         }
 
         private void HandleReviveRequested()
@@ -141,7 +153,7 @@ namespace Game.Presentation.UI.Revive
             if (!_isFailState || _isReviving || _remainingRevives <= 0)
                 return;
 
-            _revivalPopup.SetWaitingForAd(true);
+            SetPopupWaiting(true);
 
             if (_rewardedAdService == null)
             {
@@ -150,7 +162,7 @@ namespace Game.Presentation.UI.Revive
                 CompleteRewardedAd(true);
 #else
             Debug.LogError("WormReviveFlowController: rewarded ad service is missing.", this);
-            _revivalPopup.SetWaitingForAd(false);
+            SetPopupWaiting(false);
 #endif
                 return;
             }
@@ -158,7 +170,7 @@ namespace Game.Presentation.UI.Revive
             if (!_rewardedAdService.IsReady)
             {
                 Debug.LogWarning("WormReviveFlowController: rewarded ad is not ready.", this);
-                _revivalPopup.SetWaitingForAd(false);
+                SetPopupWaiting(false);
                 return;
             }
 
@@ -169,7 +181,7 @@ namespace Game.Presentation.UI.Revive
         {
             if (!rewardGranted)
             {
-                _revivalPopup.SetWaitingForAd(false);
+                SetPopupWaiting(false);
                 return;
             }
 
@@ -263,6 +275,15 @@ namespace Game.Presentation.UI.Revive
             }
         }
 
+        private void SetPopupWaiting(bool isWaiting)
+        {
+            if (_revivalPopup == null)
+                return;
+
+            _revivalPopupViewModel = _revivalPopupViewModel.WithWaiting(isWaiting);
+            _revivalPopup.Render(_revivalPopupViewModel);
+        }
+
         private void PlayPopupCloseAnimation(System.Action onComplete)
         {
             if (_revivalPopup == null)
@@ -271,7 +292,7 @@ namespace Game.Presentation.UI.Revive
                 return;
             }
 
-            _revivalPopup.SetWaitingForAd(true);
+            SetPopupWaiting(true);
             _revivalPopup.PlayCloseAnimation(
                 _popupCloseAnimationDuration,
                 _popupCloseAnimationTargetScale,

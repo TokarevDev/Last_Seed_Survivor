@@ -299,8 +299,12 @@ protection.
 1. Completed: `PopupRegistry`, `QueuedActivationState<PopupView>`, and `PopupModalLock`
    own registration, queued navigation, and input/time-scale ownership respectively;
    `PopupRoot` remains the serialized scene view host and SignalBus adapter.
-2. Add ViewModels for reward, revive, victory, HUD, lobby, and navigation.
-3. Views expose typed user intent and render immutable state only.
+2. In progress: reward state and `RevivalPopupViewModel` provide immutable rendering
+   boundaries; add equivalent focused models only where victory, HUD, lobby, and
+   navigation currently pass mutable or fragmented state.
+3. In progress: revive now exposes one `RevivalPopupIntent` stream and renders immutable
+   state; migrate remaining views at their application boundaries without adding proxy
+   abstractions around already-typed APIs.
 4. Completed: `RewardButtonContentPresenter` owns content/style binding and
    `RewardButtonAnimator` owns cached RectTransform/icon state plus tween creation;
    `RewardButtonView` remains the serialized input/view adapter.
