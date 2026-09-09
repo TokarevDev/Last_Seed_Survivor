@@ -236,8 +236,10 @@ both weapon types active, extreme configured limits, and pool exhaustion/rollbac
    and acts as the Transform/cache-invalidating adapter; immutable `BakedRailPath`
    owns runtime sampling, nearest-distance, and control-point-progress queries exposed
    through `IWormRailPath`.
-4. Move legacy import and point-editing APIs to Editor assembly utilities.
-5. Move gizmo drawing to an editor-only drawer or narrow view component.
+4. Completed: legacy waypoint/child import and all point-editing operations live in
+   `RailPathSerializedData` and `RailPathEditor` inside the Editor-only assembly.
+5. Completed: selected-path gizmos are rendered by the Editor-only
+   `RailPathGizmoDrawer`; the runtime component contains no editor drawing code.
 6. Completed: control-point distances are calculated once while baking and stored in
    `BakedRailPath`; progress queries use binary search without repeated nearest-sample
    scans.

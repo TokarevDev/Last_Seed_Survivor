@@ -72,7 +72,7 @@ namespace Game.Editor.Worm
             serializedObject.Update();
             HandleKeyboardDelete(path);
             HandleShiftClickInsert(path);
-            DrawPath(path);
+            DrawPath();
             DrawPointHandles(path);
         }
 
@@ -97,7 +97,7 @@ namespace Game.Editor.Worm
 
             using (new EditorGUILayout.HorizontalScope())
             {
-                using (new EditorGUI.DisabledScope(!CanRemoveSelectedPoint(path)))
+                using (new EditorGUI.DisabledScope(!CanRemoveSelectedPoint()))
                 {
                     if (GUILayout.Button("Remove Selected"))
                         RemoveSelectedPoint(path);
@@ -168,7 +168,7 @@ namespace Game.Editor.Worm
                 MessageType.None);
         }
 
-        private void DrawPath(RailPath path)
+        private void DrawPath()
         {
             if (_data.PointCount < 2)
                 return;
@@ -232,7 +232,6 @@ namespace Game.Editor.Worm
                 return;
 
             if (!TryFindClosestSegmentPoint(
-                    path,
                     mouseWorldPosition,
                     out int insertIndex,
                     out Vector3 insertPosition))
@@ -256,7 +255,7 @@ namespace Game.Editor.Worm
             if (current.keyCode != KeyCode.Delete && current.keyCode != KeyCode.Backspace)
                 return;
 
-            if (!CanRemoveSelectedPoint(path))
+            if (!CanRemoveSelectedPoint())
                 return;
 
             RemoveSelectedPoint(path);
@@ -264,7 +263,6 @@ namespace Game.Editor.Worm
         }
 
         private bool TryFindClosestSegmentPoint(
-            RailPath path,
             Vector3 mouseWorldPosition,
             out int insertIndex,
             out Vector3 insertPosition)
@@ -296,7 +294,7 @@ namespace Game.Editor.Worm
             Vector3 segment = end - start;
             float sqrMagnitude = segment.sqrMagnitude;
 
-            if (sqrMagnitude <= 0.0001f)
+            if (sqrMagnitude <= RailPath.MinimumSegmentLength)
                 return start;
 
             float t = Vector3.Dot(point - start, segment) / sqrMagnitude;
@@ -341,7 +339,7 @@ namespace Game.Editor.Worm
             Vector3 previous = _data.GetWorldPoint(_data.PointCount - 2);
             Vector3 offset = last - previous;
 
-            return offset.sqrMagnitude > 0.0001f
+            return offset.sqrMagnitude > RailPath.MinimumSegmentLength
                 ? last + offset.normalized * NewEndPointDistance
                 : last + Vector3.up * NewEndPointDistance;
         }
@@ -354,7 +352,7 @@ namespace Game.Editor.Worm
             EditorUtility.SetDirty(path);
         }
 
-        private bool CanRemoveSelectedPoint(RailPath path)
+        private bool CanRemoveSelectedPoint()
         {
             return _selectedPointIndex >= 0 &&
                    _selectedPointIndex < _data.PointCount &&
