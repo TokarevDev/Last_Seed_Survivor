@@ -62,7 +62,8 @@ namespace Game.Presentation.UI.Common
 
         private void OnDestroy()
         {
-            Stop(false);
+            KillSequence(ref _idleSequence);
+            KillSequence(ref _blinkSequence);
         }
 
 #if UNITY_EDITOR
@@ -85,16 +86,17 @@ namespace Game.Presentation.UI.Common
         public void Play()
         {
             Initialize();
-            Stop(false);
             RestoreState();
-            StartIdleLoop();
-            StartBlinkLoop();
+            EnsureIdleLoop();
+            EnsureBlinkLoop();
+            _idleSequence?.Restart();
+            _blinkSequence?.Restart();
         }
 
         public void Stop(bool restoreState)
         {
-            KillSequence(ref _idleSequence);
-            KillSequence(ref _blinkSequence);
+            _idleSequence?.Pause();
+            _blinkSequence?.Pause();
 
             if (restoreState && _isInitialized)
                 RestoreState();
@@ -135,8 +137,11 @@ namespace Game.Presentation.UI.Common
             }
         }
 
-        private void StartIdleLoop()
+        private void EnsureIdleLoop()
         {
+            if (_idleSequence != null && _idleSequence.IsActive())
+                return;
+
             if (_target == null || (!HasPositionAnimation() && !HasScaleAnimation()))
                 return;
 
@@ -147,7 +152,10 @@ namespace Game.Presentation.UI.Common
             AppendIdleStep(_baseAnchoredPosition + _positionOffset, GetScaledTarget(), _halfCycleDuration);
             AppendIdleStep(_baseAnchoredPosition, _baseLocalScale, _halfCycleDuration);
 
-            _idleSequence.SetLoops(-1, LoopType.Restart);
+            _idleSequence
+                .SetLoops(-1, LoopType.Restart)
+                .SetAutoKill(false)
+                .Pause();
         }
 
         private void AppendIdleStep(Vector2 targetPosition, Vector3 targetScale, float duration)
@@ -176,8 +184,11 @@ namespace Game.Presentation.UI.Common
             }
         }
 
-        private void StartBlinkLoop()
+        private void EnsureBlinkLoop()
         {
+            if (_blinkSequence != null && _blinkSequence.IsActive())
+                return;
+
             if (!_animateBlink || _blinkImages == null || _blinkImages.Length == 0)
                 return;
 
@@ -194,7 +205,10 @@ namespace Game.Presentation.UI.Common
                 _blinkSequence.AppendInterval(_blinkClosedPause);
 
             AppendBlinkFill(_openFillAmount, _blinkOpenDuration);
-            _blinkSequence.SetLoops(-1, LoopType.Restart);
+            _blinkSequence
+                .SetLoops(-1, LoopType.Restart)
+                .SetAutoKill(false)
+                .Pause();
         }
 
         private void AppendBlinkFill(float fillAmount, float duration)

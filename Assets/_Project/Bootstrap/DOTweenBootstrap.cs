@@ -5,10 +5,13 @@ namespace Game.Bootstrap
 
     public static class DOTweenBootstrap
     {
+        private const int TweenCapacity = 500;
+        private const int SequenceCapacity = 100;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         private static void Init()
         {
-            DOTween.SetTweensCapacity(500, 100);
+            DOTween.SetTweensCapacity(TweenCapacity, SequenceCapacity);
         }
     }
 }
