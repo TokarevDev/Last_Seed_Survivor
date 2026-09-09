@@ -6,8 +6,15 @@ using Game.Gameplay.Enemy.Worm.Presentation;
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
     using System;
+    using Unity.Profiling;
+
     public sealed class WormFrameSimulation
     {
+        public const string ProfilerMarkerName = "LastSeed.Gameplay.WormFrame";
+
+        private static readonly ProfilerMarker FrameProfilerMarker =
+            new(ProfilerMarkerName);
+
         private readonly WormMovementCoordinator _movement;
         private readonly WormSegmentChainPresenter _segmentPresenter;
         private readonly OrderedReferenceSet<WormSegment> _segmentChain;
@@ -27,16 +34,19 @@ namespace Game.Gameplay.Enemy.Worm.Movement
 
         public bool Tick(in WormFrameContext context)
         {
-            if (_segmentChain.Count == 0 || context.Rail == null)
-                return false;
+            using (FrameProfilerMarker.Auto())
+            {
+                if (_segmentChain.Count == 0 || context.Rail == null)
+                    return false;
 
-            WormMovementStepResult movementResult = _movement.Advance(context);
-            Render(context.Rail, context.SegmentLayout);
+                WormMovementStepResult movementResult = _movement.Advance(context);
+                Render(context.Rail, context.SegmentLayout);
 
-            if (movementResult.CompleteReviveAfterRender)
-                _movement.CompleteReviveAfterRender();
+                if (movementResult.CompleteReviveAfterRender)
+                    _movement.CompleteReviveAfterRender();
 
-            return movementResult.PathCompleted;
+                return movementResult.PathCompleted;
+            }
         }
 
         public void Render(RailPath rail, in WormSegmentChainLayout layout)

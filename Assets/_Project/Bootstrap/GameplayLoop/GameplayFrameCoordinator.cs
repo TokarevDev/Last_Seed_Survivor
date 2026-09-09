@@ -5,11 +5,17 @@ using Game.Gameplay.Enemy.Worm.Movement;
 using Game.Gameplay.Input;
 using Game.Gameplay.Player;
 using Game.Presentation.Worm;
+using Unity.Profiling;
 
 namespace Game.Bootstrap.GameplayLoop
 {
     public sealed class GameplayFrameCoordinator
     {
+        public const string ProfilerMarkerName = "LastSeed.Gameplay.Frame";
+
+        private static readonly ProfilerMarker FrameProfilerMarker =
+            new(ProfilerMarkerName);
+
         private readonly IPlayerInputSnapshotProvider _playerInputSnapshotProvider;
         private readonly IGameplayInputLock _gameplayInputLock;
         private readonly PlayerMovementController _playerMovementController;
@@ -45,10 +51,13 @@ namespace Game.Bootstrap.GameplayLoop
             float time,
             float unscaledTime)
         {
-            RunInputCaptureStage();
-            RunPlayerStage(deltaTime);
-            RunWormStage(deltaTime, unscaledDeltaTime, time, unscaledTime);
-            RunDifficultyStage(deltaTime);
+            using (FrameProfilerMarker.Auto())
+            {
+                RunInputCaptureStage();
+                RunPlayerStage(deltaTime);
+                RunWormStage(deltaTime, unscaledDeltaTime, time, unscaledTime);
+                RunDifficultyStage(deltaTime);
+            }
         }
 
         private void RunInputCaptureStage()

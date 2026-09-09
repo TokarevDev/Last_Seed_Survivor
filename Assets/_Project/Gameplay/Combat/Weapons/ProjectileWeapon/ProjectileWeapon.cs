@@ -11,10 +11,16 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
     using System;
     using System.Collections.Generic;
     using UnityEngine;
+    using Unity.Profiling;
 
     [DisallowMultipleComponent]
     public sealed class ProjectileWeapon : MonoBehaviour
     {
+        public const string FireProfilerMarkerName = "LastSeed.Gameplay.WeaponFire";
+
+        private static readonly ProfilerMarker FireProfilerMarker =
+            new(FireProfilerMarkerName);
+
         [Header("Debug / Safety")]
         [SerializeField][Min(1)] private int _maxShots = 200;
 
@@ -223,18 +229,26 @@ namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 
         private void Fire()
         {
-            _shots.Clear();
-            _shotPatternBuilder.Build(_firePoint.position, _firePoint.rotation, _runtimeState, _shots);
-
-            if (_shots.Count > _maxShots)
+            using (FireProfilerMarker.Auto())
             {
-                Debug.LogWarning($"Shot limit exceeded: {_shots.Count} → clamped to {_maxShots}");
-                _shots.RemoveRange(_maxShots, _shots.Count - _maxShots);
-            }
+                _shots.Clear();
+                _shotPatternBuilder.Build(
+                    _firePoint.position,
+                    _firePoint.rotation,
+                    _runtimeState,
+                    _shots);
 
-            foreach (var shot in _shots)
-            {
-                Spawn(shot);
+                if (_shots.Count > _maxShots)
+                {
+                    Debug.LogWarning(
+                        $"Shot limit exceeded: {_shots.Count} → clamped to {_maxShots}");
+                    _shots.RemoveRange(_maxShots, _shots.Count - _maxShots);
+                }
+
+                foreach (ShotSpawnData shot in _shots)
+                {
+                    Spawn(shot);
+                }
             }
         }
 
