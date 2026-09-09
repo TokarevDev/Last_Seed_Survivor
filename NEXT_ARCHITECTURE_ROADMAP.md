@@ -232,12 +232,15 @@ both weapon types active, extreme configured limits, and pool exhaustion/rollbac
    defensive copy of local control points; `RailPath` adapts it to world-space caches.
 2. Completed: smoothing, distance-table construction, sampling, and nearest-point
    queries live in focused stateless calculation classes.
-3. Keep `RailPathView` responsible only for Transform conversion and exposing a baked
-   runtime path through `IWormRailPath`.
+3. Completed: the serialized `RailPath` MonoBehaviour keeps its Unity script identity
+   and acts as the Transform/cache-invalidating adapter; immutable `BakedRailPath`
+   owns runtime sampling, nearest-distance, and control-point-progress queries exposed
+   through `IWormRailPath`.
 4. Move legacy import and point-editing APIs to Editor assembly utilities.
 5. Move gizmo drawing to an editor-only drawer or narrow view component.
-6. Cache control-point distances during bake; do not perform repeated nearest-sample
-   scans for control-point progress.
+6. Completed: control-point distances are calculated once while baking and stored in
+   `BakedRailPath`; progress queries use binary search without repeated nearest-sample
+   scans.
 
 Playtest: linear/smoothed paths, short/duplicate points, transformed path object, catch-up,
 burst-disable point, revive target, and editor point migration.

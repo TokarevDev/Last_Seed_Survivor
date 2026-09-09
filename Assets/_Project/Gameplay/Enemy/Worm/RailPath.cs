@@ -1,5 +1,4 @@
 
-using Game.Core.Collections;
 using Game.Core.World;
 using Game.Gameplay.Enemy.Worm.Movement;
 
@@ -34,14 +33,9 @@ namespace Game.Gameplay.Enemy.Worm
 
         [SerializeField][HideInInspector] private Transform[] _waypoints;
 
-        private Vector3[] _worldPoints;
-        private Vector3[] _samples;
-        private float[] _distances;
-        private float[] _controlPointDistances;
-        private float _totalLength;
+        private BakedRailPath _runtimePath;
         private Matrix4x4 _builtLocalToWorldMatrix;
         private bool _hasBuiltTransform;
-        private RailPathDefinition _definition;
 
         public int PointCount => _localPoints != null ? _localPoints.Count : 0;
         public float TotalLength
@@ -49,7 +43,7 @@ namespace Game.Gameplay.Enemy.Worm
             get
             {
                 EnsureBuilt();
-                return _totalLength;
+                return _runtimePath?.TotalLength ?? 0f;
             }
         }
 
@@ -72,7 +66,7 @@ namespace Game.Gameplay.Enemy.Worm
                 return;
             }
 
-            if (_totalLength <= MinimumSegmentLength)
+            if (_runtimePath.TotalLength <= MinimumSegmentLength)
                 Debug.LogError("RailPath total length must be greater than zero.", this);
         }
 
@@ -100,28 +94,7 @@ namespace Game.Gameplay.Enemy.Worm
             if (!EnsureBuilt())
                 return transform.position;
 
-            distance = Mathf.Clamp(distance, 0f, _totalLength);
-
-            if (distance >= _totalLength)
-                return _samples[^1];
-
-            float fIndex = distance / _sampleStep;
-            int index = Mathf.FloorToInt(fIndex);
-
-            if (index >= _samples.Length - 1)
-                return _samples[^1];
-
-            float intervalStart = index * _sampleStep;
-            float intervalEnd = Mathf.Min(intervalStart + _sampleStep, _totalLength);
-            float intervalLength = intervalEnd - intervalStart;
-            float t = intervalLength > MinimumSegmentLength
-                ? (distance - intervalStart) / intervalLength
-                : 0f;
-
-            return Vector3.Lerp(
-                _samples[index],
-                _samples[index + 1],
-                t);
+            return _runtimePath.GetPoint(distance);
         }
 
         NumericVector3 IPathSampler<NumericVector3>.GetPoint(float distance)
@@ -132,47 +105,29 @@ namespace Game.Gameplay.Enemy.Worm
 
         public float GetClosestDistance(Vector3 worldPosition)
         {
-            if (!EnsureBuilt() || _samples == null || _samples.Length == 0)
+            if (!EnsureBuilt())
                 return 0f;
 
-            return FindClosestSampleDistance(worldPosition);
-        }
-
-        private float FindClosestSampleDistance(Vector3 worldPosition)
-        {
-            return RailNearestPointQuery.FindSampleDistance(
-                _samples,
-                worldPosition,
-                _sampleStep,
-                _totalLength);
+            return _runtimePath.GetClosestDistance(worldPosition);
         }
 
         public bool TryGetControlPointDistance(int pointIndex, out float distance)
         {
-            distance = 0f;
-
-            if (pointIndex < 0 || !EnsureBuilt() ||
-                _controlPointDistances == null ||
-                pointIndex >= _controlPointDistances.Length)
+            if (!EnsureBuilt())
             {
+                distance = 0f;
                 return false;
             }
 
-            distance = _controlPointDistances[pointIndex];
-            return true;
+            return _runtimePath.TryGetControlPointDistance(pointIndex, out distance);
         }
 
         public float GetControlPointProgressNormalized(float distance)
         {
-            if (!EnsureBuilt() || PointCount <= 1)
+            if (!EnsureBuilt())
                 return 0f;
 
-            float clampedDistance = Mathf.Clamp(distance, 0f, _totalLength);
-            int passedPointIndex = SortedSearch.FindLastIndexAtMost(
-                _controlPointDistances,
-                clampedDistance + MinimumSegmentLength);
-
-            return Mathf.Clamp01(passedPointIndex / (float)(PointCount - 1));
+            return _runtimePath.GetControlPointProgressNormalized(distance);
         }
 
         public bool TryGetControlPointWorldPosition(int pointIndex, out Vector3 worldPosition)
@@ -215,7 +170,7 @@ namespace Game.Gameplay.Enemy.Worm
 
         private bool EnsureBuilt()
         {
-            if (_samples != null && _samples.Length > 0)
+            if (_runtimePath != null)
             {
                 if (_hasBuiltTransform &&
                     _builtLocalToWorldMatrix == transform.localToWorldMatrix)
@@ -226,49 +181,71 @@ namespace Game.Gameplay.Enemy.Worm
                 Invalidate();
             }
 
-            if (!TryBuildWorldPoints())
+            if (!TryBuildWorldPoints(
+                    out Vector3[] worldPoints,
+                    out RailPathDefinition definition))
                 return false;
 
-            Vector3[] pathPoints = BuildPathPoints();
+            Vector3[] pathPoints = BuildPathPoints(worldPoints, definition);
             if (pathPoints == null || pathPoints.Length < 2)
                 return false;
 
-            _sampleStep = _definition != null
-                ? _definition.SampleStep
+            _sampleStep = definition != null
+                ? definition.SampleStep
                 : Mathf.Max(MinimumSampleStep, _sampleStep);
-            CalculateDistances(pathPoints);
-            BuildSamples(pathPoints);
-            BuildControlPointDistances();
+            float[] distances = RailDistanceTableBuilder.Build(
+                pathPoints,
+                out float totalLength);
+            Vector3[] samples = RailSampler.Build(
+                pathPoints,
+                distances,
+                totalLength,
+                _sampleStep,
+                MinimumSegmentLength);
+            float[] controlPointDistances = BuildControlPointDistances(
+                samples,
+                totalLength);
+            _runtimePath = new BakedRailPath(
+                samples,
+                controlPointDistances,
+                _sampleStep,
+                totalLength);
             _builtLocalToWorldMatrix = transform.localToWorldMatrix;
             _hasBuiltTransform = true;
 
-            return _samples != null && _samples.Length > 0;
+            return true;
         }
 
-        private bool TryBuildWorldPoints()
+        private bool TryBuildWorldPoints(
+            out Vector3[] worldPoints,
+            out RailPathDefinition definition)
         {
             if (_localPoints != null && _localPoints.Count >= 2)
             {
-                _definition = new RailPathDefinition(
+                definition = new RailPathDefinition(
                     _localPoints,
                     _sampleStep,
                     _interpolationMode,
                     _cornerRadius,
                     _cornerSamples);
-                _worldPoints = new Vector3[_definition.PointCount];
+                worldPoints = new Vector3[definition.PointCount];
 
-                for (int i = 0; i < _definition.PointCount; i++)
-                    _worldPoints[i] = transform.TransformPoint(_definition.GetLocalPoint(i));
+                for (int i = 0; i < definition.PointCount; i++)
+                    worldPoints[i] = transform.TransformPoint(definition.GetLocalPoint(i));
 
                 return true;
             }
 
             int legacyWaypointCount = CountValidLegacyWaypoints();
             if (legacyWaypointCount < 2)
+            {
+                worldPoints = null;
+                definition = null;
                 return false;
+            }
 
-            _worldPoints = new Vector3[legacyWaypointCount];
-            _definition = null;
+            worldPoints = new Vector3[legacyWaypointCount];
+            definition = null;
 
             int pointIndex = 0;
             for (int i = 0; i < _waypoints.Length; i++)
@@ -277,42 +254,31 @@ namespace Game.Gameplay.Enemy.Worm
                 if (waypoint == null)
                     continue;
 
-                _worldPoints[pointIndex] = waypoint.position;
+                worldPoints[pointIndex] = waypoint.position;
                 pointIndex++;
             }
 
             return true;
         }
 
-        private Vector3[] BuildPathPoints()
+        private Vector3[] BuildPathPoints(
+            Vector3[] worldPoints,
+            RailPathDefinition definition)
         {
             return RailPathSmoother.Build(
-                _worldPoints,
-                _definition != null ? _definition.InterpolationMode : _interpolationMode,
-                _definition != null ? _definition.CornerRadius : _cornerRadius,
-                _definition != null ? _definition.CornerSamples : _cornerSamples,
+                worldPoints,
+                definition != null ? definition.InterpolationMode : _interpolationMode,
+                definition != null ? definition.CornerRadius : _cornerRadius,
+                definition != null ? definition.CornerSamples : _cornerSamples,
                 MinimumSegmentLength);
         }
 
-        private void CalculateDistances(Vector3[] pathPoints)
-        {
-            _distances = RailDistanceTableBuilder.Build(pathPoints, out _totalLength);
-        }
-
-        private void BuildSamples(Vector3[] pathPoints)
-        {
-            _samples = RailSampler.Build(
-                pathPoints,
-                _distances,
-                _totalLength,
-                _sampleStep,
-                MinimumSegmentLength);
-        }
-
-        private void BuildControlPointDistances()
+        private float[] BuildControlPointDistances(
+            Vector3[] samples,
+            float totalLength)
         {
             int controlPointCount = GetAvailableControlPointCount();
-            _controlPointDistances = new float[controlPointCount];
+            float[] controlPointDistances = new float[controlPointCount];
             float previousDistance = 0f;
 
             for (int i = 0; i < controlPointCount; i++)
@@ -321,11 +287,17 @@ namespace Game.Gameplay.Enemy.Worm
                 {
                     previousDistance = Mathf.Max(
                         previousDistance,
-                        FindClosestSampleDistance(worldPosition));
+                        RailNearestPointQuery.FindSampleDistance(
+                            samples,
+                            worldPosition,
+                            _sampleStep,
+                            totalLength));
                 }
 
-                _controlPointDistances[i] = previousDistance;
+                controlPointDistances[i] = previousDistance;
             }
+
+            return controlPointDistances;
         }
 
         private int GetAvailableControlPointCount()
@@ -352,14 +324,9 @@ namespace Game.Gameplay.Enemy.Worm
 
         private void Invalidate()
         {
-            _worldPoints = null;
-            _samples = null;
-            _distances = null;
-            _controlPointDistances = null;
-            _totalLength = 0f;
+            _runtimePath = null;
             _builtLocalToWorldMatrix = default;
             _hasBuiltTransform = false;
-            _definition = null;
         }
 
     }
