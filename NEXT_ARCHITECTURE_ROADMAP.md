@@ -307,7 +307,9 @@ protection.
 5. Completed: `RewardPopupAnimator`, `RewardPopupAnimatedLayout`, and
    `RewardPopupRefreshAnimationBuilder` own timeline composition, while
    `RewardPopupAudioPlayer` isolates concrete clip playback.
-6. Standardize tween lifecycle (`Play`, `Cancel`, `Restore`) and pool/disable cleanup.
+6. In progress: reward buttons remove only their owned click callback, cancel and restore
+   tween state on disable, and clear bound data/delegates; apply the same explicit
+   `Play`/`Cancel`/`Restore` lifecycle to the remaining popup animations.
 
 Playtest: rapid clicks, close during transition, nested popup request, timescale zero,
 resolution/aspect changes, navigation, and input lock restoration.

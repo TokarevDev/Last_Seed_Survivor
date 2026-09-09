@@ -58,6 +58,16 @@ namespace Game.Presentation.UI.Rewards
             EnsureControllers();
         }
 
+        private void OnDisable()
+        {
+            if (_button != null)
+                _button.onClick.RemoveListener(OnClick);
+
+            _animator?.Reset();
+            _data = null;
+            _onClick = null;
+        }
+
         public void Bind(
             RewardChoiceData data,
             RewardPresentationData presentation,
@@ -76,7 +86,7 @@ namespace Game.Presentation.UI.Rewards
                 return;
 
             _button.interactable = interactable;
-            _button.onClick.RemoveAllListeners();
+            _button.onClick.RemoveListener(OnClick);
             _button.onClick.AddListener(OnClick);
         }
 
