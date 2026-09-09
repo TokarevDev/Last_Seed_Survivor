@@ -249,8 +249,10 @@ burst-disable point, revive target, and editor point migration.
 
 ### Stage 5 — finish worm application boundary
 
-1. Extract immutable `WormMovementConfig`, `WormPresentationConfig`, and
-   `WormReviveConfig` from controller Inspector fields.
+1. Completed: the existing `WormMovementConfig` ScriptableObject retains its serialized
+   asset identity and creates immutable `WormMovementRuntimeConfig`,
+   `WormPresentationConfig`, and `WormReviveConfig` snapshots once at composition;
+   `WormController` does not read mutable balance assets during its runtime loop.
 2. Introduce `WormLifecycleController` for init/clear and a `WormMovementCoordinator`
    for named forward/rollback/revive states.
 3. Replace `WormController.PathCompleted` with a payload containing final distance,

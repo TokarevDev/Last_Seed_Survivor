@@ -90,7 +90,37 @@ namespace Game.Gameplay.Enemy.Worm.Movement
         public float RollbackSpeed => _rollbackSpeed;
         public float SectionRollbackForwardSpeedMultiplier => _sectionRollbackForwardSpeedMultiplier;
 
-        public WormForwardMotionSettings CreateForwardMotionSettings()
+        public WormMovementRuntimeConfig CreateRuntimeMovementConfig()
+        {
+            WormForwardMotionSettings forwardMotion = CreateForwardMotionSettings();
+            return new WormMovementRuntimeConfig(
+                forwardMotion,
+                _rollbackSpeed,
+                _sectionRollbackForwardSpeedMultiplier);
+        }
+
+        public WormPresentationConfig CreatePresentationConfig()
+        {
+            return new WormPresentationConfig(
+                _segmentSpacing,
+                _tailVisualSpacingMultiplier,
+                _headBridgeSpacingMultiplier,
+                _activeDistancePadding,
+                _waveAmplitude,
+                _waveFrequency,
+                _waveSpeed);
+        }
+
+        public WormReviveConfig CreateReviveConfig()
+        {
+            WormReviveAnimationSettings animationSettings =
+                CreateReviveAnimationSettings();
+            return new WormReviveConfig(
+                _reviveRollbackRailPointIndex,
+                animationSettings);
+        }
+
+        private WormForwardMotionSettings CreateForwardMotionSettings()
         {
             WormCombatBurstSettings burstSettings = new(
                 _enableCombatSpeedBursts,
@@ -110,28 +140,7 @@ namespace Game.Gameplay.Enemy.Worm.Movement
                 burstSettings);
         }
 
-        public WormSegmentChainLayout CreateSegmentLayout(
-            float headDistance,
-            float waveTime,
-            float verticalOffset,
-            bool isSectionRollback,
-            bool isReviveRollback)
-        {
-            return new WormSegmentChainLayout(
-                headDistance,
-                _segmentSpacing,
-                _tailVisualSpacingMultiplier,
-                _headBridgeSpacingMultiplier,
-                _activeDistancePadding,
-                _waveAmplitude,
-                _waveFrequency,
-                waveTime,
-                verticalOffset,
-                isSectionRollback,
-                isReviveRollback);
-        }
-
-        public WormReviveAnimationSettings CreateReviveAnimationSettings()
+        private WormReviveAnimationSettings CreateReviveAnimationSettings()
         {
             return new WormReviveAnimationSettings(
                 _baseSpeed,

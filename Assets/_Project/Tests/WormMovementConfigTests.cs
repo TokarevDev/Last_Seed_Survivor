@@ -23,9 +23,11 @@ namespace Game.Tests
         }
 
         [Test]
-        public void CreateForwardMotionSettings_UsesConfiguredDefaults()
+        public void CreateRuntimeMovementConfig_UsesConfiguredDefaults()
         {
-            WormForwardMotionSettings settings = _config.CreateForwardMotionSettings();
+            WormMovementRuntimeConfig runtimeConfig =
+                _config.CreateRuntimeMovementConfig();
+            WormForwardMotionSettings settings = runtimeConfig.ForwardMotion;
 
             Assert.That(settings.BaseSpeed, Is.EqualTo(1.2f));
             Assert.That(settings.CatchUpRailPointIndex, Is.EqualTo(3));
@@ -39,12 +41,16 @@ namespace Game.Tests
             Assert.That(settings.BurstSettings.Interval, Is.EqualTo(10f));
             Assert.That(settings.BurstSettings.Duration, Is.EqualTo(2.5f));
             Assert.That(settings.BurstSettings.SlowdownDuration, Is.EqualTo(0.35f));
+            Assert.That(runtimeConfig.RollbackSpeed, Is.EqualTo(9f));
+            Assert.That(runtimeConfig.SectionRollbackForwardSpeedMultiplier, Is.EqualTo(4f));
         }
 
         [Test]
-        public void CreateSegmentLayout_CombinesConfigWithRuntimeState()
+        public void CreatePresentationConfig_CombinesConfigWithRuntimeState()
         {
-            WormSegmentChainLayout layout = _config.CreateSegmentLayout(
+            WormPresentationConfig presentationConfig =
+                _config.CreatePresentationConfig();
+            WormSegmentChainLayout layout = presentationConfig.CreateSegmentLayout(
                 headDistance: 12f,
                 waveTime: 3f,
                 verticalOffset: 2f,
@@ -62,12 +68,14 @@ namespace Game.Tests
             Assert.That(layout.VerticalOffset, Is.EqualTo(2f));
             Assert.That(layout.IsSectionRollback, Is.True);
             Assert.That(layout.IsReviveRollback, Is.False);
+            Assert.That(presentationConfig.WaveSpeed, Is.EqualTo(1f));
         }
 
         [Test]
-        public void CreateReviveAnimationSettings_UsesConfiguredDefaults()
+        public void CreateReviveConfig_UsesConfiguredDefaults()
         {
-            WormReviveAnimationSettings settings = _config.CreateReviveAnimationSettings();
+            WormReviveConfig reviveConfig = _config.CreateReviveConfig();
+            WormReviveAnimationSettings settings = reviveConfig.AnimationSettings;
 
             Assert.That(settings.GameplaySpeed, Is.EqualTo(1.2f));
             Assert.That(settings.SquashDuration, Is.EqualTo(0.08f));
@@ -79,6 +87,7 @@ namespace Game.Tests
             Assert.That(settings.SquashYScale, Is.EqualTo(0.72f));
             Assert.That(settings.LandingXScale, Is.EqualTo(1.1f));
             Assert.That(settings.LandingYScale, Is.EqualTo(0.86f));
+            Assert.That(reviveConfig.RollbackRailPointIndex, Is.EqualTo(8));
         }
     }
 }

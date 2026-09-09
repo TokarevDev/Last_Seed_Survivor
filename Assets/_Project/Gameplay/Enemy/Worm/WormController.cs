@@ -24,6 +24,9 @@ namespace Game.Gameplay.Enemy.Worm
         private WormReviveSequence _reviveSequence;
         private OrderedReferenceSet<WormSegment> _segmentChain;
         private WormSectionRollbackState<WormSegment> _sectionRollbackState;
+        private WormMovementRuntimeConfig _runtimeMovementConfig;
+        private WormPresentationConfig _presentationConfig;
+        private WormReviveConfig _reviveConfig;
         private float _waveTime;
 
         public bool HasWorm => _segmentChain != null && _segmentChain.Count > 0;
@@ -56,6 +59,10 @@ namespace Game.Gameplay.Enemy.Worm
 
             if (_movementConfig == null)
                 throw new InvalidOperationException($"{nameof(WormController)} on '{name}' requires a movement config.");
+
+            _runtimeMovementConfig = _movementConfig.CreateRuntimeMovementConfig();
+            _presentationConfig = _movementConfig.CreatePresentationConfig();
+            _reviveConfig = _movementConfig.CreateReviveConfig();
         }
 
         public float HeadPathProgressNormalized
@@ -104,7 +111,7 @@ namespace Game.Gameplay.Enemy.Worm
             _segmentChainPresenter.Reset();
 
             _sectionRollbackState.Complete();
-            _combatBurstController.Reset(_movementConfig.BaseSpeed);
+            _combatBurstController.Reset(_runtimeMovementConfig.BaseSpeed);
             ClearTargetDistanceCaches();
             _pathProgress.Reset(TryGetCatchUpTargetDistance(out _));
 
@@ -117,7 +124,7 @@ namespace Game.Gameplay.Enemy.Worm
             _segmentChain.Clear();
             _segmentChainPresenter.Reset();
             _sectionRollbackState.Complete();
-            _combatBurstController.Reset(_movementConfig.BaseSpeed);
+            _combatBurstController.Reset(_runtimeMovementConfig.BaseSpeed);
             _pathProgress.Reset();
             ClearTargetDistanceCaches();
         }
@@ -130,15 +137,14 @@ namespace Game.Gameplay.Enemy.Worm
         {
             _waveTime = (_sectionRollbackState.IsActive || _reviveSequence.IsActive
                 ? unscaledTime
-                : time) * _movementConfig.WaveSpeed;
-            WormForwardMotionSettings settings = _movementConfig.CreateForwardMotionSettings();
+                : time) * _presentationConfig.WaveSpeed;
             WormFrameContext context = new(
                 _rail,
-                settings,
+                _runtimeMovementConfig.ForwardMotion,
                 BuildSegmentLayout(),
-                _movementConfig.BaseSpeed,
-                _movementConfig.SectionRollbackForwardSpeedMultiplier,
-                _movementConfig.RollbackSpeed,
+                _runtimeMovementConfig.BaseSpeed,
+                _runtimeMovementConfig.SectionRollbackForwardSpeedMultiplier,
+                _runtimeMovementConfig.RollbackSpeed,
                 deltaTime,
                 unscaledDeltaTime);
 
@@ -152,7 +158,7 @@ namespace Game.Gameplay.Enemy.Worm
         {
             return _railTargetResolver.TryGetCatchUpDistance(
                 _rail,
-                _movementConfig.CatchUpRailPointIndex,
+                _runtimeMovementConfig.ForwardMotion.CatchUpRailPointIndex,
                 out targetDistance);
         }
 
@@ -160,8 +166,8 @@ namespace Game.Gameplay.Enemy.Worm
         {
             return _railTargetResolver.TryGetReviveDistance(
                 _rail,
-                _movementConfig.ReviveRollbackRailPointIndex,
-                _movementConfig.CatchUpRailPointIndex,
+                _reviveConfig.RollbackRailPointIndex,
+                _runtimeMovementConfig.ForwardMotion.CatchUpRailPointIndex,
                 out targetDistance);
         }
 
@@ -177,7 +183,7 @@ namespace Game.Gameplay.Enemy.Worm
 
         private WormSegmentChainLayout BuildSegmentLayout()
         {
-            return _movementConfig.CreateSegmentLayout(
+            return _presentationConfig.CreateSegmentLayout(
                 _pathProgress.HeadDistance,
                 _waveTime,
                 _reviveSequence.VisualYOffset,
@@ -213,7 +219,7 @@ namespace Game.Gameplay.Enemy.Worm
                 splitIndex,
                 destroyedCount,
                 _pathProgress.HeadDistance,
-                _movementConfig.SegmentSpacing);
+                _presentationConfig.SegmentSpacing);
             _segmentChainPresenter.Reset();
         }
 
@@ -241,7 +247,7 @@ namespace Game.Gameplay.Enemy.Worm
             _reviveSequence.Begin(
                 _pathProgress.HeadDistance,
                 target,
-                _movementConfig.CreateReviveAnimationSettings(),
+                _reviveConfig.AnimationSettings,
                 _segmentChain.Items,
                 onComplete);
             return true;
