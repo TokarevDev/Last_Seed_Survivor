@@ -19,16 +19,18 @@ namespace Game.Gameplay.Enemy.Worm
     public sealed class RailPath : MonoBehaviour, IWormRailPath, IPathSampler<NumericVector3>
     {
         private const float DefaultSampleStep = 0.1f;
-        private const float MinSampleStep = 0.01f;
+        public const float MinimumSampleStep = 0.01f;
+        public const int MinimumCornerSamples = 2;
+        public const int MaximumCornerSamples = 16;
         public const float MinimumSegmentLength = 0.0001f;
 
         [SerializeField] private List<Vector3> _localPoints = new();
-        [SerializeField][Min(MinSampleStep)] private float _sampleStep = DefaultSampleStep;
+        [SerializeField][Min(MinimumSampleStep)] private float _sampleStep = DefaultSampleStep;
         [SerializeField] private RailPathInterpolationMode _interpolationMode = RailPathInterpolationMode.Linear;
 
         [Header("Smoothing")]
         [SerializeField][Min(0f)] private float _cornerRadius = 0.35f;
-        [SerializeField][Range(2, 16)] private int _cornerSamples = 6;
+        [SerializeField][Range(MinimumCornerSamples, MaximumCornerSamples)] private int _cornerSamples = 6;
 
         [SerializeField][HideInInspector] private Transform[] _waypoints;
 
@@ -39,6 +41,7 @@ namespace Game.Gameplay.Enemy.Worm
         private float _totalLength;
         private Matrix4x4 _builtLocalToWorldMatrix;
         private bool _hasBuiltTransform;
+        private RailPathDefinition _definition;
 
         public int PointCount => _localPoints != null ? _localPoints.Count : 0;
         public float TotalLength
@@ -78,13 +81,16 @@ namespace Game.Gameplay.Enemy.Worm
             if (_localPoints == null)
                 _localPoints = new List<Vector3>();
 
-            if (_sampleStep < MinSampleStep)
+            if (_sampleStep < MinimumSampleStep)
                 _sampleStep = DefaultSampleStep;
 
             if (_cornerRadius < 0f)
                 _cornerRadius = 0f;
 
-            _cornerSamples = Mathf.Clamp(_cornerSamples, 2, 16);
+            _cornerSamples = Mathf.Clamp(
+                _cornerSamples,
+                MinimumCornerSamples,
+                MaximumCornerSamples);
 
             Invalidate();
         }
@@ -236,7 +242,9 @@ namespace Game.Gameplay.Enemy.Worm
             if (pathPoints == null || pathPoints.Length < 2)
                 return false;
 
-            _sampleStep = Mathf.Max(MinSampleStep, _sampleStep);
+            _sampleStep = _definition != null
+                ? _definition.SampleStep
+                : Mathf.Max(MinimumSampleStep, _sampleStep);
             CalculateDistances(pathPoints);
             BuildSamples(pathPoints);
             BuildControlPointDistances();
@@ -250,10 +258,16 @@ namespace Game.Gameplay.Enemy.Worm
         {
             if (_localPoints != null && _localPoints.Count >= 2)
             {
-                _worldPoints = new Vector3[_localPoints.Count];
+                _definition = new RailPathDefinition(
+                    _localPoints,
+                    _sampleStep,
+                    _interpolationMode,
+                    _cornerRadius,
+                    _cornerSamples);
+                _worldPoints = new Vector3[_definition.PointCount];
 
-                for (int i = 0; i < _localPoints.Count; i++)
-                    _worldPoints[i] = transform.TransformPoint(_localPoints[i]);
+                for (int i = 0; i < _definition.PointCount; i++)
+                    _worldPoints[i] = transform.TransformPoint(_definition.GetLocalPoint(i));
 
                 return true;
             }
@@ -263,6 +277,7 @@ namespace Game.Gameplay.Enemy.Worm
                 return false;
 
             _worldPoints = new Vector3[legacyWaypointCount];
+            _definition = null;
 
             int pointIndex = 0;
             for (int i = 0; i < _waypoints.Length; i++)
@@ -282,9 +297,9 @@ namespace Game.Gameplay.Enemy.Worm
         {
             return RailPathGeometry.BuildPathPoints(
                 _worldPoints,
-                _interpolationMode,
-                _cornerRadius,
-                _cornerSamples,
+                _definition != null ? _definition.InterpolationMode : _interpolationMode,
+                _definition != null ? _definition.CornerRadius : _cornerRadius,
+                _definition != null ? _definition.CornerSamples : _cornerSamples,
                 MinimumSegmentLength);
         }
 
@@ -353,6 +368,7 @@ namespace Game.Gameplay.Enemy.Worm
             _totalLength = 0f;
             _builtLocalToWorldMatrix = default;
             _hasBuiltTransform = false;
+            _definition = null;
         }
 
     }

@@ -228,7 +228,8 @@ both weapon types active, extreme configured limits, and pool exhaustion/rollbac
 
 ### Stage 4 — rail domain and adapter split
 
-1. Introduce immutable `RailPathDefinition` authoring data.
+1. Completed: immutable `RailPathDefinition` owns validated authoring settings and a
+   defensive copy of local control points; `RailPath` adapts it to world-space caches.
 2. Extract `RailPathSmoother`, `RailDistanceTableBuilder`, `RailSampler`, and
    `RailNearestPointQuery` as focused calculation classes.
 3. Keep `RailPathView` responsible only for Transform conversion and exposing a baked

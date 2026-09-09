@@ -114,6 +114,7 @@ Installers are introduced only when their domain is migrated. Empty speculative 
 - [x] Hide concrete pools behind typed projectile spawn sinks; weapon views submit immutable requests and issue lifecycle-level clear commands through the abstraction.
 - [x] Publish immutable weapon runtime-stat snapshots after committed mutations instead of source-only change notifications.
 - [x] Make reward effects mutate runtime state only; `RewardApplyService` commits the affected weapon once, rebuilding derived values and publishing one snapshot without exposing weapon MonoBehaviours through reward context.
+- [x] Introduce immutable `RailPathDefinition` authoring data with defensive point ownership and normalized sampling/smoothing settings; `RailPath` remains the Unity transform/cache adapter.
 - [x] Route worm pattern and cocoon generation through the same scene-scoped random contract.
 - [x] Remove the obsolete `PlayerController` and `PlayerShooter` scene behaviours and their cross-domain serialized references.
 - [x] Pass frame time explicitly from the named gameplay loop into weapon runtime ticking.
