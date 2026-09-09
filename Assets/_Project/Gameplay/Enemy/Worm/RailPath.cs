@@ -140,20 +140,11 @@ namespace Game.Gameplay.Enemy.Worm
 
         private float FindClosestSampleDistance(Vector3 worldPosition)
         {
-            int closestIndex = 0;
-            float closestSqrDistance = float.MaxValue;
-
-            for (int i = 0; i < _samples.Length; i++)
-            {
-                float sqrDistance = Vector3.SqrMagnitude(_samples[i] - worldPosition);
-                if (sqrDistance >= closestSqrDistance)
-                    continue;
-
-                closestSqrDistance = sqrDistance;
-                closestIndex = i;
-            }
-
-            return Mathf.Clamp(closestIndex * _sampleStep, 0f, _totalLength);
+            return RailNearestPointQuery.FindSampleDistance(
+                _samples,
+                worldPosition,
+                _sampleStep,
+                _totalLength);
         }
 
         public bool TryGetControlPointDistance(int pointIndex, out float distance)
@@ -295,7 +286,7 @@ namespace Game.Gameplay.Enemy.Worm
 
         private Vector3[] BuildPathPoints()
         {
-            return RailPathGeometry.BuildPathPoints(
+            return RailPathSmoother.Build(
                 _worldPoints,
                 _definition != null ? _definition.InterpolationMode : _interpolationMode,
                 _definition != null ? _definition.CornerRadius : _cornerRadius,
@@ -305,12 +296,12 @@ namespace Game.Gameplay.Enemy.Worm
 
         private void CalculateDistances(Vector3[] pathPoints)
         {
-            _distances = RailPathGeometry.CalculateDistances(pathPoints, out _totalLength);
+            _distances = RailDistanceTableBuilder.Build(pathPoints, out _totalLength);
         }
 
         private void BuildSamples(Vector3[] pathPoints)
         {
-            _samples = RailPathGeometry.BuildSamples(
+            _samples = RailSampler.Build(
                 pathPoints,
                 _distances,
                 _totalLength,

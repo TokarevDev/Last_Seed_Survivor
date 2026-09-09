@@ -230,8 +230,8 @@ both weapon types active, extreme configured limits, and pool exhaustion/rollbac
 
 1. Completed: immutable `RailPathDefinition` owns validated authoring settings and a
    defensive copy of local control points; `RailPath` adapts it to world-space caches.
-2. Extract `RailPathSmoother`, `RailDistanceTableBuilder`, `RailSampler`, and
-   `RailNearestPointQuery` as focused calculation classes.
+2. Completed: smoothing, distance-table construction, sampling, and nearest-point
+   queries live in focused stateless calculation classes.
 3. Keep `RailPathView` responsible only for Transform conversion and exposing a baked
    runtime path through `IWormRailPath`.
 4. Move legacy import and point-editing APIs to Editor assembly utilities.

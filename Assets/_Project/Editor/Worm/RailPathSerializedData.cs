@@ -169,7 +169,7 @@ namespace Game.Editor.Worm
             if (worldPoints.Length < 2)
                 return worldPoints;
 
-            return RailPathGeometry.BuildPathPoints(
+            return RailPathSmoother.Build(
                 worldPoints,
                 (RailPathInterpolationMode)_interpolationMode.enumValueIndex,
                 _cornerRadius.floatValue,
