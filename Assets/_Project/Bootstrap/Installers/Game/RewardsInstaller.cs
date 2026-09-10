@@ -59,6 +59,7 @@ namespace Game.Bootstrap.Installers.Game
             Container.BindInterfacesAndSelfTo<RewardChoiceRollService>().AsSingle();
             Container.Bind<RewardBatchApplyService>().AsSingle();
             Container.Bind<RewardGrantedActionService>().AsSingle();
+            Container.Bind<RewardSelectionCommitter>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardFlowController>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardSessionController>()
                 .AsSingle()

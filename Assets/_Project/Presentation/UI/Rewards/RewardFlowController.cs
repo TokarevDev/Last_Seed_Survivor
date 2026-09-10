@@ -12,7 +12,7 @@ namespace Game.Presentation.UI.Rewards
     public sealed class RewardFlowController : IDisposable
     {
         private readonly IRewardChoiceRollService _choiceRollService;
-        private readonly IRewardChoiceApplier _applyService;
+        private readonly RewardSelectionCommitter _selectionCommitter;
         private readonly RewardGrantedActionService _grantedActionService;
         private readonly RewardPopupGateway _popupGateway;
         private readonly RewardedAdOperation _rewardedAdOperation;
@@ -24,7 +24,7 @@ namespace Game.Presentation.UI.Rewards
 
         public RewardFlowController(
             IRewardChoiceRollService choiceRollService,
-            IRewardChoiceApplier applyService,
+            RewardSelectionCommitter selectionCommitter,
             RewardGrantedActionService grantedActionService,
             RewardPopupGateway popupGateway,
             RewardedAdOperation rewardedAdOperation,
@@ -34,7 +34,8 @@ namespace Game.Presentation.UI.Rewards
         {
             _choiceRollService = choiceRollService ??
                 throw new ArgumentNullException(nameof(choiceRollService));
-            _applyService = applyService ?? throw new ArgumentNullException(nameof(applyService));
+            _selectionCommitter = selectionCommitter ??
+                throw new ArgumentNullException(nameof(selectionCommitter));
             _grantedActionService = grantedActionService ??
                 throw new ArgumentNullException(nameof(grantedActionService));
             _popupGateway = popupGateway ??
@@ -109,8 +110,7 @@ namespace Game.Presentation.UI.Rewards
             if (_rewardedAdOperation.IsPending)
                 return;
 
-            _requestLifecycle.MarkShouldOpenNext();
-            _applyService.Apply(choice);
+            _selectionCommitter.Commit(choice);
         }
 
         private void HandleIntent(RewardUserIntent intent)
