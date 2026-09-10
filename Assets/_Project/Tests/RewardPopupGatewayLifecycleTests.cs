@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using Game.Gameplay.Rewards.Runtime;
+using Game.Infrastructure.Advertising;
 using Game.Presentation.UI.Common.Popups;
 using Game.Presentation.UI.Rewards;
 using NUnit.Framework;
@@ -42,7 +43,9 @@ namespace Game.Tests
                 popup,
                 popupRoot,
                 new RewardRequestLifecycle(),
-                new RewardPopupStateFactory(attempts));
+                new RewardPopupStateFactory(
+                    attempts,
+                    new DisabledRewardedAdService()));
 
             Assert.That(GetSubscriberCount(popup, "Selected"), Is.EqualTo(1));
             Assert.That(GetSubscriberCount(popup, "RerollRequested"), Is.EqualTo(1));
