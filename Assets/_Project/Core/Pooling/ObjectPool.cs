@@ -77,9 +77,20 @@ namespace Game.Core.Pooling
                 initialize(item);
                 return item;
             }
-            catch
+            catch (Exception initializationException)
             {
-                Return(item);
+                try
+                {
+                    Return(item);
+                }
+                catch (Exception returnException)
+                {
+                    throw new AggregateException(
+                        "Pool item initialization and rollback both failed.",
+                        initializationException,
+                        returnException);
+                }
+
                 throw;
             }
         }
@@ -98,9 +109,20 @@ namespace Game.Core.Pooling
                 initialize(item, state);
                 return item;
             }
-            catch
+            catch (Exception initializationException)
             {
-                Return(item);
+                try
+                {
+                    Return(item);
+                }
+                catch (Exception returnException)
+                {
+                    throw new AggregateException(
+                        "Pool item initialization and rollback both failed.",
+                        initializationException,
+                        returnException);
+                }
+
                 throw;
             }
         }
@@ -110,7 +132,16 @@ namespace Game.Core.Pooling
             if (item == null || !_activeIndices.TryGetValue(item, out int activeIndex))
                 return false;
 
-            _onReturn(item);
+            try
+            {
+                _onReturn(item);
+            }
+            catch
+            {
+                RemoveActiveAtSwapBack(activeIndex);
+                throw;
+            }
+
             RemoveActiveAtSwapBack(activeIndex);
             _available.Enqueue(item);
             return true;
@@ -118,14 +149,26 @@ namespace Game.Core.Pooling
 
         public void ReturnAll()
         {
-            int returnCount = _activeItems.Count;
+            List<Exception> failures = null;
 
-            for (int index = 0; index < returnCount; index++)
+            while (_activeItems.Count > 0)
             {
                 int lastIndex = _activeItems.Count - 1;
                 T item = _activeItems[lastIndex];
-                Return(item);
+
+                try
+                {
+                    Return(item);
+                }
+                catch (Exception exception)
+                {
+                    failures ??= new List<Exception>();
+                    failures.Add(exception);
+                }
             }
+
+            if (failures != null)
+                throw new AggregateException("One or more pool items failed to return.", failures);
         }
 
         private void RemoveActiveAtSwapBack(int activeIndex)
