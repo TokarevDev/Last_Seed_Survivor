@@ -3,6 +3,7 @@
   "rootNamespace": "Game.Bootstrap",
   "references": [
     "Game.Core",
+    "Game.Gameplay.Domain",
     "Game.Gameplay",
     "Game.Infrastructure",
     "Game.Presentation",

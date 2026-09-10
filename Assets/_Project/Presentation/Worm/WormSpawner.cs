@@ -1,4 +1,5 @@
 
+using Game.Core.Timing;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Enemy.Worm.Spawning;
 using Game.Gameplay.Rewards.Data;
@@ -20,6 +21,7 @@ namespace Game.Presentation.Worm
 
         private WormSpawnLifecycle _spawnLifecycle;
         private WormAdaptiveHpController _adaptiveHpController;
+        private IGameTimeProvider _gameTimeProvider;
         private SignalBus _signalBus;
         private bool _isSubscribedToSignals;
 
@@ -27,11 +29,13 @@ namespace Game.Presentation.Worm
         public void Construct(
             SignalBus signalBus,
             WormAdaptiveHpController adaptiveHpController,
-            WormSpawnLifecycle spawnLifecycle)
+            WormSpawnLifecycle spawnLifecycle,
+            IGameTimeProvider gameTimeProvider)
         {
             _signalBus = signalBus;
             _adaptiveHpController = adaptiveHpController;
             _spawnLifecycle = spawnLifecycle;
+            _gameTimeProvider = gameTimeProvider;
             SubscribeToSignals();
         }
 
@@ -68,7 +72,7 @@ namespace Game.Presentation.Worm
 
         public void SpawnWorm()
         {
-            _spawnLifecycle.Spawn(GetCocoonProfiles(), Time.time);
+            _spawnLifecycle.Spawn(GetCocoonProfiles(), _gameTimeProvider.Time);
         }
 
         public void RestartWorm()
@@ -79,7 +83,7 @@ namespace Game.Presentation.Worm
 
         public void DespawnWorm()
         {
-            _spawnLifecycle.Despawn(Time.time);
+            _spawnLifecycle.Despawn(_gameTimeProvider.Time);
         }
 
         public void SetRuntimePressureMultiplier(float multiplier)
