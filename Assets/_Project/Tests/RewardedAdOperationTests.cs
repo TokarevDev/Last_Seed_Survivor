@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 using Game.Infrastructure.Advertising;
-using Game.Presentation.UI.Rewards;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace Game.Tests
 {
@@ -39,11 +41,16 @@ namespace Game.Tests
         }
 
         [Test]
-        public void TryBegin_WhenServiceThrows_RollsBackPendingState()
+        public void TryBegin_WhenServiceThrows_ReportsFailureAndRollsBackPendingState()
         {
             RewardedAdOperation operation = new(new ThrowingRewardedAdService());
+            LogAssert.Expect(
+                LogType.Exception,
+                new Regex("InvalidOperationException: Ad service failed to start\\."));
 
-            Assert.Throws<InvalidOperationException>(() => operation.TryBegin(_ => { }));
+            bool started = operation.TryBegin(_ => { });
+
+            Assert.That(started, Is.False);
             Assert.That(operation.IsPending, Is.False);
         }
 

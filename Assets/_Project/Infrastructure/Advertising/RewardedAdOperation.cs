@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Game.Infrastructure.Advertising
 {
@@ -31,10 +32,11 @@ namespace Game.Infrastructure.Advertising
                 _rewardedAdService.ShowRewardedAd(
                     rewardGranted => Complete(operationVersion, onCompleted, rewardGranted));
             }
-            catch
+            catch (Exception exception)
             {
                 Rollback(operationVersion);
-                throw;
+                Debug.LogException(exception);
+                return false;
             }
 
             return true;
