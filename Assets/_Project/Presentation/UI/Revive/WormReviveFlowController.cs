@@ -251,6 +251,7 @@ namespace Game.Presentation.UI.Revive
 
         public void ResetForNewRun()
         {
+            _rewardedAdOperation?.Cancel();
             _remainingRevives = _maxReviveAttempts;
             _isFailState = false;
             _isReviving = false;
