@@ -179,7 +179,15 @@ namespace Game.Presentation.UI.Revive
 
             _rewardedAdOperation ??= new RewardedAdOperation(_rewardedAdService);
 
-            if (!_rewardedAdOperation.TryBegin(CompleteRewardedAd))
+            if (!_rewardedAdOperation.TryBegin(
+                    CompleteRewardedAd,
+                    RestorePopupInteraction))
+                SetPopupWaiting(false);
+        }
+
+        private void RestorePopupInteraction()
+        {
+            if (isActiveAndEnabled)
                 SetPopupWaiting(false);
         }
 

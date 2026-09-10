@@ -17,7 +17,9 @@ namespace Game.Infrastructure.Advertising
 
         public bool IsPending { get; private set; }
 
-        public bool TryBegin(Action<bool> onCompleted)
+        public bool TryBegin(
+            Action<bool> onCompleted,
+            Action onCompletionFailed = null)
         {
             if (onCompleted == null)
                 throw new ArgumentNullException(nameof(onCompleted));
@@ -30,7 +32,11 @@ namespace Game.Infrastructure.Advertising
             try
             {
                 _rewardedAdService.ShowRewardedAd(
-                    rewardGranted => Complete(operationVersion, onCompleted, rewardGranted));
+                    rewardGranted => Complete(
+                        operationVersion,
+                        onCompleted,
+                        onCompletionFailed,
+                        rewardGranted));
             }
             catch (Exception exception)
             {
@@ -51,13 +57,38 @@ namespace Game.Infrastructure.Advertising
         private void Complete(
             int operationVersion,
             Action<bool> onCompleted,
+            Action onCompletionFailed,
             bool rewardGranted)
         {
             if (!IsPending || operationVersion != _version)
                 return;
 
             IsPending = false;
-            onCompleted(rewardGranted);
+
+            try
+            {
+                onCompleted(rewardGranted);
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+                TryRecover(onCompletionFailed);
+            }
+        }
+
+        private static void TryRecover(Action onCompletionFailed)
+        {
+            if (onCompletionFailed == null)
+                return;
+
+            try
+            {
+                onCompletionFailed();
+            }
+            catch (Exception exception)
+            {
+                Debug.LogException(exception);
+            }
         }
 
         private void Rollback(int operationVersion)

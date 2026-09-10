@@ -55,6 +55,24 @@ namespace Game.Tests
         }
 
         [Test]
+        public void Complete_WhenCompletionThrows_ReportsFailureAndInvokesRecovery()
+        {
+            DelayedRewardedAdService adService = new();
+            RewardedAdOperation operation = new(adService);
+            bool recoveryCalled = false;
+            LogAssert.Expect(
+                LogType.Exception,
+                new Regex("InvalidOperationException: Reward completion failed\\."));
+            operation.TryBegin(
+                _ => throw new InvalidOperationException("Reward completion failed."),
+                () => recoveryCalled = true);
+
+            Assert.DoesNotThrow(() => adService.Complete(0, true));
+            Assert.That(recoveryCalled, Is.True);
+            Assert.That(operation.IsPending, Is.False);
+        }
+
+        [Test]
         public void TryBegin_WhenServiceIsNotReady_DoesNotInvokeService()
         {
             UnavailableRewardedAdService adService = new();

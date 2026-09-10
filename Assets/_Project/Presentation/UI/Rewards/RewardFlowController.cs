@@ -158,7 +158,9 @@ namespace Game.Presentation.UI.Rewards
                 return;
 
             _popupGateway.SetInteractable(false);
-            if (!_rewardedAdOperation.TryBegin(CompleteAdRerollReward))
+            if (!_rewardedAdOperation.TryBegin(
+                    CompleteAdRerollReward,
+                    RestorePopupInteraction))
                 _popupGateway.SetInteractable(true);
         }
 
@@ -174,7 +176,15 @@ namespace Game.Presentation.UI.Rewards
                 return;
 
             _popupGateway.SetInteractable(false);
-            if (!_rewardedAdOperation.TryBegin(CompleteTakeAllReward))
+            if (!_rewardedAdOperation.TryBegin(
+                    CompleteTakeAllReward,
+                    RestorePopupInteraction))
+                _popupGateway.SetInteractable(true);
+        }
+
+        private void RestorePopupInteraction()
+        {
+            if (!_isDisposed)
                 _popupGateway.SetInteractable(true);
         }
 
