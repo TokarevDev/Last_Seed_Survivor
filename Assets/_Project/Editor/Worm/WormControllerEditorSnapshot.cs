@@ -1,7 +1,7 @@
 
 using Game.Gameplay.Enemy.Worm;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
     internal readonly struct WormControllerEditorSnapshot
     {

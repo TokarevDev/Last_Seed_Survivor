@@ -1,13 +1,12 @@
+using System;
+using Cysharp.Threading.Tasks;
 using Game.Infrastructure.Navigation;
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 namespace Game.Presentation.UI.Common
 {
-    using System;
-    using Cysharp.Threading.Tasks;
-    using UnityEngine;
-    using UnityEngine.UI;
-    using Zenject;
-
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Button))]
     public sealed class LobbyStartBattleButton : MonoBehaviour

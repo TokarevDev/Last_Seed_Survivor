@@ -1,15 +1,12 @@
-
+using System;
+using System.Collections.Generic;
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers.Parallel;
-
-using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.Runtime
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class WeaponShotPatternState
     {
         private const int DefaultMaxParallelProjectiles = 5;

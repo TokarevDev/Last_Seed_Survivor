@@ -1,10 +1,10 @@
-namespace Game.Presentation.UI.Rewards
-{
-    using UnityEngine;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
-    using UnityEngine.InputSystem;
+using UnityEngine.InputSystem;
 #endif
 
+namespace Game.Presentation.UI.Rewards
+{
     public static class RewardPopupPointerState
     {
         public static bool IsAnyPressed()

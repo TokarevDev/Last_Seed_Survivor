@@ -1,15 +1,13 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Core.Collections;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Enemy.Worm.Movement;
 using Game.Gameplay.Enemy.Worm.Presentation;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class WormController : MonoBehaviour, IWormPathProgressProvider
     {
         [Header("Rail")]

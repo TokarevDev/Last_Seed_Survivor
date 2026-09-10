@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Gameplay.Combat.Projectiles
 {
-    using UnityEngine;
-
     public readonly struct ProjectileRuntimeStats
     {
         public readonly int Damage;

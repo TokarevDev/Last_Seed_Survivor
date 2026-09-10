@@ -1,17 +1,15 @@
-
+using System.Collections.Generic;
 using Game.Core.Combat;
-using Game.Core.Random;
+using Game.Core.Randomization;
 using Game.Core.World;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Combat.Projectiles.Configs;
 using Game.Gameplay.Enemy.Worm.Combat;
 using Game.Gameplay.Pooling;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Projectiles
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class Projectile : MonoBehaviour
     {

@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Gameplay.Enemy.Worm
 {
-    using UnityEngine;
-
     public static class RailSampler
     {
         public static Vector3[] Build(

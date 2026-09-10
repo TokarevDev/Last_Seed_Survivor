@@ -1,12 +1,10 @@
-
+using System;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Combat;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    using System;
-    using UnityEngine;
-
     public sealed class WormSegmentVisualRig
     {
         private readonly Transform _visualRoot;

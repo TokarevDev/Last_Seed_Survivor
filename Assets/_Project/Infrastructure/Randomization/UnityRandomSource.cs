@@ -1,10 +1,8 @@
+using Game.Core.Randomization;
+using UnityEngine;
 
-using Game.Core.Random;
-
-namespace Game.Infrastructure.Random
+namespace Game.Infrastructure.Randomization
 {
-    using UnityEngine;
-
     public sealed class UnityRandomSource : IRandomSource
     {
         public float NextUnitFloat()

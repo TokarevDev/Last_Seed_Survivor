@@ -1,9 +1,9 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace Game.Gameplay.Enemy.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class RailPathDefinition
     {
         private readonly Vector3[] _localPoints;

@@ -1,8 +1,8 @@
+using System;
+using UnityEngine;
+
 namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    using System;
-    using UnityEngine;
-
     public sealed class WormSegmentPooledViewLifecycle
     {
         private readonly GameObject _owner;

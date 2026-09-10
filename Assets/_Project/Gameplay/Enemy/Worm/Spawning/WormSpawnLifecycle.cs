@@ -1,19 +1,17 @@
-
-using Game.Core.Random;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using Game.Core.Randomization;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Enemy.Worm.Combat;
 using Game.Gameplay.Enemy.Worm.Presentation;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Spawning
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using Cysharp.Threading.Tasks;
-    using UnityEngine;
-
     public sealed class WormSpawnLifecycle
     {
         private readonly WormSegmentPool _segmentPool;

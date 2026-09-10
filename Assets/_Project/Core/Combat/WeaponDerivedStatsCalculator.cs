@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Core.Combat
 {
-    using System;
-
     public static class WeaponDerivedStatsCalculator
     {
         public const float MinimumProjectileSpeedMultiplier = 0.1f;

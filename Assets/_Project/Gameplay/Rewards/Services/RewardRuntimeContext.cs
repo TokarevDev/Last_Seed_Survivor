@@ -1,4 +1,4 @@
-
+using System;
 using Game.Core;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
@@ -7,8 +7,6 @@ using Game.Gameplay.Combat.Weapons.Runtime;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System;
-
     public readonly struct RewardRollContext
     {
         public readonly float HeadPathProgressNormalized;

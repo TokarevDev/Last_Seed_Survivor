@@ -1,4 +1,4 @@
-
+using System;
 using Game.Gameplay.Rewards;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
@@ -8,8 +8,6 @@ using Game.Presentation.UI.Common.Popups;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-
     public sealed class RewardFlowController : IDisposable
     {
         private readonly IRewardChoiceRollService _choiceRollService;

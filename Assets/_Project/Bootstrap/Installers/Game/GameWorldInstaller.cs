@@ -1,10 +1,10 @@
 using UnityEngine;
 using Zenject;
 
-using Game.Core.Random;
+using Game.Core.Randomization;
 using Game.Core.Timing;
 using Game.Gameplay.World;
-using Game.Infrastructure.Random;
+using Game.Infrastructure.Randomization;
 using Game.Infrastructure.Timing;
 
 namespace Game.Bootstrap.Installers.Game

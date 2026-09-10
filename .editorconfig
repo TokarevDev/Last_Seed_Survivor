@@ -1,0 +1,36 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{json,asmdef,asmref,inputactions,inputsettings}]
+indent_size = 2
+
+[Assets/_Project/**/*.cs]
+csharp_style_namespace_declarations = block_scoped:suggestion
+dotnet_style_namespace_match_folder = false:silent
+dotnet_diagnostic.IDE0130.severity = none
+
+# Keep every using directive at the beginning of the file and remove unused imports.
+csharp_using_directive_placement = outside_namespace:error
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false
+dotnet_diagnostic.IDE0005.severity = error
+dotnet_diagnostic.IDE0065.severity = error
+
+# Zenject creates implementations through bindings rather than explicit constructors.
+resharper_class_never_instantiated_global_highlighting = none
+
+# Unity serializes backing fields; cleanup must not convert them into auto-properties.
+dotnet_style_prefer_auto_properties = false:silent
+resharper_convert_to_auto_property_highlighting = none
+resharper_convert_to_auto_property_when_possible_highlighting = none
+resharper_convert_to_auto_property_with_private_setter_highlighting = none
+
+# Unity message methods and serialized callbacks can be used without direct C# callers.
+dotnet_diagnostic.IDE0051.severity = none

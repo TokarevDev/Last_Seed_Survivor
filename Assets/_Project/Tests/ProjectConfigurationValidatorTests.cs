@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
-using Game.Editor.Validation;
+using Game.EditorTools.Validation;
 using Game.Gameplay.Combat.Projectiles.Configs;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;

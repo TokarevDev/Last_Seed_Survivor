@@ -1,12 +1,10 @@
-
-using Game.Core.Random;
+using System.Collections.Generic;
+using Game.Core.Randomization;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public static class WormCocoonRules
     {
         public const int EmptySegmentsAroundCocoon = 3;

@@ -1,12 +1,10 @@
-
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Rewards.Services;
 using Game.Gameplay.Signals;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    using UnityEngine;
-
     public abstract class RewardEffect : ScriptableObject
     {
         public virtual WeaponRuntimeStatsSource AffectedWeapon =>

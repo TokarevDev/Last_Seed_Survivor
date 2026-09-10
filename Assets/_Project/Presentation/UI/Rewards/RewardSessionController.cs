@@ -1,11 +1,9 @@
-
 using Game.Gameplay.Rewards.Services;
 using Game.Gameplay.Signals;
+using Zenject;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using Zenject;
-
     public sealed class RewardSessionController : IInitializable, System.IDisposable
     {
         private readonly RewardFlowController _rewardFlow;

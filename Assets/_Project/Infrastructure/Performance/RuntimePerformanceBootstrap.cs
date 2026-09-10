@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Infrastructure.Performance
 {
-    using UnityEngine;
-
     public static class RuntimePerformanceBootstrap
     {
         private const int MinimumMobileTargetFrameRate = 60;

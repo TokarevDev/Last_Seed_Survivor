@@ -1,6 +1,6 @@
 {
-  "name": "Game.Editor",
-  "rootNamespace": "Game.Editor",
+  "name": "Game.EditorTools",
+  "rootNamespace": "Game.EditorTools",
   "references": [
     "Game.Core",
     "Game.Gameplay",

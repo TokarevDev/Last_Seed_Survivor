@@ -1,12 +1,10 @@
-
+using System.Collections.Generic;
+using System.Text;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System.Collections.Generic;
-    using System.Text;
-    using UnityEngine;
-
     public sealed class RewardTextFormatter
     {
         private readonly List<HighlightRange> _ranges = new(8);

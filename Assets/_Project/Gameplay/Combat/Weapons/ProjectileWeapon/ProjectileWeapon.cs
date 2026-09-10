@@ -1,18 +1,16 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Core.Combat;
 using Game.Core.Timing;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Pooling;
 using Game.Gameplay.Signals;
+using Unity.Profiling;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Unity.Profiling;
-
     [DisallowMultipleComponent]
     public sealed class ProjectileWeapon : MonoBehaviour
     {

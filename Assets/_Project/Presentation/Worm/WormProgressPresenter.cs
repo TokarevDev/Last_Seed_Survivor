@@ -1,11 +1,10 @@
 using Game.Gameplay.Signals;
+using TMPro;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Presentation.Worm
 {
-    using TMPro;
-    using UnityEngine;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class WormProgressPresenter : MonoBehaviour
     {

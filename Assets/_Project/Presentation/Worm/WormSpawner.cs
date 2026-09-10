@@ -1,18 +1,16 @@
-
+using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Game.Core.Timing;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Enemy.Worm.Spawning;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Signals;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Presentation.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using Cysharp.Threading.Tasks;
-    using UnityEngine;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class WormSpawner : MonoBehaviour
     {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-using Game.Core.Random;
+using Game.Core.Randomization;
 
 namespace Game.Tests
 {

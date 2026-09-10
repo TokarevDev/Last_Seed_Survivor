@@ -1,4 +1,3 @@
-
 using Game.Core.Combat;
 using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Projectiles.Configs;
@@ -6,11 +5,10 @@ using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Combat.Weapons.Runtime;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    using UnityEngine;
-
     public static class WeaponPowerEstimator
     {
         public static WeaponPowerSnapshot Estimate(ProjectileWeapon weapon)

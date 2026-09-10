@@ -1,9 +1,8 @@
+using System;
+using UnityEngine;
 
 namespace Game.Infrastructure.Advertising
 {
-    using System;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class ImmediateRewardedAdService : RewardedAdService
     {

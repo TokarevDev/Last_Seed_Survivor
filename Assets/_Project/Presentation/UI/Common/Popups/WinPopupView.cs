@@ -1,11 +1,10 @@
+using System;
+using UnityEngine;
+using UnityEngine.UI;
+using Zenject;
 
 namespace Game.Presentation.UI.Common.Popups
 {
-    using System;
-    using UnityEngine;
-    using UnityEngine.UI;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class WinPopupView : PopupView
     {

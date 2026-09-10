@@ -1,7 +1,7 @@
+using DG.Tweening;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using DG.Tweening;
-
     public readonly struct RewardPopupAnimationSettings
     {
         public RewardPopupAnimationSettings(

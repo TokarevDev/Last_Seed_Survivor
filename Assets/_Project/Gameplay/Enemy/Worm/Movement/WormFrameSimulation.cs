@@ -1,13 +1,11 @@
-
+using System;
 using Game.Core.Collections;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Presentation;
+using Unity.Profiling;
 
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using System;
-    using Unity.Profiling;
-
     public sealed class WormFrameSimulation
     {
         public const string ProfilerMarkerName = "LastSeed.Gameplay.WormFrame";

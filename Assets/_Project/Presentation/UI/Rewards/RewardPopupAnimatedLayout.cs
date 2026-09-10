@@ -1,9 +1,9 @@
+using System;
+using DG.Tweening;
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-    using DG.Tweening;
-    using UnityEngine;
-
     internal sealed class RewardPopupAnimatedLayout
     {
         private const float TopEnterStartSeconds = 0.02f;

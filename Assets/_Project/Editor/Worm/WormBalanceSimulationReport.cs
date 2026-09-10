@@ -1,12 +1,10 @@
-
+using System.Collections.Generic;
+using System.Text;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Rewards;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System.Collections.Generic;
-    using System.Text;
-
     internal sealed class WormBalanceSimulationReport
     {
         private const float NoAdsTargetMinWinRate = 0.6f;

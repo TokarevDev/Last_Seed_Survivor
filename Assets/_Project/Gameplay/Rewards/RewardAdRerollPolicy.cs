@@ -1,14 +1,12 @@
-
+using System;
 using Game.Core;
-using Game.Core.Random;
+using Game.Core.Randomization;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Services;
 
 namespace Game.Gameplay.Rewards
 {
-    using System;
-
     public static class RewardAdRerollPolicy
     {
         public const float LegendaryChanceMinDangerProgress = 0.65f;

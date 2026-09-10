@@ -1,7 +1,7 @@
-namespace Game.Editor.Worm
-{
-    using System.Text;
+using System.Text;
 
+namespace Game.EditorTools.Worm
+{
     internal static class WormBalanceScenarioSummaryFormatter
     {
         public static void Append(

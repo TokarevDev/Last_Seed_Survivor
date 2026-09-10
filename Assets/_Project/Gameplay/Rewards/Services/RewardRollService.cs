@@ -1,13 +1,11 @@
-
-using Game.Core.Random;
+using System.Collections.Generic;
+using Game.Core.Randomization;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
+using UnityEngine;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class RewardRollService : IRewardChoiceRoller
     {
         private const int MaxChoices = 3;

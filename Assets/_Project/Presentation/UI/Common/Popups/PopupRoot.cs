@@ -1,15 +1,13 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Core.Collections;
 using Game.Core.Timing;
 using Game.Gameplay.Input;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Presentation.UI.Common.Popups
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class PopupRoot : MonoBehaviour
     {

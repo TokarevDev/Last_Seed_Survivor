@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Core.Combat
 {
-    using System;
-
     public sealed class DamageMultiplierProgressionState
     {
         private const float ComparisonEpsilon = 0.0001f;

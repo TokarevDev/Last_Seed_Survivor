@@ -1,12 +1,10 @@
-
+using System;
 using Game.Core;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Enemy.Worm.Balance;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System;
-
     public enum RewardWeaponGroup
     {
         None,

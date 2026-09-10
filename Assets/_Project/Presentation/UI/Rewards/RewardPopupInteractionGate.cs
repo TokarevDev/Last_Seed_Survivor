@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-
     public sealed class RewardPopupInteractionGate
     {
         private readonly Func<bool> _canOpen;

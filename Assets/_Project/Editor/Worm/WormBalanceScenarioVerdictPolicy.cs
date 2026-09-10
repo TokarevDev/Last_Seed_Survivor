@@ -1,8 +1,7 @@
+using System.Collections.Generic;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System.Collections.Generic;
-
     internal static class WormBalanceScenarioVerdictPolicy
     {
         private const float LateFirstRewardSeconds = 12f;

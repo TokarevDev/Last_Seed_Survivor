@@ -1,7 +1,7 @@
+using System.Collections.Generic;
+
 namespace Game.Gameplay.Rewards.Runtime
 {
-    using System.Collections.Generic;
-
     public sealed class RewardRequestQueue
     {
         private readonly Queue<RewardOpenRequest> _requests = new();

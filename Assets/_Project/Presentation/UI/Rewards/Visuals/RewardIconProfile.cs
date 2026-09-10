@@ -1,8 +1,8 @@
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Game.Presentation.UI.Rewards.Visuals
 {
-    using UnityEngine;
-    using UnityEngine.UI;
-
     [CreateAssetMenu(menuName = "Game/Rewards/UI/Icon Profile")]
     public sealed class RewardIconProfile : ScriptableObject
     {

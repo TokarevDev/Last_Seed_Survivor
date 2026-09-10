@@ -1,18 +1,15 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Enemy.Worm.Balance;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Random = UnityEngine.Random;
-
     internal static class WormBalanceWeaponSimulation
     {
         public static WeaponRuntimeState CreateMainWeaponState(WeaponConfig config)

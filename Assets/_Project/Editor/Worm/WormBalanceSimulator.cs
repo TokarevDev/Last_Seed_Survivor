@@ -1,23 +1,16 @@
-
-using Game.Core.Random;
+using System.Collections.Generic;
+using System.Text;
+using Game.Core.Randomization;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Enemy.Worm.Balance;
-using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
 using Game.Gameplay.Rewards.Services;
-using Game.Infrastructure.Random;
+using Game.Infrastructure.Randomization;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using UnityEditor;
-    using UnityEngine;
-    using Random = UnityEngine.Random;
-
     internal static class WormBalanceSimulator
     {
 
@@ -106,7 +99,7 @@ namespace Game.Editor.Worm
                 acaciaState,
                 runtimePressureMultiplier,
                 headProgress,
-                hasRevivedThisRun,
+                hasRevivedThisRun: false,
                 allowHpDecrease: true);
 
             int totalProgressSegments = WormBalanceSectionSimulator.CountProgressSegments(sections);

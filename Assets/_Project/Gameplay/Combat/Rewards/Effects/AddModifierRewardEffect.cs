@@ -1,14 +1,11 @@
-
+using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers.Parallel;
 using Game.Gameplay.Combat.Weapons.Runtime;
-
-using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/Rewards/Effects/Add Modifier")]
     public sealed class AddModifierRewardEffect : RewardEffect
     {

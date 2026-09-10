@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/UI/Reward Popup Action Presentation Config")]
     public sealed class RewardPopupActionPresentationConfig : ScriptableObject
     {

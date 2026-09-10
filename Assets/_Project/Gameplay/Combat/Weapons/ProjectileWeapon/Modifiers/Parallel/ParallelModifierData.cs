@@ -1,11 +1,9 @@
-
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon.Modifiers.Parallel
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Combat/Modifiers/Parallel")]
     public sealed class ParallelModifierData : ShotModifierData
     {

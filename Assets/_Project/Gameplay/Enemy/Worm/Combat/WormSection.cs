@@ -1,15 +1,13 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Core.Combat;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class WormSection : IWormSectionHpTarget
     {
         private readonly Health _health = new();

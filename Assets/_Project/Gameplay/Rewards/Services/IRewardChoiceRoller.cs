@@ -1,11 +1,9 @@
-
+using System.Collections.Generic;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System.Collections.Generic;
-
     public interface IRewardChoiceRoller
     {
         List<RewardChoiceData> Roll3(

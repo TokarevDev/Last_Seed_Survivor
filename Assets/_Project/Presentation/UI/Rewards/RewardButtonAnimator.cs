@@ -1,9 +1,9 @@
+using System;
+using DG.Tweening;
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-    using DG.Tweening;
-    using UnityEngine;
-
     public sealed class RewardButtonAnimator
     {
         private readonly RectTransform _root;

@@ -1,18 +1,16 @@
-
+using System;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
 using Game.Gameplay.Rewards.Services;
 using Game.Infrastructure.Advertising;
 using Game.Presentation.UI.Common.Popups;
 using Game.Presentation.UI.Rewards;
+using UnityEngine;
+using UnityEngine.Serialization;
+using Zenject;
 
 namespace Game.Bootstrap.Installers.Game
 {
-    using System;
-    using UnityEngine;
-    using UnityEngine.Serialization;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class RewardsInstaller : MonoInstaller
     {

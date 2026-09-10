@@ -1,15 +1,13 @@
-
+using System;
 using Game.Core.Combat;
 using Game.Core.Timing;
-using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
+using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Signals;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    using System;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class AcaciaThornWeapon : MonoBehaviour
     {

@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Combat.Weapons.Runtime;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Rewards.Effects
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/Rewards/Effects/Fire Rate")]
     public sealed class FireRateRewardEffect : RewardEffect
     {

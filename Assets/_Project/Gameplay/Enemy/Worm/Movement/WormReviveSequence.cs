@@ -1,11 +1,9 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Enemy.Worm;
 
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class WormReviveSequence
     {
         private readonly WormReviveAnimationController _animationController;

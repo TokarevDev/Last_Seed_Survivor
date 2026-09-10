@@ -1,11 +1,9 @@
-
 using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Projectiles.Configs;
+using UnityEngine;
 
 namespace Game.Gameplay.Pooling
 {
-    using UnityEngine;
-
     public readonly struct ProjectileSpawnRequest
     {
         public ProjectileSpawnRequest(

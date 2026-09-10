@@ -1,12 +1,10 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Presentation.UI.Rewards.Visuals
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/Rewards/UI/Visual Catalog")]
     public sealed class RewardVisualCatalog : ScriptableObject
     {

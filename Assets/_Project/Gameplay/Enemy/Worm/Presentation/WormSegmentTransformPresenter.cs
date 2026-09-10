@@ -1,13 +1,11 @@
-
+using System.Collections.Generic;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Movement;
+using NumericVector3 = System.Numerics.Vector3;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-    using NumericVector3 = System.Numerics.Vector3;
-
     public sealed class WormSegmentTransformPresenter
     {
         private const float PositionSqrMagnitudeThreshold = 0.000001f;

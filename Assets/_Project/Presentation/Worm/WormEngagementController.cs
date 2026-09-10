@@ -1,13 +1,11 @@
-
 using Game.Gameplay.Combat;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Signals;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Presentation.Worm
 {
-    using UnityEngine;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class WormEngagementController : MonoBehaviour
     {

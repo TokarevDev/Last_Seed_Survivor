@@ -1,3 +1,4 @@
+using System;
 using Game.Core.Combat;
 using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern;
@@ -6,8 +7,6 @@ using Game.Gameplay.Pooling;
 
 namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon
 {
-    using System;
-
     public sealed class ProjectileSpawnRequestFactory
     {
         public ProjectileSpawnRequest Create(

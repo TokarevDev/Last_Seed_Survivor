@@ -1,11 +1,9 @@
-
+using System;
 using Game.Gameplay.Enemy.Worm;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    using System;
-    using UnityEngine;
-
     public sealed class WormSegmentDamageBinding
     {
         private readonly GameObject _owner;

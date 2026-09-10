@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    using System;
-
     public sealed class WormAdaptiveHpSettings
     {
         public WormAdaptiveHpSettings(

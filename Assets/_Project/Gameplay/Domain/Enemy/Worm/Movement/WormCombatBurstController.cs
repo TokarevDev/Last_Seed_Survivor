@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using System;
-
     public sealed class WormCombatBurstController
     {
         private const float ActiveSpeedTolerance = 0.01f;

@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Player;
+using UnityEngine;
 
 namespace Game.Presentation.Player
 {
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     [RequireComponent(typeof(SpriteRenderer))]
     [RequireComponent(typeof(Animator))]

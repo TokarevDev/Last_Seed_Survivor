@@ -1,12 +1,10 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Rewards.Runtime;
 using Game.Presentation.UI.Rewards.Visuals;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class RewardPopupChoiceBinder
     {
         private static readonly RewardPresentationData DefaultPresentation =

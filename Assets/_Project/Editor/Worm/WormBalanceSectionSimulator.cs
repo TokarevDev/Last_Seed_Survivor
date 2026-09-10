@@ -1,21 +1,19 @@
-
-using Game.Core.Random;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using Game.Core.Randomization;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Enemy.Worm.Combat;
 using Game.Gameplay.Rewards.Data;
-using Game.Infrastructure.Random;
+using Game.Infrastructure.Randomization;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using UnityEngine;
-
     internal static class WormBalanceSectionSimulator
     {
         private static readonly IRandomSource RandomSource = new UnityRandomSource();

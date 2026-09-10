@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using System;
-
     public sealed class WormForwardMotionController
     {
         private readonly WormCombatBurstController _combatBurstController;

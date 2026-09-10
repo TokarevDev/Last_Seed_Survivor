@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Gameplay.Enemy.Worm
 {
-    using UnityEngine;
-
     public static class RailDistanceTableBuilder
     {
         public static float[] Build(Vector3[] pathPoints, out float totalLength)

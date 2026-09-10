@@ -1,10 +1,8 @@
-
+using System;
 using Game.Gameplay.Rewards.Runtime;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System;
-
     public sealed class RewardRequestCoordinator
     {
         private readonly RewardRequestQueue _queue;

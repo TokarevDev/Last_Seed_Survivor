@@ -1,11 +1,9 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Rewards.Data;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System.Collections.Generic;
-    using System;
-
     public enum RewardPickMode
     {
         UniqueCategory,

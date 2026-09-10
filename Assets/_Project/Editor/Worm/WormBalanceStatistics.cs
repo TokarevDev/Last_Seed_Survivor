@@ -1,8 +1,8 @@
-namespace Game.Editor.Worm
-{
-    using System.Collections.Generic;
-    using UnityEngine;
+using System.Collections.Generic;
+using UnityEngine;
 
+namespace Game.EditorTools.Worm
+{
     internal static class WormBalanceStatistics
     {
         public static float Average(IReadOnlyList<float> values)

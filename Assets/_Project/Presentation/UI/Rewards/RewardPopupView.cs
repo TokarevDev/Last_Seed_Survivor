@@ -1,16 +1,14 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Rewards.Runtime;
 using Game.Presentation.UI.Common.Popups;
 using Game.Presentation.UI.Rewards.Visuals;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-    using System.Collections.Generic;
-    using TMPro;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     [DisallowMultipleComponent]
     public sealed class RewardPopupView : PopupView
     {

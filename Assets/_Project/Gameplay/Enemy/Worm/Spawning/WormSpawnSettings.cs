@@ -1,10 +1,8 @@
-
+using System;
 using Game.Gameplay.Enemy.Worm;
 
 namespace Game.Gameplay.Enemy.Worm.Spawning
 {
-    using System;
-
     public sealed class WormSpawnSettings
     {
         public WormSpawnSettings(

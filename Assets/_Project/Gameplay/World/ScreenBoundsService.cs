@@ -1,10 +1,8 @@
-
 using Game.Core.World;
+using UnityEngine;
 
 namespace Game.Gameplay.World
 {
-    using UnityEngine;
-
     public sealed class ScreenBoundsService : IScreenBounds
     {
         public float Left { get; private set; }

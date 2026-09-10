@@ -1,14 +1,12 @@
-
+using System.Collections.Generic;
 using Game.Core.Combat;
 using Game.Core.Pooling;
 using Game.Gameplay.Signals;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Presentation.Worm
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class WormDamagePopupPresenter : MonoBehaviour
     {

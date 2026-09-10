@@ -1,13 +1,11 @@
-
+using System;
+using System.Collections.Generic;
+using DG.Tweening;
 using Game.Gameplay.Rewards.Runtime;
+using UnityEngine;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-    using System.Collections.Generic;
-    using DG.Tweening;
-    using UnityEngine;
-
     public sealed class RewardPopupAnimator
     {
         private const float ShowSettleTimeSeconds = 0.28f;

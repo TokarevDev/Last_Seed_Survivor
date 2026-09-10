@@ -1,16 +1,13 @@
-
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using Game.Gameplay.Rewards.Runtime;
+using UnityEditor;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using UnityEditor;
-    using UnityEngine;
-    using Random = UnityEngine.Random;
-
     internal readonly struct WormBalanceRewardChoiceEvaluation
     {
         public readonly RewardChoiceData Reward;

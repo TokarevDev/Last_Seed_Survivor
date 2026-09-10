@@ -1,10 +1,8 @@
-
+using System;
 using Game.Core;
 
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using System;
-
     public sealed class WormReviveMotionCalculator
     {
         private const float MinimumDistance = 0.01f;

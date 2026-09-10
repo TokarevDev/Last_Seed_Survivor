@@ -1,12 +1,10 @@
-
-using Game.Core.Random;
+using System;
+using System.Collections.Generic;
+using Game.Core.Randomization;
 using Game.Gameplay.Rewards.Data;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System.Collections.Generic;
-    using System;
-
     public static class RewardRarityRoller
     {
         public static RewardRarity[] BuildSlotRarities(

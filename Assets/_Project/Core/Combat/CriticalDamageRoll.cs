@@ -1,10 +1,8 @@
-
-using Game.Core.Random;
+using System;
+using Game.Core.Randomization;
 
 namespace Game.Core.Combat
 {
-    using System;
-
     public readonly struct CriticalDamageRoll
     {
         public CriticalDamageRoll(int damage, bool isCritical)

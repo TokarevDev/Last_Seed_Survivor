@@ -1,11 +1,9 @@
-
+using System;
 using Game.Core;
 using Game.Core.World;
 
 namespace Game.Gameplay.Player
 {
-    using System;
-
     public sealed class PlayerMovementModel
     {
         private const float InputEpsilon = 0.0001f;

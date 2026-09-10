@@ -7,7 +7,7 @@
     "Game.Gameplay",
     "Game.Infrastructure",
     "Game.Presentation",
-    "Game.Editor",
+    "Game.EditorTools",
     "UniTask",
     "Unity.TextMeshPro"
   ],

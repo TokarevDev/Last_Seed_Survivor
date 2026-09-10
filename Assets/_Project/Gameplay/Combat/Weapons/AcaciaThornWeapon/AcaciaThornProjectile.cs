@@ -1,14 +1,12 @@
-
 using Game.Core.Combat;
 using Game.Core.World;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Combat;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class AcaciaThornProjectile : MonoBehaviour
     {

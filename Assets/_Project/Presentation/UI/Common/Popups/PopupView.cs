@@ -1,8 +1,8 @@
+using System;
+using UnityEngine;
+
 namespace Game.Presentation.UI.Common.Popups
 {
-    using System;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public class PopupView : MonoBehaviour
     {

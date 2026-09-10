@@ -1,11 +1,9 @@
-
 using Game.Gameplay.Enemy.Worm;
+using UnityEditor;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using UnityEditor;
-    using UnityEngine;
-
     internal static class RailPathGizmoDrawer
     {
         private const float PointRadius = 0.08f;

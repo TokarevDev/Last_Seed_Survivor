@@ -1,10 +1,10 @@
+using DG.Tweening;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using DG.Tweening;
-    using TMPro;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     internal sealed class RewardPopupActionLayoutAnimator
     {
         private const float ActionStaggerSeconds = 0.035f;

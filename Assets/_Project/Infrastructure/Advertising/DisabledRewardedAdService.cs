@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Infrastructure.Advertising
 {
-    using System;
-
     public sealed class DisabledRewardedAdService : IRewardedAdService
     {
         public bool IsReady => false;

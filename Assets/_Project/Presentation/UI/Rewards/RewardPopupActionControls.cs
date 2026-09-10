@@ -1,11 +1,11 @@
+using System;
+using DG.Tweening;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-    using DG.Tweening;
-    using TMPro;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     public sealed class RewardPopupActionControls
     {
         private readonly Button _rerollButton;

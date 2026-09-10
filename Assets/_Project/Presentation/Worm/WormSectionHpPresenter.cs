@@ -1,13 +1,11 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Core.Collections;
 using Game.Gameplay.Enemy.Worm.Combat;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class WormSectionHpPresenter : MonoBehaviour, IWormSectionHealthPresentation
     {
         [SerializeField] private WormSectionHpView _viewPrefab;

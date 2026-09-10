@@ -1,10 +1,9 @@
 
+using System;
 using Game.Core;
 
 namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    using System;
-
     public sealed class WormSectionHpResolver
     {
         private readonly IWormHpScalingPolicy _config;

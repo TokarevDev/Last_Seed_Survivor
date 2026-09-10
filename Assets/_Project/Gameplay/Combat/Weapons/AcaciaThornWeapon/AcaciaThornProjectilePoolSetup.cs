@@ -1,10 +1,8 @@
-
 using Game.Core.World;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    using UnityEngine;
-
     public readonly struct AcaciaThornProjectilePoolSetup
     {
         public AcaciaThornProjectilePoolSetup(

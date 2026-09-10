@@ -1,11 +1,9 @@
-
-using Game.Core.Random;
+using System;
+using Game.Core.Randomization;
+using UnityEngine;
 
 namespace Game.Gameplay.Rewards.Data
 {
-    using System;
-    using UnityEngine;
-
     [Serializable]
     public sealed class RewardRaritySlot
     {

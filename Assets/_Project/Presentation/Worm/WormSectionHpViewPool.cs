@@ -1,10 +1,9 @@
+using System;
 using Game.Core.Pooling;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using System;
-    using UnityEngine;
-
     public sealed class WormSectionHpViewPool
     {
         private readonly WormSectionHpView _prefab;

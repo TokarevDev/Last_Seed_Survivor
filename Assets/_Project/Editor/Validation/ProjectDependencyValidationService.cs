@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using Zenject.Internal;
 
-namespace Game.Editor.Validation
+namespace Game.EditorTools.Validation
 {
     public static class ProjectDependencyValidationService
     {
@@ -37,6 +37,11 @@ namespace Game.Editor.Validation
 
         public static bool TryValidateCurrentScene()
         {
+            SceneSetup[] currentSceneSetup = EditorSceneManager.GetSceneManagerSetup();
+
+            if (!ContainsLoadedScene(currentSceneSetup) && !TryOpenFirstEnabledBuildScene())
+                return false;
+
             bool validationCompleted = false;
             bool validationExecuted = ZenUnityEditorUtil.SaveThenRunPreserveSceneSetup(() =>
             {
@@ -49,6 +54,29 @@ namespace Game.Editor.Validation
                 Debug.Log("Last Seed dependency validation succeeded for the current scene setup.");
 
             return validationExecuted && validationCompleted;
+        }
+
+        private static bool TryOpenFirstEnabledBuildScene()
+        {
+            EditorBuildSettingsScene[] buildScenes = EditorBuildSettings.scenes;
+
+            for (int sceneIndex = 0; sceneIndex < buildScenes.Length; sceneIndex++)
+            {
+                EditorBuildSettingsScene buildScene = buildScenes[sceneIndex];
+
+                if (!buildScene.enabled || string.IsNullOrWhiteSpace(buildScene.path))
+                    continue;
+
+                EditorSceneManager.OpenScene(buildScene.path, OpenSceneMode.Single);
+                Debug.LogWarning(
+                    $"No scene was loaded. Opened the first enabled build scene " +
+                    $"'{buildScene.path}' before dependency validation.");
+                return true;
+            }
+
+            Debug.LogError(
+                "Play Mode dependency validation requires at least one enabled build scene.");
+            return false;
         }
 
         private static bool ContainsLoadedScene(SceneSetup[] sceneSetup)

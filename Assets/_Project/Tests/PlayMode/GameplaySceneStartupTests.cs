@@ -10,7 +10,7 @@ using Game.Bootstrap.GameplayLoop;
 using Game.Bootstrap.Scenes.Game;
 using Game.Core.Collections;
 using Game.Core.Pooling;
-using Game.Core.Random;
+using Game.Core.Randomization;
 using Game.Core.Timing;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;

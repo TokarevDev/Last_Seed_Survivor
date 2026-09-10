@@ -1,11 +1,9 @@
-
+using DG.Tweening;
 using Game.Gameplay.Enemy.Worm.Presentation;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using DG.Tweening;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class WormFaceVisualController : WormFaceBurstView
     {

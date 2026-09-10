@@ -2,7 +2,7 @@ using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
 
-using Game.Editor.Worm;
+using Game.EditorTools.Worm;
 using Game.Gameplay.Enemy.Worm;
 
 namespace Game.Tests

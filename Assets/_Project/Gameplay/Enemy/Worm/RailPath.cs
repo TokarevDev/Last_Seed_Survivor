@@ -1,13 +1,11 @@
-
+using System.Collections.Generic;
 using Game.Core.World;
 using Game.Gameplay.Enemy.Worm.Movement;
+using NumericVector3 = System.Numerics.Vector3;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-    using NumericVector3 = System.Numerics.Vector3;
-
     public enum RailPathInterpolationMode
     {
         Linear = 0,

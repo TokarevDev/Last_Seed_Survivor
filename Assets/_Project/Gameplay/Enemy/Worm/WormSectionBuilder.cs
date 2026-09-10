@@ -1,14 +1,12 @@
-
-using Game.Core.Random;
+using System.Collections.Generic;
+using Game.Core.Randomization;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Enemy.Worm.Combat;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public static class WormSectionBuilder
     {
         public static List<WormSection> BuildSections(

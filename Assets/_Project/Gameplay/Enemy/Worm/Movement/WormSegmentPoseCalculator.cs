@@ -1,11 +1,10 @@
-
+using System;
+using System.Numerics;
 using Game.Core.World;
 using Game.Gameplay.Enemy.Worm.Presentation;
 
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using System;
-    using System.Numerics;
     public static class WormSegmentPoseCalculator
     {
         private const float MinimumSpacing = 0.01f;

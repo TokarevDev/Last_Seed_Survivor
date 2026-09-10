@@ -1,10 +1,8 @@
-
 using Game.Core.Combat;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat
 {
-    using UnityEngine;
-
     public readonly struct DamageHit
     {
         public DamageHit(in DamageInfo damage, Vector3 hitPosition)

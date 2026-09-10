@@ -1,13 +1,12 @@
-namespace Game.Editor.Worm
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using UnityEditor;
-    using UnityEngine;
-    using Random = UnityEngine.Random;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
 
+namespace Game.EditorTools.Worm
+{
     public enum WormBalanceRewardPickStrategy
     {
         RandomChoice = 0,

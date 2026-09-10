@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Infrastructure.Advertising
 {
-    using System;
-
     public interface IRewardedAdService
     {
         bool IsReady { get; }

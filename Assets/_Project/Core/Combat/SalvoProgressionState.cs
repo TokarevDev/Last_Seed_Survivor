@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Core.Combat
 {
-    using System;
-
     public sealed class SalvoProgressionState
     {
         private readonly int _hardLimit;

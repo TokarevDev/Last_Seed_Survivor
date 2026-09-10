@@ -1,14 +1,12 @@
-
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using Game.Gameplay.Enemy.Worm.Balance;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using UnityEngine;
-
     internal static class WormBalanceTimelineSimulator
     {
         public static bool AdvanceTime(

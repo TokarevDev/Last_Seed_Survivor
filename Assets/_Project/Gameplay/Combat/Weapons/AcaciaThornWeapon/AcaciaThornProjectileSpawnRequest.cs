@@ -1,10 +1,8 @@
-
 using Game.Core.Combat;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    using UnityEngine;
-
     public readonly struct AcaciaThornProjectileSpawnRequest
     {
         public AcaciaThornProjectileSpawnRequest(

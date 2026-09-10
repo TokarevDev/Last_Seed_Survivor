@@ -1,12 +1,10 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Enemy.Worm.Combat;
 
 namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class WormAdaptiveHpController
     {
         private const int ThousandHp = 1000;

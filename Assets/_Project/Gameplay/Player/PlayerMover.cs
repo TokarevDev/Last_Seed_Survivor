@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Gameplay.Player
 {
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class PlayerMover : MonoBehaviour
     {

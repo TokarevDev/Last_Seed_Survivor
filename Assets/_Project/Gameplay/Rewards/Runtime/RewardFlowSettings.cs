@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Gameplay.Rewards.Runtime
 {
-    using System;
-
     public sealed class RewardFlowSettings
     {
         public RewardFlowSettings(

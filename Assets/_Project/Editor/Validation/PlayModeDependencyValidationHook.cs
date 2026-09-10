@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Game.Editor.Validation
+namespace Game.EditorTools.Validation
 {
     [InitializeOnLoad]
     public static class PlayModeDependencyValidationHook

@@ -1,14 +1,12 @@
-
+using System;
 using Game.Core.Combat;
 using Game.Core.Pooling;
 using Game.Core.World;
 using Game.Gameplay.Combat.Weapons.Runtime;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    using System;
-    using UnityEngine;
-
     public sealed class AcaciaThornProjectilePool :
         IConfigurablePooledSpawnService<
             AcaciaThornProjectilePoolSetup,

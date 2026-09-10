@@ -1,11 +1,9 @@
-
-using Game.Core.Random;
+using System.Collections.Generic;
+using Game.Core.Randomization;
 using Game.Gameplay.Rewards.Data;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System.Collections.Generic;
-
     public static class RewardWeightedPicker
     {
         public static bool TryTakeFromRarity(

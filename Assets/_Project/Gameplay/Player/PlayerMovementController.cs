@@ -1,10 +1,9 @@
-
+using System;
 using Game.Core.Input;
 using Game.Core.World;
 
 namespace Game.Gameplay.Player
 {
-    using System;
     public sealed class PlayerMovementController
     {
         private readonly PlayerMover _view;

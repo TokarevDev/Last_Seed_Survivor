@@ -1,12 +1,10 @@
-
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Movement;
+using UnityEditor;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using UnityEditor;
-    using UnityEngine;
-
     internal static class WormControllerEditorSnapshotReader
     {
         public static WormControllerEditorSnapshot Read(WormController controller)

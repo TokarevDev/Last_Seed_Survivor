@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    using UnityEngine;
-
     public abstract class WormCocoonVisual : MonoBehaviour
     {
         public abstract void Apply(CocoonRewardProfile profile);

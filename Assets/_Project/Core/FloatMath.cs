@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Core
 {
-    using System;
-
     public static class FloatMath
     {
         public static float Clamp(float value, float minimum, float maximum)

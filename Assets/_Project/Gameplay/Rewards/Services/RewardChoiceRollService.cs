@@ -1,14 +1,12 @@
-
-using Game.Core.Random;
+using System;
+using System.Collections.Generic;
+using Game.Core.Randomization;
 using Game.Gameplay.Rewards;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class RewardChoiceRollService : IRewardChoiceRollService
     {
         private const int StandardGuaranteedSlotCount = 1;

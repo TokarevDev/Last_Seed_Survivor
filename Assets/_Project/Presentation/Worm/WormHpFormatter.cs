@@ -1,7 +1,7 @@
+using System.Globalization;
+
 namespace Game.Presentation.Worm
 {
-    using System.Globalization;
-
     public static class WormHpFormatter
     {
         private const int Thousand = 1000;

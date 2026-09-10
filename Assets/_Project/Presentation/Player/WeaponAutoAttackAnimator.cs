@@ -1,13 +1,11 @@
-
 using Game.Gameplay.Combat;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Signals;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Presentation.Player
 {
-    using UnityEngine;
-    using Zenject;
-
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Animator))]
     public sealed class WeaponAutoAttackAnimator : MonoBehaviour

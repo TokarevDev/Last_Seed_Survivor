@@ -1,12 +1,10 @@
-
+using System;
 using Game.Gameplay.Enemy.Worm.Presentation;
 using Game.Gameplay.Signals;
+using Zenject;
 
 namespace Game.Presentation.Worm
 {
-    using System;
-    using Zenject;
-
     public sealed class WormFaceBurstPresenter :
         IWormFaceBurstPresentation,
         IInitializable,

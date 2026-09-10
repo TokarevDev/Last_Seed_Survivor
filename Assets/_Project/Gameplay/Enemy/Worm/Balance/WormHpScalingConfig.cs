@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Combat.Weapons.Runtime;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/Worm/HP Scaling Config")]
     public sealed class WormHpScalingConfig : ScriptableObject, IWormHpScalingPolicy
     {

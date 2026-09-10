@@ -1,12 +1,10 @@
-
 using Game.Gameplay.Enemy.Worm.Combat;
 using Game.Gameplay.Enemy.Worm.Presentation;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm
 {
-    using UnityEngine;
-
     public enum WormSegmentType
     {
         None,

@@ -1,14 +1,12 @@
-
+using System;
+using DG.Tweening;
 using Game.Core.Combat;
 using Game.Gameplay.Signals;
+using TMPro;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using DG.Tweening;
-    using System;
-    using TMPro;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class WormDamagePopupView : MonoBehaviour
     {

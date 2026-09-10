@@ -1,13 +1,11 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Enemy.Worm;
+using UnityEditor;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEditor;
-    using UnityEngine;
-
     public sealed class RailPathSerializedData
     {
         private readonly RailPath _path;

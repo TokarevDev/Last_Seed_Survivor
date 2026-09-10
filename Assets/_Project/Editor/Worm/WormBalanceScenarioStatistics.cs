@@ -1,7 +1,7 @@
-namespace Game.Editor.Worm
-{
-    using System.Collections.Generic;
+using System.Collections.Generic;
 
+namespace Game.EditorTools.Worm
+{
     internal sealed class WormBalanceScenarioStatistics
     {
         private readonly List<float> _adsWatched = new();

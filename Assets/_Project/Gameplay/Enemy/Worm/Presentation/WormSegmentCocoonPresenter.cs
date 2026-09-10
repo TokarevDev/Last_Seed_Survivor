@@ -1,11 +1,9 @@
-
+using System;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    using System;
-    using UnityEngine;
-
     public sealed class WormSegmentCocoonPresenter
     {
         private const int CocoonSortingOffset = 100;

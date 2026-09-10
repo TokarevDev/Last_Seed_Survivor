@@ -1,22 +1,18 @@
-
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using Game.Gameplay.Combat.Projectiles;
+using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Enemy.Worm.Balance;
 using Game.Gameplay.Rewards.Data;
+using UnityEditor;
+using UnityEngine;
 
-using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
-
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using UnityEditor;
-    using UnityEngine;
-    using Random = UnityEngine.Random;
-
     internal sealed class WormBalanceSimulationSettings
     {
         public readonly RewardDatabase RewardDatabase;

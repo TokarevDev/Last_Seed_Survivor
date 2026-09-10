@@ -1,11 +1,9 @@
-
+using System;
 using Game.Gameplay.Enemy.Worm;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Spawning
 {
-    using System;
-    using UnityEngine;
-
     public sealed class WormSegmentPoolSettings
     {
         public WormSegmentPoolSettings(

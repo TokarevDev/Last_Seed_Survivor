@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Gameplay.Enemy.Worm.Balance
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/Worm/Pressure Config")]
     public sealed class WormPressureConfig : ScriptableObject
     {

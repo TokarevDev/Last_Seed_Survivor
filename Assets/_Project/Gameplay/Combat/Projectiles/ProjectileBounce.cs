@@ -1,10 +1,8 @@
-
 using Game.Core.World;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Projectiles
 {
-    using UnityEngine;
-
     public sealed class ProjectileBounce : MonoBehaviour
     {
         private int _maxBounces;

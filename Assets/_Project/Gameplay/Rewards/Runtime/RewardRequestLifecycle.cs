@@ -1,12 +1,10 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Services;
 
 namespace Game.Gameplay.Rewards.Runtime
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class RewardRequestLifecycle
     {
         public bool IsActive { get; private set; }

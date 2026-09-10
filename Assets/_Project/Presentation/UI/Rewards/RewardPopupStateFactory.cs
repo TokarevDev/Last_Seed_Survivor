@@ -1,4 +1,4 @@
-
+using System;
 using Game.Gameplay.Rewards;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
@@ -6,8 +6,6 @@ using Game.Gameplay.Rewards.Services;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-
     public sealed class RewardPopupStateFactory
     {
         private readonly RewardAttemptState _attempts;

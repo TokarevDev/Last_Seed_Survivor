@@ -1,12 +1,11 @@
+using System;
 using Game.Core.Combat;
-using Game.Core.Random;
+using Game.Core.Randomization;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    using System;
-    using UnityEngine;
-
     public sealed class AcaciaThornProjectileSpawnRequestFactory
     {
         private readonly IRandomSource _randomSource;

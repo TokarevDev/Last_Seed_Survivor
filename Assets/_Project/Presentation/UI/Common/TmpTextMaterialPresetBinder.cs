@@ -1,8 +1,8 @@
+using TMPro;
+using UnityEngine;
+
 namespace Game.Presentation.UI.Common
 {
-    using TMPro;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     [RequireComponent(typeof(TMP_Text))]
     public sealed class TmpTextMaterialPresetBinder : MonoBehaviour

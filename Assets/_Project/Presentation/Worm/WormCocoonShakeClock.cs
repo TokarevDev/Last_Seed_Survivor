@@ -1,12 +1,10 @@
-
+using System;
+using DG.Tweening;
 using Game.Gameplay.Enemy.Worm.Presentation;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using System;
-    using DG.Tweening;
-    using UnityEngine;
-
     public sealed class WormCocoonShakeClock : IWormCocoonShakeClock, IDisposable
     {
         private const int ShakeStepCount = 8;

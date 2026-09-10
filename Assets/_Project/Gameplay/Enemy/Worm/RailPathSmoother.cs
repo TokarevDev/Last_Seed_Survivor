@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace Game.Gameplay.Enemy.Worm
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public static class RailPathSmoother
     {
         private const float CornerDistanceFraction = 0.45f;

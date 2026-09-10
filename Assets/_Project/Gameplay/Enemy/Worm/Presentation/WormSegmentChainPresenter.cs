@@ -1,14 +1,12 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Core.World;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Movement;
+using NumericVector3 = System.Numerics.Vector3;
 
 namespace Game.Gameplay.Enemy.Worm.Presentation
 {
-    using System;
-    using System.Collections.Generic;
-    using NumericVector3 = System.Numerics.Vector3;
-
     public sealed class WormSegmentChainPresenter
     {
         private readonly WormSegmentTransformPresenter _transformPresenter;

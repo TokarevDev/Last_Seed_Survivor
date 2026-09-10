@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards.Visuals
 {
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class RewardFlagWindTimeDriver : MonoBehaviour
     {

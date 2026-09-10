@@ -1,5 +1,6 @@
-
-using Game.Core.Random;
+using System;
+using System.Collections.Generic;
+using Game.Core.Randomization;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.Runtime;
 using Game.Gameplay.Enemy.Worm.Balance;
@@ -7,14 +8,11 @@ using Game.Gameplay.Rewards;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
 using Game.Gameplay.Rewards.Services;
+using Random = UnityEngine.Random;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-    using Random = UnityEngine.Random;
-
     internal static class WormBalanceRewardSimulator
     {
         public static WormBalanceRewardSelection ResolveRewardPopup(

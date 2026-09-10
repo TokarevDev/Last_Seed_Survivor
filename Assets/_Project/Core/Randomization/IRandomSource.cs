@@ -1,4 +1,4 @@
-namespace Game.Core.Random
+namespace Game.Core.Randomization
 {
     public interface IRandomSource
     {

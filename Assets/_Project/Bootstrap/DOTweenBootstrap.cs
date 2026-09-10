@@ -1,8 +1,8 @@
+using DG.Tweening;
+using UnityEngine;
+
 namespace Game.Bootstrap
 {
-    using DG.Tweening;
-    using UnityEngine;
-
     public static class DOTweenBootstrap
     {
         private const int TweenCapacity = 500;

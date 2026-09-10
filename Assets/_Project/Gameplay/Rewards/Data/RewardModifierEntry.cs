@@ -1,11 +1,9 @@
-
+using System;
 using Game.Gameplay.Combat.Rewards.Effects;
+using UnityEngine;
 
 namespace Game.Gameplay.Rewards.Data
 {
-    using System;
-    using UnityEngine;
-
     public enum RewardModifierCategory
     {
         None = 0,

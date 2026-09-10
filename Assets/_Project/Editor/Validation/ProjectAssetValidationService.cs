@@ -8,7 +8,7 @@ using Game.Presentation.UI.Rewards.Visuals;
 using UnityEditor;
 using UnityEngine;
 
-namespace Game.Editor.Validation
+namespace Game.EditorTools.Validation
 {
     public static class ProjectAssetValidationService
     {

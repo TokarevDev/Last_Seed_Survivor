@@ -1,10 +1,9 @@
+using System.Collections.Generic;
 using Game.Gameplay.Combat.Weapons.Runtime;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public interface IShotPatternBuilder
     {
         void Build(

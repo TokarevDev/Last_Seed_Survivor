@@ -1,10 +1,8 @@
-
+using System;
 using Game.Core;
 
 namespace Game.Core.Combat
 {
-    using System;
-
     public sealed class CriticalHitProgressionState
     {
         private const float ComparisonEpsilon = 0.0001f;

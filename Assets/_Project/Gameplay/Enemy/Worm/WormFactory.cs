@@ -1,11 +1,9 @@
-
+using System.Collections.Generic;
 using Game.Gameplay.Enemy.Worm.Combat;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class WormFactory
     {
         private readonly WormSegmentPool _pool;

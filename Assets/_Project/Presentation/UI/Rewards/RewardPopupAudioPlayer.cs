@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using UnityEngine;
-
     public sealed class RewardPopupAudioPlayer
     {
         private readonly AudioSource _source;

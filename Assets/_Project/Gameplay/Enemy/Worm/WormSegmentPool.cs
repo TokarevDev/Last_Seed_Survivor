@@ -1,14 +1,12 @@
-
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using Game.Core.Pooling;
 using Game.Gameplay.Enemy.Worm.Presentation;
 using Game.Gameplay.Enemy.Worm.Spawning;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm
 {
-    using System.Threading;
-    using Cysharp.Threading.Tasks;
-    using UnityEngine;
-
     public sealed class WormSegmentPool
     {
         private readonly Transform _parent;

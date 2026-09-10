@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Zenject;
 
-using Game.Core.Random;
+using Game.Core.Randomization;
 using Game.Gameplay.Player;
 using Game.Gameplay.Pooling;
 using Game.Gameplay.World;

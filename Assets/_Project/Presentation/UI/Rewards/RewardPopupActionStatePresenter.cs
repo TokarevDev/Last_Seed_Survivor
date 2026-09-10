@@ -1,12 +1,10 @@
-
 using Game.Gameplay.Rewards.Data;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using TMPro;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     internal sealed class RewardPopupActionStatePresenter
     {
         private readonly Button _rerollButton;

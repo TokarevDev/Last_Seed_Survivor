@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Combat/Acacia Thorn Weapon Config")]
     public sealed class AcaciaThornWeaponConfig : ScriptableObject
     {

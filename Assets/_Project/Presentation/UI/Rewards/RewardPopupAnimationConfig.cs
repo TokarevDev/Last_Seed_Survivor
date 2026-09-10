@@ -1,8 +1,8 @@
+using DG.Tweening;
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using DG.Tweening;
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/UI/Reward Popup Animation Config")]
     public sealed class RewardPopupAnimationConfig : ScriptableObject
     {

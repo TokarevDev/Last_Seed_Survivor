@@ -1,8 +1,7 @@
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class CocoonLegendaryLightningEffect : MonoBehaviour
     {

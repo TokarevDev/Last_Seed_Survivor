@@ -1,15 +1,13 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Signals;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    using System;
-    using System.Collections.Generic;
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class WormCombatController : MonoBehaviour
     {

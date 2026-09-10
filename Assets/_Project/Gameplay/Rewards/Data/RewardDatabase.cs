@@ -1,8 +1,8 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace Game.Gameplay.Rewards.Data
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/Rewards/Reward Database")]
     public sealed class RewardDatabase : ScriptableObject
     {

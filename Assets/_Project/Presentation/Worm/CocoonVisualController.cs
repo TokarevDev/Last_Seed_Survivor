@@ -1,11 +1,9 @@
-
 using Game.Gameplay.Enemy.Worm.Presentation;
 using Game.Gameplay.Rewards.Data;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class CocoonVisualController : WormCocoonVisual
     {

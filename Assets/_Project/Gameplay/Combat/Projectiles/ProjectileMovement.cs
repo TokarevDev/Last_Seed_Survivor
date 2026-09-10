@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Gameplay.Combat.Projectiles
 {
-    using UnityEngine;
-
     public sealed class ProjectileMovement : MonoBehaviour
     {
         public Vector2 Direction { get; private set; }

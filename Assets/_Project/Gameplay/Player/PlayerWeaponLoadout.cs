@@ -1,11 +1,9 @@
-
+using System;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using UnityEngine;
 
 namespace Game.Gameplay.Player
 {
-    using System;
-    using UnityEngine;
-
     public sealed class PlayerWeaponLoadout
     {
         public PlayerWeaponLoadout(Transform firePoint, WeaponConfig startConfig)

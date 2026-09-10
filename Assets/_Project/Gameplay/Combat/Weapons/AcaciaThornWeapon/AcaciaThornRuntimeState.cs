@@ -1,9 +1,8 @@
+using System;
 using Game.Core.Combat;
 
 namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 {
-    using System;
-
     public sealed class AcaciaThornRuntimeState
     {
         public const float DefaultMaxFireRateBonus = 3f;

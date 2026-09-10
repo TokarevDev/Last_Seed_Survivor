@@ -1,15 +1,13 @@
-
+using System;
+using Cysharp.Threading.Tasks;
 using Game.Gameplay.Signals;
 using Game.Infrastructure.Navigation;
 using Game.Presentation.UI.Common.Popups;
+using UnityEngine;
+using Zenject;
 
 namespace Game.Presentation.UI.Combat
 {
-    using System;
-    using Cysharp.Threading.Tasks;
-    using UnityEngine;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class WormVictoryPopupController : MonoBehaviour
     {

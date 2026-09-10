@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Enemy.Worm.Presentation;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Game/Worm/Movement Config")]
     public sealed class WormMovementConfig : ScriptableObject
     {

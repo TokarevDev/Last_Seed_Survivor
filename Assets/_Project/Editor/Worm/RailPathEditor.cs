@@ -1,11 +1,9 @@
-
 using Game.Gameplay.Enemy.Worm;
+using UnityEditor;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using UnityEditor;
-    using UnityEngine;
-
     [CustomEditor(typeof(RailPath))]
     public sealed class RailPathEditor : Editor
     {

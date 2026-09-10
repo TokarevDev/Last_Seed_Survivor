@@ -1,15 +1,13 @@
-
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Text;
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Rewards.Runtime;
+using UnityEngine;
 
-namespace Game.Editor.Worm
+namespace Game.EditorTools.Worm
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Text;
-    using UnityEngine;
-
     internal static class WormBalanceRewardLogFormatter
     {
         public static void AppendRewardLog(

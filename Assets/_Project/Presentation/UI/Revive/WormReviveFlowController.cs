@@ -1,4 +1,5 @@
-
+using System;
+using Cysharp.Threading.Tasks;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Enemy.Worm;
@@ -9,15 +10,12 @@ using Game.Infrastructure.Advertising;
 using Game.Infrastructure.Navigation;
 using Game.Presentation.UI.Common.Popups;
 using Game.Presentation.Worm;
+using UnityEngine;
+using UnityEngine.Serialization;
+using Zenject;
 
 namespace Game.Presentation.UI.Revive
 {
-    using System;
-    using Cysharp.Threading.Tasks;
-    using UnityEngine;
-    using UnityEngine.Serialization;
-    using Zenject;
-
     [DisallowMultipleComponent]
     public sealed class WormReviveFlowController : MonoBehaviour
     {

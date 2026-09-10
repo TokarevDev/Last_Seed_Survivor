@@ -1,11 +1,11 @@
 
+using System;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Game.Presentation.UI.Common.Popups
 {
-    using System;
-    using TMPro;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     public sealed class RevivalPopupView : PopupView
     {
         [SerializeField] private Button _reviveButton;

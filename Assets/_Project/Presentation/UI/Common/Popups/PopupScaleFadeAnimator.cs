@@ -1,11 +1,11 @@
+using System;
+using System.Collections.Generic;
+using DG.Tweening;
+using UnityEngine;
+using UnityEngine.UI;
+
 namespace Game.Presentation.UI.Common.Popups
 {
-    using System;
-    using System.Collections.Generic;
-    using DG.Tweening;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     public sealed class PopupScaleFadeAnimator
     {
         private const string AnimatedContentRootName = "AnimatedContentRoot";

@@ -1,12 +1,10 @@
-
+using System.Collections.Generic;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Movement;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using System.Collections.Generic;
-    using UnityEngine;
-
     public sealed class WormReviveVisualScaler : IWormReviveVisualScaler
     {
         private readonly List<Vector3> _baseScales = new();

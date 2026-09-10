@@ -1,7 +1,7 @@
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using UnityEngine;
-
     public readonly struct RewardButtonContentStyle
     {
         public RewardButtonContentStyle(

@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Combat.Projectiles;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Projectiles.Configs
 {
-    using UnityEngine;
-
     [CreateAssetMenu(menuName = "Combat/Projectile Config")]
     public sealed class ProjectileConfig : ScriptableObject
     {

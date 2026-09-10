@@ -1,11 +1,9 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Core.Pooling;
 
 namespace Game.Gameplay.Enemy.Worm.Movement
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class WormSectionRollbackMotionController<TSegment>
         where TSegment : class
     {

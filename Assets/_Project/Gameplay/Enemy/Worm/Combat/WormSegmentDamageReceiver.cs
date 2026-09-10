@@ -1,12 +1,10 @@
-
 using Game.Core.Combat;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Enemy.Worm;
+using UnityEngine;
 
 namespace Game.Gameplay.Enemy.Worm.Combat
 {
-    using UnityEngine;
-
     [DisallowMultipleComponent]
     public sealed class WormSegmentDamageReceiver : MonoBehaviour, IDamageable<DamageHit>
     {

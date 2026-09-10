@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Core.Timing
 {
-    using System;
-
     public enum WeaponFireCycleStep
     {
         None,

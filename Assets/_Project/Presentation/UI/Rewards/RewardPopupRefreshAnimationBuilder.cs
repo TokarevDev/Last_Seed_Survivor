@@ -1,12 +1,10 @@
-
+using System;
+using System.Collections.Generic;
+using DG.Tweening;
 using Game.Gameplay.Rewards.Runtime;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-    using System.Collections.Generic;
-    using DG.Tweening;
-
     internal sealed class RewardPopupRefreshAnimationBuilder
     {
         private const float RevealPaddingSeconds = 0.02f;

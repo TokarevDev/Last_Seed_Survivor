@@ -1,14 +1,13 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using Game.Infrastructure.Navigation;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Game.Presentation.UI.Loading
 {
-    using System.Threading;
-    using Cysharp.Threading.Tasks;
-    using DG.Tweening;
-    using TMPro;
-    using UnityEngine;
-    using UnityEngine.UI;
-
     [DisallowMultipleComponent]
     public sealed class BootstrapLoadingView : MonoBehaviour, ISceneTransition
     {

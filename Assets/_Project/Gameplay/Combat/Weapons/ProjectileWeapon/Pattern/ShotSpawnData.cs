@@ -1,10 +1,8 @@
-
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using UnityEngine;
 
 namespace Game.Gameplay.Combat.Weapons.ProjectileWeapon.Pattern
 {
-    using UnityEngine;
-
     public struct ShotSpawnData
     {
         public Vector3 Position;

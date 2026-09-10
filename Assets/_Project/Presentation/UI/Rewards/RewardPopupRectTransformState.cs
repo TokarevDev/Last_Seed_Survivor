@@ -1,8 +1,8 @@
+using DG.Tweening;
+using UnityEngine;
+
 namespace Game.Presentation.UI.Rewards
 {
-    using DG.Tweening;
-    using UnityEngine;
-
     public readonly struct RewardPopupRectTransformState
     {
         private readonly RectTransform _rectTransform;

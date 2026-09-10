@@ -1,11 +1,9 @@
-
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Rewards.Runtime;
 
 namespace Game.Gameplay.Rewards.Services
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class RewardBatchApplyService
     {
         private readonly IRewardChoiceApplier _choiceApplier;

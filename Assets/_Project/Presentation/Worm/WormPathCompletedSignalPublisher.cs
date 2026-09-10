@@ -1,12 +1,10 @@
-
+using System;
 using Game.Gameplay.Enemy.Worm.Movement;
 using Game.Gameplay.Signals;
+using Zenject;
 
 namespace Game.Presentation.Worm
 {
-    using System;
-    using Zenject;
-
     public sealed class WormPathCompletedSignalPublisher
     {
         private readonly SignalBus _signalBus;

@@ -1,7 +1,7 @@
+using System;
+
 namespace Game.Core.Combat
 {
-    using System;
-
     public static class WeaponDamageClamp
     {
         public const int MaximumDamage = 9999999;

@@ -1,9 +1,8 @@
+using TMPro;
+using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
-    using TMPro;
-    using UnityEngine;
-
     public sealed class WormSectionHpView : MonoBehaviour
     {
         private const int HpTextBufferSize = 16;

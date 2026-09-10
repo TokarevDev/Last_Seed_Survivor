@@ -6,7 +6,7 @@ using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Rewards.Data;
 using Game.Presentation.UI.Rewards.Visuals;
 
-namespace Game.Editor.Validation
+namespace Game.EditorTools.Validation
 {
     public static class ProjectConfigurationValidator
     {

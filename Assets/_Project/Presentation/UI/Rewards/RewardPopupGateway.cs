@@ -1,11 +1,9 @@
-
+using System;
 using Game.Gameplay.Rewards.Runtime;
 using Game.Presentation.UI.Common.Popups;
 
 namespace Game.Presentation.UI.Rewards
 {
-    using System;
-
     public sealed class RewardPopupGateway : IDisposable
     {
         private readonly RewardPopupView _popup;

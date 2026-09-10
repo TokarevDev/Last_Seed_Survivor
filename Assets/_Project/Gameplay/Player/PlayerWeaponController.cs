@@ -1,4 +1,4 @@
-
+using System;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Combat.Projectiles;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon;
@@ -9,7 +9,6 @@ using Game.Gameplay.Signals;
 
 namespace Game.Gameplay.Player
 {
-    using System;
     public sealed class PlayerWeaponController
     {
         private readonly ProjectileWeapon _mainWeapon;
