@@ -13,21 +13,34 @@ namespace Game.Gameplay.Enemy.Worm.Spawning
             WormSegment tailPrefab)
         {
             Parent = parent != null ? parent : throw new ArgumentNullException(nameof(parent));
-            HeadPrefab = headPrefab != null
-                ? headPrefab
-                : throw new ArgumentNullException(nameof(headPrefab));
-            BodyPrefab = bodyPrefab != null
-                ? bodyPrefab
-                : throw new ArgumentNullException(nameof(bodyPrefab));
-            TailPrefab = tailPrefab != null
-                ? tailPrefab
-                : throw new ArgumentNullException(nameof(tailPrefab));
+            HeadPrefab = ValidatePrefab(headPrefab, WormSegmentType.Head, nameof(headPrefab));
+            BodyPrefab = ValidatePrefab(bodyPrefab, WormSegmentType.Body, nameof(bodyPrefab));
+            TailPrefab = ValidatePrefab(tailPrefab, WormSegmentType.Tail, nameof(tailPrefab));
         }
 
         public Transform Parent { get; }
         public WormSegment HeadPrefab { get; }
         public WormSegment BodyPrefab { get; }
         public WormSegment TailPrefab { get; }
+
+        private static WormSegment ValidatePrefab(
+            WormSegment prefab,
+            WormSegmentType expectedType,
+            string parameterName)
+        {
+            if (prefab == null)
+                throw new ArgumentNullException(parameterName);
+
+            if (prefab.Type != expectedType)
+            {
+                throw new ArgumentException(
+                    $"Worm segment prefab '{prefab.name}' must have type {expectedType}, " +
+                    $"but has {prefab.Type}.",
+                    parameterName);
+            }
+
+            return prefab;
+        }
     }
 
 }

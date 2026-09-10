@@ -132,7 +132,7 @@ namespace Game.Gameplay.Enemy.Worm
             WormSegmentType.Head => _headPool,
             WormSegmentType.Body => _bodyPool,
             WormSegmentType.Tail => _tailPool,
-            _ => _bodyPool
+            _ => null
         };
 
     }
