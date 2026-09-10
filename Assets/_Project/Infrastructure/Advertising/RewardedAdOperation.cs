@@ -21,7 +21,7 @@ namespace Game.Infrastructure.Advertising
             if (onCompleted == null)
                 throw new ArgumentNullException(nameof(onCompleted));
 
-            if (IsPending)
+            if (IsPending || !_rewardedAdService.IsReady)
                 return false;
 
             IsPending = true;

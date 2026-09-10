@@ -48,6 +48,21 @@ namespace Game.Tests
         }
 
         [Test]
+        public void TryBegin_WhenServiceIsNotReady_DoesNotInvokeService()
+        {
+            UnavailableRewardedAdService adService = new();
+            RewardedAdOperation operation = new(adService);
+            bool? result = null;
+
+            bool started = operation.TryBegin(value => result = value);
+
+            Assert.That(started, Is.False);
+            Assert.That(result, Is.Null);
+            Assert.That(operation.IsPending, Is.False);
+            Assert.That(adService.ShowCalls, Is.Zero);
+        }
+
+        [Test]
         public void Cancel_InvalidatesLateCallback()
         {
             DelayedRewardedAdService adService = new();
@@ -108,6 +123,17 @@ namespace Game.Tests
             public void ShowRewardedAd(Action<bool> onCompleted)
             {
                 throw new InvalidOperationException("Ad service failed to start.");
+            }
+        }
+
+        private sealed class UnavailableRewardedAdService : IRewardedAdService
+        {
+            public bool IsReady => false;
+            public int ShowCalls { get; private set; }
+
+            public void ShowRewardedAd(Action<bool> onCompleted)
+            {
+                ShowCalls++;
             }
         }
     }
