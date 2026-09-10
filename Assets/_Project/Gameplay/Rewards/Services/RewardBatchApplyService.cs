@@ -19,8 +19,27 @@ namespace Game.Gameplay.Rewards.Services
             if (choices == null)
                 throw new ArgumentNullException(nameof(choices));
 
+            List<Exception> failures = null;
+
             for (int index = 0; index < choices.Count; index++)
-                _choiceApplier.Apply(choices[index]);
+            {
+                try
+                {
+                    _choiceApplier.Apply(choices[index]);
+                }
+                catch (Exception exception)
+                {
+                    failures ??= new List<Exception>();
+                    failures.Add(exception);
+                }
+            }
+
+            if (failures != null)
+            {
+                throw new AggregateException(
+                    "One or more rewards could not be applied.",
+                    failures);
+            }
         }
     }
 

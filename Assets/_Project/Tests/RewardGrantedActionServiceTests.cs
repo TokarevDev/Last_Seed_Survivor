@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 
@@ -100,6 +101,25 @@ namespace Game.Tests
             Assert.That(applier.Applied, Is.EqualTo(new[] { first, second }));
         }
 
+        [Test]
+        public void CompleteTakeAll_WhenBatchFails_ConsumesAttemptAndMarksContinuation()
+        {
+            RewardAttemptState attempts = CreateAttempts();
+            RewardRequestLifecycle lifecycle = CreateActiveLifecycle();
+            lifecycle.SetRollResult(
+                RewardRarity.Rare,
+                new List<RewardChoiceData> { CreateChoice() });
+            RewardGrantedActionService service = CreateService(
+                attempts,
+                lifecycle,
+                new FakeChoiceRollService(default),
+                new ThrowingChoiceApplier());
+
+            Assert.Throws<AggregateException>(() => service.CompleteTakeAll());
+            Assert.That(attempts.TakeAllLeft, Is.Zero);
+            Assert.That(lifecycle.ShouldOpenNext, Is.True);
+        }
+
         private static RewardGrantedActionService CreateService(
             RewardAttemptState attempts,
             RewardRequestLifecycle lifecycle,
@@ -164,6 +184,14 @@ namespace Game.Tests
             public void Apply(RewardChoiceData choice)
             {
                 Applied.Add(choice);
+            }
+        }
+
+        private sealed class ThrowingChoiceApplier : IRewardChoiceApplier
+        {
+            public void Apply(RewardChoiceData choice)
+            {
+                throw new InvalidOperationException("Reward application failed.");
             }
         }
     }

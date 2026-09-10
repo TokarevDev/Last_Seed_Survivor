@@ -44,6 +44,23 @@ namespace Game.Tests
             Assert.That(applier.Applied, Is.Empty);
         }
 
+        [Test]
+        public void ApplyAll_WhenChoiceFails_AttemptsRemainingChoicesAndReportsFailure()
+        {
+            RewardChoiceData first = CreateChoice();
+            RewardChoiceData failing = CreateChoice();
+            RewardChoiceData last = CreateChoice();
+            FailingChoiceApplier applier = new(failing);
+            RewardBatchApplyService service = new(applier);
+
+            AggregateException exception = Assert.Throws<AggregateException>(() =>
+                service.ApplyAll(new[] { first, failing, last }));
+
+            Assert.That(applier.Attempted, Is.EqualTo(new[] { first, failing, last }));
+            Assert.That(exception.InnerExceptions, Has.Count.EqualTo(1));
+            Assert.That(exception.InnerExceptions[0], Is.TypeOf<InvalidOperationException>());
+        }
+
         private static RewardChoiceData CreateChoice()
         {
             return new RewardChoiceData(new RewardModifierEntry());
@@ -56,6 +73,26 @@ namespace Game.Tests
             public void Apply(RewardChoiceData choice)
             {
                 Applied.Add(choice);
+            }
+        }
+
+        private sealed class FailingChoiceApplier : IRewardChoiceApplier
+        {
+            private readonly RewardChoiceData _failingChoice;
+
+            public FailingChoiceApplier(RewardChoiceData failingChoice)
+            {
+                _failingChoice = failingChoice;
+            }
+
+            public List<RewardChoiceData> Attempted { get; } = new();
+
+            public void Apply(RewardChoiceData choice)
+            {
+                Attempted.Add(choice);
+
+                if (ReferenceEquals(choice, _failingChoice))
+                    throw new InvalidOperationException("Reward application failed.");
             }
         }
     }

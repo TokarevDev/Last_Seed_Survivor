@@ -5,6 +5,7 @@ using Game.Gameplay.Rewards.Runtime;
 using Game.Gameplay.Rewards.Services;
 using Game.Infrastructure.Advertising;
 using Game.Presentation.UI.Common.Popups;
+using UnityEngine;
 
 namespace Game.Presentation.UI.Rewards
 {
@@ -208,10 +209,17 @@ namespace Game.Presentation.UI.Rewards
                 return;
             }
 
-            if (!_grantedActionService.CompleteTakeAll())
+            try
             {
-                _popupGateway.SetInteractable(true);
-                return;
+                if (!_grantedActionService.CompleteTakeAll())
+                {
+                    _popupGateway.SetInteractable(true);
+                    return;
+                }
+            }
+            catch (AggregateException exception)
+            {
+                Debug.LogException(exception);
             }
 
             _popupGateway.Close();
