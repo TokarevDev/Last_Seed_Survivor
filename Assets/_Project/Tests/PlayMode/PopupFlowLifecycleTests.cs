@@ -48,6 +48,33 @@ namespace Game.Tests.PlayMode
         }
 
         [UnityTest]
+        public IEnumerator DuplicatePopupId_IsRejectedWithoutReplacingActivePopup()
+        {
+            yield return _flow.LoadScene(GameSceneNames.Gameplay);
+
+            PopupRoot popupRoot = _flow.FindInActiveScene<PopupRoot>();
+            GameObject firstObject = new("FirstPopup");
+            GameObject duplicateObject = new("DuplicatePopup");
+            firstObject.SetActive(false);
+            duplicateObject.SetActive(false);
+            PopupView first = firstObject.AddComponent<PopupView>();
+            PopupView duplicate = duplicateObject.AddComponent<PopupView>();
+
+            popupRoot.Show(first);
+            LogAssert.Expect(LogType.Warning, "PopupRoot: duplicate popup id 'PopupView'.");
+            popupRoot.Show(duplicate);
+
+            Assert.That(first.IsVisible, Is.True);
+            Assert.That(duplicate.IsVisible, Is.False);
+
+            popupRoot.HideActive();
+            Object.Destroy(firstObject);
+            Object.Destroy(duplicateObject);
+            yield return null;
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest]
         public IEnumerator RewardFlow_SceneTeardown_ClearsRequestAndRestoresModalOwnership()
         {
             yield return _flow.LoadScene(GameSceneNames.Gameplay);

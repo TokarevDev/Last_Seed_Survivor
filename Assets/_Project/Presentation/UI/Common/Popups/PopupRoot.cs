@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Game.Core.Collections;
 using Game.Core.Timing;
@@ -88,10 +87,8 @@ namespace Game.Presentation.UI.Common.Popups
 
         public void Show(PopupView popup)
         {
-            if (popup == null)
+            if (popup == null || !RegisterPopup(popup))
                 return;
-
-            RegisterPopup(popup);
 
             if (ReferenceEquals(_navigation.ActiveItem, popup))
                 return;
@@ -161,18 +158,22 @@ namespace Game.Presentation.UI.Common.Popups
             }
         }
 
-        private void RegisterPopup(PopupView popup)
+        private bool RegisterPopup(PopupView popup)
         {
             if (popup == null)
-                return;
+                return false;
 
             EnsureRegistry();
             PopupRegistrationResult result = _registry.Register(popup);
 
             if (result == PopupRegistrationResult.DuplicateId)
             {
+                popup.Hide();
                 Debug.LogWarning($"PopupRoot: duplicate popup id '{popup.PopupId}'.", popup);
+                return false;
             }
+
+            return true;
         }
 
         private void HandlePopupCloseRequested(PopupView popup)
