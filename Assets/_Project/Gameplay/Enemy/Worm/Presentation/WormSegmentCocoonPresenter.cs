@@ -134,8 +134,8 @@ namespace Game.Gameplay.Enemy.Worm.Presentation
                 return;
             }
 
-            _isShakeRegistered = true;
             _shakeClock.Register(_shakeInterval, _shakeAngle);
+            _isShakeRegistered = true;
         }
 
         private void UnregisterShake()

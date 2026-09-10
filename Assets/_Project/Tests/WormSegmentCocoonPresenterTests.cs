@@ -1,3 +1,4 @@
+using System;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -23,7 +24,7 @@ namespace Game.Tests
         [TearDown]
         public void TearDown()
         {
-            Object.DestroyImmediate(_ownerObject);
+            UnityEngine.Object.DestroyImmediate(_ownerObject);
         }
 
         [Test]
@@ -82,6 +83,25 @@ namespace Game.Tests
             Assert.That(shakeClock.RegisterCount, Is.EqualTo(1));
         }
 
+        [Test]
+        public void RegistrationFailure_DoesNotCommitOwnershipAndCanRetry()
+        {
+            ThrowOnceShakeClock shakeClock = new();
+            WormSegmentCocoonPresenter presenter = CreatePresenter();
+            presenter.BindShakeClock(shakeClock, ownerIsActive: false);
+            presenter.Show(null, ownerIsActive: false);
+
+            Assert.Throws<InvalidOperationException>(presenter.OnOwnerEnabled);
+            Assert.That(shakeClock.RegisterCount, Is.EqualTo(1));
+
+            Assert.DoesNotThrow(presenter.OnOwnerEnabled);
+            Assert.That(shakeClock.RegisterCount, Is.EqualTo(2));
+
+            presenter.Hide();
+
+            Assert.That(shakeClock.UnregisterCount, Is.EqualTo(1));
+        }
+
         private WormSegmentCocoonPresenter CreatePresenter()
         {
             return new WormSegmentCocoonPresenter(
@@ -100,6 +120,26 @@ namespace Game.Tests
             public void Register(float interval, float angle)
             {
                 RegisterCount++;
+            }
+
+            public void Unregister()
+            {
+                UnregisterCount++;
+            }
+        }
+
+        private sealed class ThrowOnceShakeClock : IWormCocoonShakeClock
+        {
+            public float RotationOffset => 0f;
+            public int RegisterCount { get; private set; }
+            public int UnregisterCount { get; private set; }
+
+            public void Register(float interval, float angle)
+            {
+                RegisterCount++;
+
+                if (RegisterCount == 1)
+                    throw new InvalidOperationException("Shake registration failed.");
             }
 
             public void Unregister()
