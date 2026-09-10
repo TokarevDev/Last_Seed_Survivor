@@ -65,6 +65,7 @@ namespace Game.Presentation.Worm
         private void OnDisable()
         {
             UnsubscribeFromSignals();
+            ClearActivePopups();
         }
 
         private void OnDamageDealt(WormDamageDealtSignal signal)
