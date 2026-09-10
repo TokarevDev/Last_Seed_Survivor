@@ -42,14 +42,16 @@ namespace Game.Presentation.UI.Common.Popups
             if (popup == null)
                 throw new ArgumentNullException(nameof(popup));
 
-            if (!_popups.Add(popup))
+            if (_popups.Contains(popup))
                 return PopupRegistrationResult.AlreadyRegistered;
 
-            popup.CloseRequested += _closeRequestedHandler;
             string popupId = popup.PopupId;
 
             if (_popupsById.ContainsKey(popupId))
                 return PopupRegistrationResult.DuplicateId;
+
+            _popups.Add(popup);
+            popup.CloseRequested += _closeRequestedHandler;
 
             try
             {

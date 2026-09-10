@@ -1,30 +1,32 @@
+using Game.Presentation.UI.Common.Popups;
 using NUnit.Framework;
 using UnityEngine;
-
-using Game.Presentation.UI.Common.Popups;
 
 namespace Game.Tests
 {
     public sealed class PopupRegistryTests
     {
         [Test]
-        public void Register_DeduplicatesInstancesAndKeepsFirstDuplicateIdOwner()
+        public void Register_DuplicateId_DoesNotRetainItemOrSubscribeToEvents()
         {
             PopupView first = CreatePopup("First");
             PopupView duplicateId = CreatePopup("Duplicate");
+            int closeRequestCount = 0;
 
             try
             {
-                PopupRegistry registry = new(_ => { });
+                PopupRegistry registry = new(_ => closeRequestCount++);
 
                 Assert.That(registry.Register(first), Is.EqualTo(PopupRegistrationResult.Registered));
                 Assert.That(registry.Register(first), Is.EqualTo(PopupRegistrationResult.AlreadyRegistered));
                 Assert.That(registry.Register(duplicateId), Is.EqualTo(PopupRegistrationResult.DuplicateId));
-                Assert.That(registry.Count, Is.EqualTo(2));
+                duplicateId.RequestClose();
+
+                Assert.That(closeRequestCount, Is.Zero);
+                Assert.That(registry.Count, Is.EqualTo(1));
                 Assert.That(registry.TryGet(first.PopupId, out PopupView resolved), Is.True);
                 Assert.That(resolved, Is.SameAs(first));
                 Assert.That(registry.Items[0], Is.SameAs(first));
-                Assert.That(registry.Items[1], Is.SameAs(duplicateId));
             }
             finally
             {
