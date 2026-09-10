@@ -27,14 +27,18 @@ namespace Game.Gameplay.Rewards.Services
 
         public bool CompleteAdReroll()
         {
-            if (!_requestLifecycle.IsActive || !_attempts.ConsumeAdReroll())
+            if (!_requestLifecycle.IsActive || !_attempts.HasAdReroll)
                 return false;
 
             RewardChoiceRollResult result = _choiceRollService.RollAdAssisted(
                 _requestLifecycle.CocoonProfile,
                 _requestLifecycle.RollContext);
+
+            if (!result.HasChoices || !_attempts.ConsumeAdReroll())
+                return false;
+
             _requestLifecycle.SetRollResult(result.GuaranteeRarity, result.Choices);
-            return result.HasChoices;
+            return true;
         }
 
         public bool CompleteTakeAll()

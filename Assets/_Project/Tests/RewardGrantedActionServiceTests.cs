@@ -50,6 +50,32 @@ namespace Game.Tests
         }
 
         [Test]
+        public void CompleteAdReroll_EmptyRoll_PreservesAttemptAndCurrentChoices()
+        {
+            RewardAttemptState attempts = CreateAttempts();
+            RewardRequestLifecycle lifecycle = CreateActiveLifecycle();
+            List<RewardChoiceData> currentChoices = new() { CreateChoice() };
+            lifecycle.SetRollResult(RewardRarity.Rare, currentChoices);
+            FakeChoiceRollService roller = new(
+                new RewardChoiceRollResult(
+                    RewardRarity.Legendary,
+                    new List<RewardChoiceData>()));
+            RewardGrantedActionService service = CreateService(
+                attempts,
+                lifecycle,
+                roller,
+                new RecordingChoiceApplier());
+
+            bool completed = service.CompleteAdReroll();
+
+            Assert.That(completed, Is.False);
+            Assert.That(attempts.AdRerollsLeft, Is.EqualTo(1));
+            Assert.That(roller.AdRollCalls, Is.EqualTo(1));
+            Assert.That(lifecycle.GuaranteeRarity, Is.EqualTo(RewardRarity.Rare));
+            Assert.That(lifecycle.Choices, Is.SameAs(currentChoices));
+        }
+
+        [Test]
         public void CompleteTakeAll_AppliesStableBatchAndMarksContinuation()
         {
             RewardAttemptState attempts = CreateAttempts();
