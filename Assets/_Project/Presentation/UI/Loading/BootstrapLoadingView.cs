@@ -89,6 +89,11 @@ namespace Game.Presentation.UI.Loading
             return _completionSource.Task;
         }
 
+        private void OnDisable()
+        {
+            CancelAnimation();
+        }
+
         private void OnDestroy()
         {
             CancelAnimation();
