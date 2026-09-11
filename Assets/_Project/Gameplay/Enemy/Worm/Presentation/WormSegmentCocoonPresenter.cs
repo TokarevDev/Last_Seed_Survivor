@@ -143,8 +143,8 @@ namespace Game.Gameplay.Enemy.Worm.Presentation
             if (!_isShakeRegistered)
                 return;
 
-            _isShakeRegistered = false;
             _shakeClock?.Unregister();
+            _isShakeRegistered = false;
         }
     }
 

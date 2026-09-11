@@ -102,6 +102,23 @@ namespace Game.Tests
             Assert.That(shakeClock.UnregisterCount, Is.EqualTo(1));
         }
 
+        [Test]
+        public void UnregistrationFailure_PreservesOwnershipAndCanRetry()
+        {
+            ThrowOnceUnregisterShakeClock shakeClock = new();
+            WormSegmentCocoonPresenter presenter = CreatePresenter();
+            presenter.BindShakeClock(shakeClock, ownerIsActive: false);
+            presenter.Show(null, ownerIsActive: true);
+
+            Assert.Throws<InvalidOperationException>(presenter.Hide);
+            Assert.That(shakeClock.UnregisterCount, Is.EqualTo(1));
+            Assert.That(presenter.IsVisible, Is.True);
+
+            Assert.DoesNotThrow(presenter.Hide);
+            Assert.That(shakeClock.UnregisterCount, Is.EqualTo(2));
+            Assert.That(presenter.IsVisible, Is.False);
+        }
+
         private WormSegmentCocoonPresenter CreatePresenter()
         {
             return new WormSegmentCocoonPresenter(
@@ -145,6 +162,24 @@ namespace Game.Tests
             public void Unregister()
             {
                 UnregisterCount++;
+            }
+        }
+
+        private sealed class ThrowOnceUnregisterShakeClock : IWormCocoonShakeClock
+        {
+            public float RotationOffset => 0f;
+            public int UnregisterCount { get; private set; }
+
+            public void Register(float interval, float angle)
+            {
+            }
+
+            public void Unregister()
+            {
+                UnregisterCount++;
+
+                if (UnregisterCount == 1)
+                    throw new InvalidOperationException("Shake unregistration failed.");
             }
         }
     }
