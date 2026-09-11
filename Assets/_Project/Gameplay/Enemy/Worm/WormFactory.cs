@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Game.Gameplay.Enemy.Worm.Combat;
 using UnityEngine;
@@ -37,7 +38,7 @@ namespace Game.Gameplay.Enemy.Worm
                     WormSegment segment = _pool.Get(entry.Type);
 
                     if (segment == null)
-                        throw new System.InvalidOperationException(
+                        throw new InvalidOperationException(
                             $"Failed to rent worm segment of type {entry.Type}.");
 
                     segments.Add(segment);
@@ -59,18 +60,39 @@ namespace Game.Gameplay.Enemy.Worm
                 }
 
                 if (head == null || tail == null)
-                    throw new System.InvalidOperationException(
+                    throw new InvalidOperationException(
                         "Worm pattern must create both a head and a tail.");
 
                 return segments;
             }
-            catch
+            catch (Exception creationException)
             {
+                List<Exception> rollbackFailures = null;
+
                 for (int segmentIndex = segments.Count - 1; segmentIndex >= 0; segmentIndex--)
-                    _pool.Release(segments[segmentIndex]);
+                {
+                    try
+                    {
+                        _pool.Release(segments[segmentIndex]);
+                    }
+                    catch (Exception rollbackException)
+                    {
+                        rollbackFailures ??= new List<Exception>();
+                        rollbackFailures.Add(rollbackException);
+                    }
+                }
 
                 head = null;
                 tail = null;
+
+                if (rollbackFailures != null)
+                {
+                    rollbackFailures.Insert(0, creationException);
+                    throw new AggregateException(
+                        "Worm segment creation and rollback both failed.",
+                        rollbackFailures);
+                }
+
                 throw;
             }
         }

@@ -82,6 +82,48 @@ namespace Game.Tests.PlayMode
             Assert.That(lifecycle.IsSpawned, Is.False);
         }
 
+        [Test]
+        public void CreateSegments_WhenRentAndRollbackFail_PreservesRentFailureAndReleasesEverySegment()
+        {
+            WormSegmentPool segmentPool = CreateSegmentPool();
+            WormSegment head = CreateSegmentPrefab("RentedHead", WormSegmentType.Head);
+            WormSegment tail = CreateSegmentPrefab("RentedTail", WormSegmentType.Tail);
+            List<string> releaseOrder = new();
+            ObjectPool<WormSegment> headPool = new(
+                () => head,
+                _ => releaseOrder.Add("head"));
+            ObjectPool<WormSegment> tailPool = new(
+                () => tail,
+                _ =>
+                {
+                    releaseOrder.Add("tail");
+                    throw new InvalidOperationException("tail rollback failed");
+                });
+            ObjectPool<WormSegment> bodyPool = new(
+                () => throw new InvalidOperationException("body rent failed"),
+                _ => { });
+            SetPrivateField(segmentPool, "_headPool", headPool);
+            SetPrivateField(segmentPool, "_bodyPool", bodyPool);
+            SetPrivateField(segmentPool, "_tailPool", tailPool);
+            WormFactory factory = new(segmentPool);
+            List<WormPatternEntry> pattern = new()
+            {
+                new WormPatternEntry(WormSegmentType.Head),
+                new WormPatternEntry(WormSegmentType.Tail),
+                new WormPatternEntry(WormSegmentType.Body)
+            };
+
+            AggregateException exception = Assert.Throws<AggregateException>(() =>
+                factory.CreateSegments(pattern, out _, out _));
+
+            Assert.That(exception.InnerExceptions, Has.Count.EqualTo(2));
+            Assert.That(exception.InnerExceptions[0].Message, Is.EqualTo("body rent failed"));
+            Assert.That(exception.InnerExceptions[1].Message, Is.EqualTo("tail rollback failed"));
+            Assert.That(releaseOrder, Is.EqualTo(new[] { "tail", "head" }));
+            Assert.That(headPool.ActiveCount, Is.Zero);
+            Assert.That(tailPool.ActiveCount, Is.Zero);
+        }
+
         private WormSegmentPool CreateSegmentPool()
         {
             _poolRoot = new GameObject("WormSegmentPoolRoot");
