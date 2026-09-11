@@ -124,6 +124,67 @@ namespace Game.Tests.PlayMode
             Assert.That(tailPool.ActiveCount, Is.Zero);
         }
 
+        [Test]
+        public void Despawn_WhenConsumersFail_ContinuesCleanupAndClearsCommittedState()
+        {
+            WormSegmentPool segmentPool = CreateSegmentPool();
+            WormSegment head = CreateSegmentPrefab("ActiveHead", WormSegmentType.Head);
+            ObjectPool<WormSegment> headPool = new(() => head, _ => { });
+            SetPrivateField(segmentPool, "_headPool", headPool);
+            WormSegment rentedHead = segmentPool.Get(WormSegmentType.Head);
+            WormAdaptiveHpController adaptiveHpController = new(
+                null,
+                new InvalidWeaponPowerProvider(),
+                null,
+                new WormAdaptiveHpSettings(1, 1, 0f));
+            GetPrivateField<List<IWormSectionHpTarget>>(
+                adaptiveHpController,
+                "_sections").Add(new StubHpTarget());
+
+            _wormControllerObject = new GameObject("WormController");
+            LogAssert.Expect(LogType.Error, "WormController requires a rail path.");
+            LogAssert.Expect(LogType.Error, "WormController requires a movement config.");
+            WormController wormController =
+                _wormControllerObject.AddComponent<WormController>();
+            _combatControllerObject = new GameObject("WormCombatController");
+            WormCombatController combatController =
+                _combatControllerObject.AddComponent<WormCombatController>();
+            TrackingHealthPresentation healthPresentation = new(throwOnClear: true);
+            TrackingFacePresentation facePresentation = new();
+            WormSpawnLifecycle lifecycle = new(
+                segmentPool,
+                new WormFactory(segmentPool),
+                new WormSpawnSettings(1, 0, 1),
+                adaptiveHpController,
+                wormController,
+                combatController,
+                healthPresentation,
+                facePresentation,
+                new FixedRandomSource());
+            GetPrivateField<List<WormSegment>>(lifecycle, "_activeSegments").Add(rentedHead);
+            GetPrivateField<List<WormSection>>(lifecycle, "_activeSections").Add(new WormSection());
+            SetPrivateField(lifecycle, "_head", rentedHead);
+            SetPrivateField(lifecycle, "<IsSpawned>k__BackingField", true);
+
+            AggregateException exception = Assert.Throws<AggregateException>(
+                () => lifecycle.Despawn(24f));
+
+            Assert.That(exception.InnerExceptions, Has.Count.EqualTo(3));
+            Assert.That(exception.InnerExceptions[0].Message, Is.EqualTo("health cleanup failed"));
+            Assert.That(healthPresentation.ClearCalls, Is.EqualTo(1));
+            Assert.That(facePresentation.UnbindCalls, Is.EqualTo(1));
+            Assert.That(headPool.ActiveCount, Is.Zero);
+            Assert.That(GetAdaptiveSectionCount(adaptiveHpController), Is.Zero);
+            Assert.That(
+                GetPrivateField<List<WormSegment>>(lifecycle, "_activeSegments"),
+                Is.Empty);
+            Assert.That(
+                GetPrivateField<List<WormSection>>(lifecycle, "_activeSections"),
+                Is.Empty);
+            Assert.That(GetPrivateField<WormSegment>(lifecycle, "_head"), Is.Null);
+            Assert.That(lifecycle.IsSpawned, Is.False);
+        }
+
         private WormSegmentPool CreateSegmentPool()
         {
             _poolRoot = new GameObject("WormSegmentPoolRoot");
@@ -218,6 +279,13 @@ namespace Game.Tests.PlayMode
 
         private sealed class TrackingHealthPresentation : IWormSectionHealthPresentation
         {
+            private readonly bool _throwOnClear;
+
+            public TrackingHealthPresentation(bool throwOnClear = false)
+            {
+                _throwOnClear = throwOnClear;
+            }
+
             public int ClearCalls { get; private set; }
 
             public void BindSections(IReadOnlyList<WormSection> sections)
@@ -227,6 +295,9 @@ namespace Game.Tests.PlayMode
             public void Clear()
             {
                 ClearCalls++;
+
+                if (_throwOnClear)
+                    throw new InvalidOperationException("health cleanup failed");
             }
         }
 
@@ -241,6 +312,24 @@ namespace Game.Tests.PlayMode
             public void Unbind()
             {
                 UnbindCalls++;
+            }
+        }
+
+        private sealed class StubHpTarget : IWormSectionHpTarget
+        {
+            public int Index { get; set; }
+            public int HpOrder => 0;
+            public int MaxHp => 1;
+            public bool IsDestroyed => false;
+            public bool HasTakenDamage => false;
+            public bool HasVisibleAliveSegment => true;
+
+            public void InitializeHp(int hp)
+            {
+            }
+
+            public void ResetHp(int hp)
+            {
             }
         }
     }

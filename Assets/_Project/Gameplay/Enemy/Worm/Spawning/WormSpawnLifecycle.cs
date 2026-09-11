@@ -133,13 +133,20 @@ namespace Game.Gameplay.Enemy.Worm.Spawning
 
         public void Despawn(float currentTime)
         {
-            UnbindGameplayAndPresentation();
-            ReleaseSegments(_activeSegments);
+            List<Exception> failures = null;
+
+            RollbackGameplayAndPresentation(
+                SpawnStage.HealthPresentation,
+                ref failures);
+            ReleaseSegmentsForRollback(_activeSegments, ref failures);
             _activeSegments.Clear();
             _activeSections.Clear();
-            _adaptiveHpController.Reset(currentTime);
+            ResetAdaptiveHpForRollback(currentTime, ref failures);
             _head = null;
             IsSpawned = false;
+
+            if (failures != null)
+                throw new AggregateException("Worm despawn cleanup failed.", failures);
         }
 
         public void RebindFacePresentation()
@@ -193,22 +200,11 @@ namespace Game.Gameplay.Enemy.Worm.Spawning
         {
             List<Exception> failures = null;
 
-            if (stage >= SpawnStage.HealthPresentation)
-                TryRollback(_hpPresentation.Clear, ref failures);
-
-            if (stage >= SpawnStage.Combat)
-                TryRollback(_wormCombat.Clear, ref failures);
-
-            if (stage >= SpawnStage.FacePresentation)
-                TryRollback(_faceBurstPresenter.Unbind, ref failures);
-
-            if (stage >= SpawnStage.WormController)
-                TryRollback(_wormController.ClearWorm, ref failures);
-
+            RollbackGameplayAndPresentation(stage, ref failures);
             ReleaseSegmentsForRollback(rentedSegments, ref failures);
 
             if (stage >= SpawnStage.SectionModels)
-                TryRollback(() => _adaptiveHpController.Reset(currentTime), ref failures);
+                ResetAdaptiveHpForRollback(currentTime, ref failures);
 
             _head = null;
             IsSpawned = false;
@@ -224,41 +220,90 @@ namespace Game.Gameplay.Enemy.Worm.Spawning
 
             for (int index = segments.Count - 1; index >= 0; index--)
             {
-                WormSegment segment = segments[index];
-                TryRollback(() => _segmentPool.Release(segment), ref failures);
+                try
+                {
+                    _segmentPool.Release(segments[index]);
+                }
+                catch (Exception exception)
+                {
+                    AddRollbackFailure(exception, ref failures);
+                }
             }
         }
 
-        private static void TryRollback(
-            Action rollback,
+        private void RollbackGameplayAndPresentation(
+            SpawnStage stage,
+            ref List<Exception> failures)
+        {
+            if (stage >= SpawnStage.HealthPresentation)
+            {
+                try
+                {
+                    _hpPresentation.Clear();
+                }
+                catch (Exception exception)
+                {
+                    AddRollbackFailure(exception, ref failures);
+                }
+            }
+
+            if (stage >= SpawnStage.Combat)
+            {
+                try
+                {
+                    _wormCombat.Clear();
+                }
+                catch (Exception exception)
+                {
+                    AddRollbackFailure(exception, ref failures);
+                }
+            }
+
+            if (stage >= SpawnStage.FacePresentation)
+            {
+                try
+                {
+                    _faceBurstPresenter.Unbind();
+                }
+                catch (Exception exception)
+                {
+                    AddRollbackFailure(exception, ref failures);
+                }
+            }
+
+            if (stage < SpawnStage.WormController)
+                return;
+
+            try
+            {
+                _wormController.ClearWorm();
+            }
+            catch (Exception exception)
+            {
+                AddRollbackFailure(exception, ref failures);
+            }
+        }
+
+        private void ResetAdaptiveHpForRollback(
+            float currentTime,
             ref List<Exception> failures)
         {
             try
             {
-                rollback();
+                _adaptiveHpController.Reset(currentTime);
             }
             catch (Exception exception)
             {
-                failures ??= new List<Exception>();
-                failures.Add(exception);
+                AddRollbackFailure(exception, ref failures);
             }
         }
 
-        private void UnbindGameplayAndPresentation()
+        private static void AddRollbackFailure(
+            Exception exception,
+            ref List<Exception> failures)
         {
-            _hpPresentation.Clear();
-            _wormCombat.Clear();
-            _faceBurstPresenter.Unbind();
-            _wormController.ClearWorm();
-        }
-
-        private void ReleaseSegments(IReadOnlyList<WormSegment> segments)
-        {
-            if (segments == null)
-                return;
-
-            for (int index = segments.Count - 1; index >= 0; index--)
-                _segmentPool.Release(segments[index]);
+            failures ??= new List<Exception>();
+            failures.Add(exception);
         }
     }
 
