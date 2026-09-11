@@ -4,6 +4,7 @@ using Game.Gameplay.Rewards.Runtime;
 using Game.Gameplay.Rewards.Services;
 using Game.Infrastructure.Advertising;
 using Game.Presentation.UI.Common.Popups;
+using Game.Presentation.UI.Revive;
 using Game.Presentation.UI.Rewards;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -54,6 +55,7 @@ namespace Game.Bootstrap.Installers.Game
             Container.Bind<RewardPopupStateFactory>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardPopupGateway>().AsSingle();
             Container.Bind<RewardedAdOperation>().AsSingle();
+            Container.Bind<WormReviveApplicationFlow>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardRollService>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardApplyService>().AsSingle();
             Container.BindInterfacesAndSelfTo<RewardChoiceRollService>().AsSingle();

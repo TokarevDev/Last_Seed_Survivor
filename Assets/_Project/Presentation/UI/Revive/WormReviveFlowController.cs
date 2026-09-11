@@ -37,22 +37,22 @@ namespace Game.Presentation.UI.Revive
         [FormerlySerializedAs("_giveUpRestartTargetScale")]
         [SerializeField, Range(0.5f, 1f)] private float _popupCloseAnimationTargetScale = 0.92f;
 
-        private int _remainingRevives;
-        private bool _isFailState;
-        private bool _isReviving;
-        private bool _isRevivePopupClosePending;
-        private bool _isReviveRollbackPending;
         private RevivalPopupViewModel _revivalPopupViewModel;
-        private RewardedAdOperation _rewardedAdOperation;
+        private WormReviveApplicationFlow _applicationFlow;
         private ISceneNavigator<GameSceneId> _sceneNavigator;
         private SignalBus _signalBus;
         private bool _isSubscribedToSignals;
 
         [Inject]
-        public void Construct(ISceneNavigator<GameSceneId> sceneNavigator, SignalBus signalBus)
+        public void Construct(
+            ISceneNavigator<GameSceneId> sceneNavigator,
+            SignalBus signalBus,
+            WormReviveApplicationFlow applicationFlow)
         {
             _sceneNavigator = sceneNavigator;
             _signalBus = signalBus;
+            _applicationFlow = applicationFlow ??
+                throw new ArgumentNullException(nameof(applicationFlow));
             SubscribeToSignals();
         }
 
@@ -62,10 +62,7 @@ namespace Game.Presentation.UI.Revive
 
         private void Awake()
         {
-            _remainingRevives = _maxReviveAttempts;
-
-            if (_rewardedAdService != null)
-                _rewardedAdOperation = new RewardedAdOperation(_rewardedAdService);
+            _applicationFlow.InitializeSession(_maxReviveAttempts);
         }
 
         private void OnEnable()
@@ -83,20 +80,33 @@ namespace Game.Presentation.UI.Revive
             if (_revivalPopup != null)
                 _revivalPopup.Intent -= HandleRevivalPopupIntent;
 
-            _popupRoot?.ReleaseGameplayLock();
-            _rewardedAdOperation?.Cancel();
-            _isRevivePopupClosePending = false;
-            _isReviveRollbackPending = false;
+            try
+            {
+                _popupRoot?.ReleaseGameplayLock();
+            }
+            finally
+            {
+                _applicationFlow?.Deactivate();
+            }
         }
 
         private void HandlePathCompleted(WormPathCompletedSignal signal)
         {
-            if (_isFailState || _isReviving)
+            if (!_applicationFlow.TryBeginFailure())
                 return;
 
             ClearTransientGameplay();
-            _isFailState = true;
-            ShowRevivalPopup();
+
+            try
+            {
+                ShowRevivalPopup();
+            }
+            catch
+            {
+                _applicationFlow.AbortFailure();
+                _popupRoot?.ReleaseGameplayLock();
+                throw;
+            }
         }
 
         private void SubscribeToSignals()
@@ -122,15 +132,16 @@ namespace Game.Presentation.UI.Revive
             if (_popupRoot == null || _revivalPopup == null)
             {
                 Debug.LogError("WormReviveFlowController: popup references are missing.", this);
+                _applicationFlow.AbortFailure();
                 return;
             }
 
             _revivalPopupViewModel = new RevivalPopupViewModel(
-                _remainingRevives,
+                _applicationFlow.RemainingAttempts,
                 GetCurrentLevelProgressNormalized(),
                 GetCurrentRemainingLevelNormalized(),
-                _remainingRevives > 0,
-                false);
+                _applicationFlow.CanRevive,
+                _applicationFlow.IsWaiting);
             _revivalPopup.Render(_revivalPopupViewModel);
 
             _popupRoot.Show(_revivalPopup);
@@ -153,7 +164,7 @@ namespace Game.Presentation.UI.Revive
 
         private void HandleReviveRequested()
         {
-            if (!_isFailState || _isReviving || _remainingRevives <= 0)
+            if (!_applicationFlow.CanRevive)
                 return;
 
             SetPopupWaiting(true);
@@ -162,7 +173,8 @@ namespace Game.Presentation.UI.Revive
             {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
                 Debug.LogWarning("WormReviveFlowController: rewarded ad service is missing. Granting revive in editor/development build.", this);
-                CompleteRewardedAd(true);
+                if (_applicationFlow.TryCommitDevelopmentRevive())
+                    CompleteRewardedRevive();
 #else
             Debug.LogError("WormReviveFlowController: rewarded ad service is missing.", this);
             SetPopupWaiting(false);
@@ -170,9 +182,7 @@ namespace Game.Presentation.UI.Revive
                 return;
             }
 
-            _rewardedAdOperation ??= new RewardedAdOperation(_rewardedAdService);
-
-            if (!_rewardedAdOperation.TryBegin(
+            if (!_applicationFlow.TryBeginRewardedRevive(
                     CompleteRewardedAd,
                     RestorePopupInteraction))
                 SetPopupWaiting(false);
@@ -192,17 +202,24 @@ namespace Game.Presentation.UI.Revive
                 return;
             }
 
-            _signalBus.Fire<WormReviveGrantedSignal>();
-            StartReviveRollbackWithPopupClose();
+            CompleteRewardedRevive();
         }
 
-        private void StartReviveRollbackWithPopupClose()
+        private void CompleteRewardedRevive()
         {
-            _isRevivePopupClosePending = true;
-            _isReviveRollbackPending = true;
+            Exception failure = null;
 
-            StartReviveRollback();
-            PlayPopupCloseAnimation(CompleteRevivePopupClose);
+            TryRunStage(
+                () => _signalBus.Fire<WormReviveGrantedSignal>(),
+                ref failure);
+            TryRunStage(StartReviveRollback, ref failure, CompleteReviveRollback);
+            TryRunStage(
+                () => PlayPopupCloseAnimation(CompleteRevivePopupClose),
+                ref failure,
+                CompleteRevivePopupClose);
+
+            if (failure != null)
+                Debug.LogException(failure, this);
         }
 
         private void StartReviveRollback()
@@ -214,36 +231,56 @@ namespace Game.Presentation.UI.Revive
                 return;
             }
 
-            _remainingRevives = Mathf.Max(0, _remainingRevives - 1);
-            _isReviving = true;
-
             if (!_wormController.RollbackToReviveStart(CompleteReviveRollback))
                 CompleteReviveRollback();
         }
 
         private void CompleteReviveRollback()
         {
-            _isFailState = false;
-            _isReviving = false;
-            _isReviveRollbackPending = false;
+            WormReviveStageCompletion completion =
+                _applicationFlow.CompleteRollback();
 
-            _signalBus.Fire<WormReviveRollbackCompletedSignal>();
-            ReleaseGameplayLockWhenReviveVisualsComplete();
+            if (completion == WormReviveStageCompletion.Ignored)
+                return;
+
+            try
+            {
+                _signalBus.Fire<WormReviveRollbackCompletedSignal>();
+            }
+            finally
+            {
+                if (completion == WormReviveStageCompletion.FlowCompleted)
+                    _popupRoot?.ReleaseGameplayLock();
+            }
         }
 
         private void CompleteRevivePopupClose()
         {
-            _popupRoot?.HideActive(releaseGameplayLock: false);
-            _isRevivePopupClosePending = false;
+            WormReviveStageCompletion completion =
+                _applicationFlow.CompletePopupClose();
 
-            ReleaseGameplayLockWhenReviveVisualsComplete();
+            if (completion == WormReviveStageCompletion.Ignored)
+                return;
+
+            try
+            {
+                _popupRoot?.HideActive(releaseGameplayLock: false);
+            }
+            finally
+            {
+                if (completion == WormReviveStageCompletion.FlowCompleted)
+                    _popupRoot?.ReleaseGameplayLock();
+            }
         }
 
         private void HandleGiveUpRequested()
         {
+            if (!_applicationFlow.TryBeginGiveUp())
+                return;
+
             if (!_returnToLobbyOnGiveUp)
             {
-                _popupRoot?.HideActive();
+                CompleteGiveUpWithoutNavigation();
                 return;
             }
 
@@ -252,18 +289,33 @@ namespace Game.Presentation.UI.Revive
 
         public void ResetForNewRun()
         {
-            _rewardedAdOperation?.Cancel();
-            _remainingRevives = _maxReviveAttempts;
-            _isFailState = false;
-            _isReviving = false;
-            _isRevivePopupClosePending = false;
-            _isReviveRollbackPending = false;
+            _applicationFlow.ResetSession();
         }
 
         private void RequestLobbyLoad()
         {
-            _popupRoot?.HideActive();
+            try
+            {
+                _popupRoot?.HideActive();
+            }
+            finally
+            {
+                _applicationFlow.CompleteGiveUp();
+            }
+
             NavigateToLobbyAsync().Forget();
+        }
+
+        private void CompleteGiveUpWithoutNavigation()
+        {
+            try
+            {
+                _popupRoot?.HideActive();
+            }
+            finally
+            {
+                _applicationFlow.CompleteGiveUp();
+            }
         }
 
         private async UniTask NavigateToLobbyAsync()
@@ -307,12 +359,33 @@ namespace Game.Presentation.UI.Revive
                 onComplete);
         }
 
-        private void ReleaseGameplayLockWhenReviveVisualsComplete()
+        private static void TryRunStage(
+            Action stage,
+            ref Exception failure,
+            Action recover = null)
         {
-            if (_isRevivePopupClosePending || _isReviveRollbackPending)
-                return;
+            try
+            {
+                stage();
+            }
+            catch (Exception exception)
+            {
+                failure = failure == null
+                    ? exception
+                    : new AggregateException(failure, exception);
 
-            _popupRoot?.ReleaseGameplayLock();
+                if (recover == null)
+                    return;
+
+                try
+                {
+                    recover();
+                }
+                catch (Exception recoveryException)
+                {
+                    failure = new AggregateException(failure, recoveryException);
+                }
+            }
         }
 
         private float GetCurrentRemainingLevelNormalized()
@@ -333,10 +406,22 @@ namespace Game.Presentation.UI.Revive
 
         private void ClearTransientGameplay()
         {
-            _projectilePoolRegistry?.ReleaseAllActiveProjectiles();
-            _projectileWeapon?.ClearTransientState();
-            _acaciaThornWeapon?.ClearTransientState();
-            _damagePopupPresenter?.ClearActivePopups();
+            Exception failure = null;
+            TryRunStage(
+                () => _projectilePoolRegistry?.ReleaseAllActiveProjectiles(),
+                ref failure);
+            TryRunStage(
+                () => _projectileWeapon?.ClearTransientState(),
+                ref failure);
+            TryRunStage(
+                () => _acaciaThornWeapon?.ClearTransientState(),
+                ref failure);
+            TryRunStage(
+                () => _damagePopupPresenter?.ClearActivePopups(),
+                ref failure);
+
+            if (failure != null)
+                Debug.LogException(failure, this);
         }
     }
 

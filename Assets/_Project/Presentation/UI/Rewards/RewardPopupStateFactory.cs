@@ -28,7 +28,7 @@ namespace Game.Presentation.UI.Rewards
             bool isRewardOperationPending)
         {
             bool canStartRewardedAd =
-                !isRewardOperationPending && _rewardedAdOperation.IsAvailable;
+                !isRewardOperationPending && _rewardedAdOperation.CanBegin;
             bool canTakeAll = _attempts.HasTakeAll
                 && canStartRewardedAd
                 && RewardAdRerollPolicy.CanOfferTakeAll(rollContext);

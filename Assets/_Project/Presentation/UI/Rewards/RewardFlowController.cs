@@ -59,7 +59,7 @@ namespace Game.Presentation.UI.Rewards
             _popupGateway.Intent -= HandleIntent;
             _popupGateway.Hidden -= HandlePopupHidden;
 
-            _rewardedAdOperation.Cancel();
+            _rewardedAdOperation.Cancel(this);
             _requestCoordinator.Reset();
             _isDisposed = true;
         }
@@ -81,7 +81,7 @@ namespace Game.Presentation.UI.Rewards
 
         private bool StartActiveRequest()
         {
-            _rewardedAdOperation.Cancel();
+            _rewardedAdOperation.Cancel(this);
 
             if (!RollCurrentChoices())
             {
@@ -102,7 +102,7 @@ namespace Game.Presentation.UI.Rewards
         {
             _requestCoordinator.Reset();
             _attempts.Reset();
-            _rewardedAdOperation.Cancel();
+            _rewardedAdOperation.Cancel(this);
         }
 
         private void HandleSelected(RewardChoiceData choice)
@@ -159,6 +159,7 @@ namespace Game.Presentation.UI.Rewards
 
             _popupGateway.SetInteractable(false);
             if (!_rewardedAdOperation.TryBegin(
+                    this,
                     CompleteAdRerollReward,
                     RestorePopupInteraction))
                 _popupGateway.SetInteractable(true);
@@ -177,6 +178,7 @@ namespace Game.Presentation.UI.Rewards
 
             _popupGateway.SetInteractable(false);
             if (!_rewardedAdOperation.TryBegin(
+                    this,
                     CompleteTakeAllReward,
                     RestorePopupInteraction))
                 _popupGateway.SetInteractable(true);
@@ -253,7 +255,7 @@ namespace Game.Presentation.UI.Rewards
 
         private bool CompleteCurrentPopupRequest()
         {
-            _rewardedAdOperation.Cancel();
+            _rewardedAdOperation.Cancel(this);
             return _requestCoordinator.CompleteActive();
         }
 

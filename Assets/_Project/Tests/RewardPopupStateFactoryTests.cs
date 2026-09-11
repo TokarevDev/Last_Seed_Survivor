@@ -129,6 +129,29 @@ namespace Game.Tests
             Assert.That(readyState.CanTakeAll, Is.True);
         }
 
+        [Test]
+        public void Create_WhileAnotherAdOwnerIsPending_DisablesAdBackedActions()
+        {
+            RewardAttemptState attempts = new(new RewardFlowSettings(0, 1, 1));
+            PendingRewardedAdService adService = new();
+            RewardedAdOperation operation = new(adService);
+            RewardPopupStateFactory factory = new(attempts, operation);
+            RewardRollContext context = new(
+                headPathProgressNormalized: 1f,
+                wormDestructionProgressNormalized: 0f,
+                hasRevivedThisRun: false);
+            Assert.That(operation.TryBegin(new object(), _ => { }), Is.True);
+
+            RewardPopupState state = factory.Create(
+                RewardRarity.Common,
+                cocoonProfile: null,
+                context,
+                isRewardOperationPending: false);
+
+            Assert.That(state.CanAdReroll, Is.False);
+            Assert.That(state.CanTakeAll, Is.False);
+        }
+
         private sealed class StubRewardedAdService : IRewardedAdService
         {
             public StubRewardedAdService(bool isReady)
@@ -141,6 +164,15 @@ namespace Game.Tests
             public void ShowRewardedAd(Action<bool> onCompleted)
             {
                 onCompleted?.Invoke(IsReady);
+            }
+        }
+
+        private sealed class PendingRewardedAdService : IRewardedAdService
+        {
+            public bool IsReady => true;
+
+            public void ShowRewardedAd(Action<bool> onCompleted)
+            {
             }
         }
 

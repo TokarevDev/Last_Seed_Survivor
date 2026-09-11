@@ -6,8 +6,10 @@ namespace Game.Infrastructure.Advertising
     public sealed class RewardedAdOperation
     {
         private readonly IRewardedAdService _rewardedAdService;
+        private readonly object _defaultOwner = new();
 
         private int _version;
+        private object _owner;
 
         public RewardedAdOperation(IRewardedAdService rewardedAdService)
         {
@@ -16,6 +18,7 @@ namespace Game.Infrastructure.Advertising
         }
 
         public bool IsPending { get; private set; }
+        public bool CanBegin => !IsPending && IsAvailable;
 
         public bool IsAvailable
         {
@@ -37,13 +40,25 @@ namespace Game.Infrastructure.Advertising
             Action<bool> onCompleted,
             Action onCompletionFailed = null)
         {
+            return TryBegin(_defaultOwner, onCompleted, onCompletionFailed);
+        }
+
+        public bool TryBegin(
+            object owner,
+            Action<bool> onCompleted,
+            Action onCompletionFailed = null)
+        {
+            if (owner == null)
+                throw new ArgumentNullException(nameof(owner));
+
             if (onCompleted == null)
                 throw new ArgumentNullException(nameof(onCompleted));
 
-            if (IsPending || !IsAvailable)
+            if (!CanBegin)
                 return false;
 
             IsPending = true;
+            _owner = owner;
             int operationVersion = ++_version;
             try
             {
@@ -66,8 +81,21 @@ namespace Game.Infrastructure.Advertising
 
         public void Cancel()
         {
+            Cancel(_defaultOwner);
+        }
+
+        public bool Cancel(object owner)
+        {
+            if (owner == null)
+                throw new ArgumentNullException(nameof(owner));
+
+            if (!IsPending || !ReferenceEquals(_owner, owner))
+                return false;
+
             IsPending = false;
+            _owner = null;
             _version++;
+            return true;
         }
 
         private void Complete(
@@ -80,6 +108,7 @@ namespace Game.Infrastructure.Advertising
                 return;
 
             IsPending = false;
+            _owner = null;
 
             try
             {
@@ -113,6 +142,7 @@ namespace Game.Infrastructure.Advertising
                 return;
 
             IsPending = false;
+            _owner = null;
             _version++;
         }
     }

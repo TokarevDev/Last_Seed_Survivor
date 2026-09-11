@@ -139,6 +139,27 @@ namespace Game.Tests
             Assert.That(operation.IsPending, Is.False);
         }
 
+        [Test]
+        public void Cancel_WithDifferentOwner_DoesNotCancelActiveOperation()
+        {
+            DelayedRewardedAdService adService = new();
+            RewardedAdOperation operation = new(adService);
+            object owner = new();
+            object otherOwner = new();
+            bool completed = false;
+            Assert.That(
+                operation.TryBegin(owner, _ => completed = true),
+                Is.True);
+
+            Assert.That(operation.Cancel(otherOwner), Is.False);
+            Assert.That(operation.IsPending, Is.True);
+
+            adService.Complete(0, true);
+
+            Assert.That(completed, Is.True);
+            Assert.That(operation.IsPending, Is.False);
+        }
+
         private sealed class DelayedRewardedAdService : IRewardedAdService
         {
             private readonly List<Action<bool>> _callbacks = new();

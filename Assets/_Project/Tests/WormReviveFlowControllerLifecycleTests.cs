@@ -23,13 +23,20 @@ namespace Game.Tests
         public void ResetForNewRun_CancelsPendingRewardedAdAndInvalidatesLateCallback()
         {
             _controllerObject = new GameObject("WormReviveFlowController");
+            _controllerObject.SetActive(false);
             WormReviveFlowController controller =
                 _controllerObject.AddComponent<WormReviveFlowController>();
             DelayedRewardedAdService adService = new();
             RewardedAdOperation operation = new(adService);
+            WormReviveApplicationFlow applicationFlow = new(operation);
+            applicationFlow.InitializeSession(1);
+            SetApplicationFlow(controller, applicationFlow);
+            _controllerObject.SetActive(true);
             bool wasCalled = false;
-            bool started = operation.TryBegin(_ => wasCalled = true);
-            SetRewardedAdOperation(controller, operation);
+            Assert.That(applicationFlow.TryBeginFailure(), Is.True);
+            bool started = applicationFlow.TryBeginRewardedRevive(
+                _ => wasCalled = true,
+                null);
 
             Assert.That(started, Is.True);
             controller.ResetForNewRun();
@@ -39,15 +46,15 @@ namespace Game.Tests
             Assert.That(wasCalled, Is.False);
         }
 
-        private static void SetRewardedAdOperation(
+        private static void SetApplicationFlow(
             WormReviveFlowController controller,
-            RewardedAdOperation operation)
+            WormReviveApplicationFlow applicationFlow)
         {
             FieldInfo field = typeof(WormReviveFlowController).GetField(
-                "_rewardedAdOperation",
+                "_applicationFlow",
                 BindingFlags.Instance | BindingFlags.NonPublic);
             Assert.That(field, Is.Not.Null);
-            field.SetValue(controller, operation);
+            field.SetValue(controller, applicationFlow);
         }
 
         private sealed class DelayedRewardedAdService : IRewardedAdService
