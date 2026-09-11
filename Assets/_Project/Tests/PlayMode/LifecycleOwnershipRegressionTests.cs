@@ -24,15 +24,17 @@ namespace Game.Tests.PlayMode
                 throwOnError: true);
             Component text = owner.AddComponent(textType);
             WormProgressPresenter presenter = owner.AddComponent<WormProgressPresenter>();
-            MutableProgressSnapshotProvider snapshotProvider = new(5, 10);
-            presenter.Construct(null, snapshotProvider);
+            WormDestructionProgressState progressState = new();
+            progressState.Reset(10);
+            progressState.RecordDestroyed(5);
+            presenter.Construct(null, progressState);
 
             owner.SetActive(true);
             yield return null;
             Assert.That(GetText(text), Is.EqualTo("Progress: 50%"));
 
             owner.SetActive(false);
-            snapshotProvider.Set(7, 10);
+            progressState.RecordDestroyed(2);
             owner.SetActive(true);
             yield return null;
 
@@ -91,22 +93,6 @@ namespace Game.Tests.PlayMode
         private static string GetText(Component text)
         {
             return (string)text.GetType().GetProperty("text")?.GetValue(text);
-        }
-
-        private sealed class MutableProgressSnapshotProvider :
-            IWormDestructionProgressSnapshotProvider
-        {
-            public MutableProgressSnapshotProvider(int destroyed, int total)
-            {
-                Set(destroyed, total);
-            }
-
-            public WormDestructionProgressSnapshot CurrentProgress { get; private set; }
-
-            public void Set(int destroyed, int total)
-            {
-                CurrentProgress = new WormDestructionProgressSnapshot(destroyed, total);
-            }
         }
 
         private sealed class ThrowOnceShakeClock : IWormCocoonShakeClock

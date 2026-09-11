@@ -9,8 +9,7 @@ using UnityEngine;
 namespace Game.Gameplay.Enemy.Worm.Combat
 {
     [DisallowMultipleComponent]
-    public sealed class WormCombatController : MonoBehaviour,
-        IWormDestructionProgressSnapshotProvider
+    public sealed class WormCombatController : MonoBehaviour
     {
         [SerializeField] private WormController _wormController;
 
@@ -18,28 +17,22 @@ namespace Game.Gameplay.Enemy.Worm.Combat
 
         private WormSegment _head;
         private WormSegment _tail;
-        private int _totalProgressSegments;
-        private int _destroyedProgressSegments;
         private bool _isWormDead;
         private IWormCombatEventPublisher _eventPublisher;
+        private WormDestructionProgressState _destructionProgress;
 
-        public void Configure(IWormCombatEventPublisher eventPublisher)
+        public void Configure(
+            IWormCombatEventPublisher eventPublisher,
+            WormDestructionProgressState destructionProgress)
         {
             _eventPublisher = eventPublisher ??
                 throw new ArgumentNullException(nameof(eventPublisher));
+            _destructionProgress = destructionProgress ??
+                throw new ArgumentNullException(nameof(destructionProgress));
         }
 
-        public int TotalProgressSegments => _totalProgressSegments;
-        public int DestroyedProgressSegments => _destroyedProgressSegments;
-        public float DestructionProgressNormalized =>
-            _totalProgressSegments > 0
-                ? Mathf.Clamp01(_destroyedProgressSegments / (float)_totalProgressSegments)
-                : 0f;
-
-        public float RemainingProgressNormalized => 1f - DestructionProgressNormalized;
-        public WormDestructionProgressSnapshot CurrentProgress => new(
-            _destroyedProgressSegments,
-            _totalProgressSegments);
+        private WormDestructionProgressSnapshot CurrentProgress =>
+            _destructionProgress.CurrentProgress;
 
         public void Init(WormSegment head, WormSegment tail, List<WormSection> sections)
         {
@@ -51,8 +44,7 @@ namespace Game.Gameplay.Enemy.Worm.Combat
             if (sections != null)
                 _sections.AddRange(sections);
 
-            _totalProgressSegments = CountProgressSegments(_sections);
-            _destroyedProgressSegments = 0;
+            _destructionProgress.Reset(CountProgressSegments(_sections));
             _isWormDead = false;
 
             NotifyDestructionProgressChanged();
@@ -63,8 +55,7 @@ namespace Game.Gameplay.Enemy.Worm.Combat
             _head = null;
             _tail = null;
             _sections.Clear();
-            _totalProgressSegments = 0;
-            _destroyedProgressSegments = 0;
+            _destructionProgress.Clear();
             _isWormDead = false;
             NotifyDestructionProgressChanged();
         }
@@ -111,9 +102,8 @@ namespace Game.Gameplay.Enemy.Worm.Combat
             }
 
             _sections.Remove(section);
-            _destroyedProgressSegments = Mathf.Min(
-                _destroyedProgressSegments + CountProgressSegments(removedSegments),
-                _totalProgressSegments);
+            _destructionProgress.RecordDestroyed(
+                CountProgressSegments(removedSegments));
 
             NotifyDestructionProgressChanged();
 
@@ -141,7 +131,7 @@ namespace Game.Gameplay.Enemy.Worm.Combat
                 _eventPublisher.PublishRewardRequested(
                     rewardProfile,
                     headProgress,
-                    DestructionProgressNormalized);
+                    CurrentProgress.NormalizedProgress);
             }
         }
 
@@ -239,10 +229,8 @@ namespace Game.Gameplay.Enemy.Worm.Combat
 
         private void NotifyDestructionProgressChanged()
         {
-            _eventPublisher.PublishDestructionProgressChanged(
-                _destroyedProgressSegments,
-                _totalProgressSegments,
-                DestructionProgressNormalized);
+            WormDestructionProgressSnapshot snapshot = CurrentProgress;
+            _eventPublisher.PublishDestructionProgressChanged(snapshot);
         }
 
         private static int CountProgressSegments(List<WormSection> sections)

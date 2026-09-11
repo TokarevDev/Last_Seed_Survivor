@@ -16,6 +16,7 @@ using Game.Gameplay.Combat;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Balance;
+using Game.Gameplay.Enemy.Worm.Combat;
 using Game.Gameplay.Enemy.Worm.Movement;
 using Game.Gameplay.Enemy.Worm.Presentation;
 using Game.Gameplay.Enemy.Worm.Spawning;
@@ -119,6 +120,9 @@ namespace Game.Tests.PlayMode
             Assert.That(sceneContainer.Resolve<WormCombatBurstSignalPublisher>(), Is.Not.Null);
             Assert.That(sceneContainer.Resolve<WormPathCompletedSignalPublisher>(), Is.Not.Null);
             Assert.That(sceneContainer.Resolve<IWormCombatEventPublisher>(), Is.Not.Null);
+            Assert.That(
+                sceneContainer.Resolve<IWormDestructionProgressSnapshotProvider>(),
+                Is.SameAs(sceneContainer.Resolve<WormDestructionProgressState>()));
             Assert.That(sceneContainer.Resolve<WormCocoonShakeClock>(), Is.Not.Null);
             Assert.That(sceneContainer.Resolve<WormSpawnLifecycle>(), Is.Not.Null);
             Assert.That(sceneContainer.Resolve<WormForwardMotionController>(), Is.Not.Null);

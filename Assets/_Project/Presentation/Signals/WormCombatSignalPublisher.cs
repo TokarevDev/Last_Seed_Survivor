@@ -3,6 +3,7 @@ using Zenject;
 
 using Game.Gameplay.Rewards.Data;
 using Game.Gameplay.Signals;
+using Game.Gameplay.Enemy.Worm.Combat;
 
 namespace Game.Presentation.Signals
 {
@@ -37,14 +38,12 @@ namespace Game.Presentation.Signals
         }
 
         public void PublishDestructionProgressChanged(
-            int destroyedSegments,
-            int totalSegments,
-            float normalizedProgress)
+            in WormDestructionProgressSnapshot snapshot)
         {
             _signalBus.Fire(new WormDestructionProgressChangedSignal(
-                destroyedSegments,
-                totalSegments,
-                normalizedProgress));
+                snapshot.DestroyedSegments,
+                snapshot.TotalSegments,
+                snapshot.NormalizedProgress));
         }
     }
 }

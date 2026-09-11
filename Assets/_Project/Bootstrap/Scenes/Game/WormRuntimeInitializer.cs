@@ -23,6 +23,7 @@ namespace Game.Bootstrap.Scenes.Game
         private readonly OrderedReferenceSet<WormSegment> _segmentChain;
         private readonly WormSectionRollbackState<WormSegment> _sectionRollbackState;
         private readonly IWormCombatEventPublisher _combatEventPublisher;
+        private readonly WormDestructionProgressState _destructionProgress;
 
         public WormRuntimeInitializer(
             WormController wormController,
@@ -35,7 +36,8 @@ namespace Game.Bootstrap.Scenes.Game
             WormReviveSequence reviveSequence,
             OrderedReferenceSet<WormSegment> segmentChain,
             WormSectionRollbackState<WormSegment> sectionRollbackState,
-            IWormCombatEventPublisher combatEventPublisher)
+            IWormCombatEventPublisher combatEventPublisher,
+            WormDestructionProgressState destructionProgress)
         {
             _wormController = wormController ??
                 throw new ArgumentNullException(nameof(wormController));
@@ -59,6 +61,8 @@ namespace Game.Bootstrap.Scenes.Game
                 throw new ArgumentNullException(nameof(sectionRollbackState));
             _combatEventPublisher = combatEventPublisher ??
                 throw new ArgumentNullException(nameof(combatEventPublisher));
+            _destructionProgress = destructionProgress ??
+                throw new ArgumentNullException(nameof(destructionProgress));
         }
 
         public void Initialize()
@@ -72,7 +76,9 @@ namespace Game.Bootstrap.Scenes.Game
                 _reviveSequence,
                 _segmentChain,
                 _sectionRollbackState);
-            _wormCombatController.Configure(_combatEventPublisher);
+            _wormCombatController.Configure(
+                _combatEventPublisher,
+                _destructionProgress);
         }
     }
 }

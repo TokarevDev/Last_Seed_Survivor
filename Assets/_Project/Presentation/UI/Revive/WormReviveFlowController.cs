@@ -20,7 +20,6 @@ namespace Game.Presentation.UI.Revive
     public sealed class WormReviveFlowController : MonoBehaviour
     {
         [SerializeField] private WormController _wormController;
-        [SerializeField] private WormCombatController _wormCombat;
         [SerializeField] private PoolRegistry _projectilePoolRegistry;
         [SerializeField] private ProjectileWeapon _projectileWeapon;
         [SerializeField] private AcaciaThornWeapon _acaciaThornWeapon;
@@ -39,6 +38,7 @@ namespace Game.Presentation.UI.Revive
 
         private RevivalPopupViewModel _revivalPopupViewModel;
         private WormReviveApplicationFlow _applicationFlow;
+        private IWormDestructionProgressSnapshotProvider _progressSnapshotProvider;
         private ISceneNavigator<GameSceneId> _sceneNavigator;
         private SignalBus _signalBus;
         private bool _isSubscribedToSignals;
@@ -47,12 +47,15 @@ namespace Game.Presentation.UI.Revive
         public void Construct(
             ISceneNavigator<GameSceneId> sceneNavigator,
             SignalBus signalBus,
-            WormReviveApplicationFlow applicationFlow)
+            WormReviveApplicationFlow applicationFlow,
+            IWormDestructionProgressSnapshotProvider progressSnapshotProvider)
         {
             _sceneNavigator = sceneNavigator;
             _signalBus = signalBus;
             _applicationFlow = applicationFlow ??
                 throw new ArgumentNullException(nameof(applicationFlow));
+            _progressSnapshotProvider = progressSnapshotProvider ??
+                throw new ArgumentNullException(nameof(progressSnapshotProvider));
             SubscribeToSignals();
         }
 
@@ -390,18 +393,27 @@ namespace Game.Presentation.UI.Revive
 
         private float GetCurrentRemainingLevelNormalized()
         {
-            if (_wormCombat == null || _wormCombat.TotalProgressSegments <= 0)
+            WormDestructionProgressSnapshot snapshot = GetProgressSnapshot();
+
+            if (snapshot.TotalSegments <= 0)
                 return _fallbackRemainingLevelNormalized;
 
-            return _wormCombat.RemainingProgressNormalized;
+            return snapshot.RemainingNormalized;
         }
 
         private float GetCurrentLevelProgressNormalized()
         {
-            if (_wormCombat == null || _wormCombat.TotalProgressSegments <= 0)
+            WormDestructionProgressSnapshot snapshot = GetProgressSnapshot();
+
+            if (snapshot.TotalSegments <= 0)
                 return 1f - _fallbackRemainingLevelNormalized;
 
-            return _wormCombat.DestructionProgressNormalized;
+            return snapshot.NormalizedProgress;
+        }
+
+        private WormDestructionProgressSnapshot GetProgressSnapshot()
+        {
+            return _progressSnapshotProvider?.CurrentProgress ?? default;
         }
 
         private void ClearTransientGameplay()

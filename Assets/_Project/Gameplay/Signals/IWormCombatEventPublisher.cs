@@ -1,5 +1,6 @@
 
 using Game.Gameplay.Rewards.Data;
+using Game.Gameplay.Enemy.Worm.Combat;
 
 namespace Game.Gameplay.Signals
 {
@@ -15,8 +16,6 @@ namespace Game.Gameplay.Signals
         void PublishWormDied();
 
         void PublishDestructionProgressChanged(
-            int destroyedSegments,
-            int totalSegments,
-            float normalizedProgress);
+            in WormDestructionProgressSnapshot snapshot);
     }
 }
