@@ -78,6 +78,8 @@ namespace Game.Presentation.Worm
 
         public void Clear()
         {
+            List<Exception> failures = null;
+
             foreach (KeyValuePair<WormSection, WormSectionHpView> entry in _views)
             {
                 WormSection section = entry.Key;
@@ -88,10 +90,25 @@ namespace Game.Presentation.Worm
                     section.Destroyed -= OnSectionDestroyed;
                 }
 
-                _viewPool?.Return(entry.Value);
+                try
+                {
+                    _viewPool?.Return(entry.Value);
+                }
+                catch (Exception exception)
+                {
+                    failures ??= new List<Exception>();
+                    failures.Add(exception);
+                }
             }
 
             _views.Clear();
+
+            if (failures != null)
+            {
+                throw new AggregateException(
+                    "One or more worm section HP views failed to return.",
+                    failures);
+            }
         }
 
         private void BindSection(WormSection section)
