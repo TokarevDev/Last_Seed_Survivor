@@ -79,13 +79,32 @@ namespace Game.Gameplay.Pooling
                 return null;
             }
 
-            var pool = Instantiate(_poolPrefab, transform);
-            pool.name = $"Pool_{prefab.name}";
+            ProjectilePool pool = Instantiate(_poolPrefab, transform);
 
-            pool.SetPrefab(prefab, _screenBounds, _randomSource);
+            try
+            {
+                pool.name = $"Pool_{prefab.name}";
+                pool.SetPrefab(prefab, _screenBounds, _randomSource);
 
-            _pools.Add(key, pool);
-            return pool;
+                _pools.Add(key, pool);
+                return pool;
+            }
+            catch
+            {
+                DestroyUnregisteredPool(pool);
+                throw;
+            }
+        }
+
+        private static void DestroyUnregisteredPool(ProjectilePool pool)
+        {
+            if (pool == null)
+                return;
+
+            if (Application.isPlaying)
+                Destroy(pool.gameObject);
+            else
+                DestroyImmediate(pool.gameObject);
         }
     }
 
