@@ -88,6 +88,21 @@ namespace Game.Tests
         }
 
         [Test]
+        public void TryBegin_WhenReadinessThrows_ReportsFailureWithoutEscapingBoundary()
+        {
+            RewardedAdOperation operation = new(new ThrowingReadinessRewardedAdService());
+            LogAssert.Expect(
+                LogType.Exception,
+                new Regex("InvalidOperationException: Ad readiness failed\\."));
+
+            bool started = false;
+            Assert.DoesNotThrow(() => started = operation.TryBegin(_ => { }));
+
+            Assert.That(started, Is.False);
+            Assert.That(operation.IsPending, Is.False);
+        }
+
+        [Test]
         public void Cancel_InvalidatesLateCallback()
         {
             DelayedRewardedAdService adService = new();
@@ -159,6 +174,17 @@ namespace Game.Tests
             public void ShowRewardedAd(Action<bool> onCompleted)
             {
                 ShowCalls++;
+            }
+        }
+
+        private sealed class ThrowingReadinessRewardedAdService : IRewardedAdService
+        {
+            public bool IsReady =>
+                throw new InvalidOperationException("Ad readiness failed.");
+
+            public void ShowRewardedAd(Action<bool> onCompleted)
+            {
+                throw new AssertionException("Show must not be called.");
             }
         }
     }

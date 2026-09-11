@@ -127,6 +127,42 @@ namespace Game.Tests
         }
 
         [Test]
+        public void Return_WhenCleanupFails_DiscardsQuarantinedItem()
+        {
+            TestItem discardedItem = null;
+            ObjectPool<TestItem> pool = new(
+                () => new TestItem(),
+                _ => throw new InvalidOperationException("Cleanup failed."),
+                item => discardedItem = item);
+            TestItem item = pool.Rent();
+
+            Assert.Throws<InvalidOperationException>(() => pool.Return(item));
+
+            Assert.That(discardedItem, Is.SameAs(item));
+            Assert.That(pool.ActiveCount, Is.Zero);
+            Assert.That(pool.AvailableCount, Is.Zero);
+        }
+
+        [Test]
+        public void Return_WhenCleanupAndDiscardFail_ReportsBothFailures()
+        {
+            ObjectPool<TestItem> pool = new(
+                () => new TestItem(),
+                _ => throw new InvalidOperationException("Cleanup failed."),
+                _ => throw new ArgumentException("Discard failed."));
+            TestItem item = pool.Rent();
+
+            AggregateException exception =
+                Assert.Throws<AggregateException>(() => pool.Return(item));
+
+            Assert.That(exception.InnerExceptions, Has.Count.EqualTo(2));
+            Assert.That(exception.InnerExceptions[0], Is.TypeOf<InvalidOperationException>());
+            Assert.That(exception.InnerExceptions[1], Is.TypeOf<ArgumentException>());
+            Assert.That(pool.ActiveCount, Is.Zero);
+            Assert.That(pool.AvailableCount, Is.Zero);
+        }
+
+        [Test]
         public void Rent_WhenInitializationAndRollbackFail_ReportsBothFailures()
         {
             ObjectPool<TestItem> pool = new(

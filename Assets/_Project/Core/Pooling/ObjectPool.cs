@@ -11,15 +11,20 @@ namespace Game.Core.Pooling
 
         private readonly Func<T> _create;
         private readonly Action<T> _onReturn;
+        private readonly Action<T> _onDiscard;
         private readonly Queue<T> _available = new();
         private readonly List<T> _activeItems = new();
         private readonly Dictionary<T, int> _activeIndices =
             new(ReferenceEqualityComparer<T>.Instance);
 
-        public ObjectPool(Func<T> create, Action<T> onReturn)
+        public ObjectPool(
+            Func<T> create,
+            Action<T> onReturn,
+            Action<T> onDiscard = null)
         {
             _create = create ?? throw new ArgumentNullException(nameof(create));
             _onReturn = onReturn ?? throw new ArgumentNullException(nameof(onReturn));
+            _onDiscard = onDiscard;
         }
 
         public int ActiveCount => _activeItems.Count;
@@ -136,9 +141,25 @@ namespace Game.Core.Pooling
             {
                 _onReturn(item);
             }
-            catch
+            catch (Exception cleanupException)
             {
                 RemoveActiveAtSwapBack(activeIndex);
+
+                if (_onDiscard == null)
+                    throw;
+
+                try
+                {
+                    _onDiscard(item);
+                }
+                catch (Exception discardException)
+                {
+                    throw new AggregateException(
+                        "Pool item cleanup and discard both failed.",
+                        cleanupException,
+                        discardException);
+                }
+
                 throw;
             }
 

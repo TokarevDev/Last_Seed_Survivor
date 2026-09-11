@@ -111,7 +111,8 @@ namespace Game.Gameplay.Enemy.Worm
 
             return new ObjectPool<WormSegment>(
                 () => CreateSegment(prefab),
-                PrepareForPool);
+                PrepareForPool,
+                DiscardSegment);
         }
 
         private WormSegment CreateSegment(WormSegment prefab)
@@ -123,8 +124,27 @@ namespace Game.Gameplay.Enemy.Worm
 
         private static void PrepareForPool(WormSegment segment)
         {
-            segment.PrepareForWorm();
-            segment.gameObject.SetActive(false);
+            try
+            {
+                segment.PrepareForWorm();
+            }
+            finally
+            {
+                segment.gameObject.SetActive(false);
+            }
+        }
+
+        private static void DiscardSegment(WormSegment segment)
+        {
+            if (segment == null)
+                return;
+
+            GameObject owner = segment.gameObject;
+
+            if (owner.activeSelf)
+                owner.SetActive(false);
+
+            Object.Destroy(owner);
         }
 
         private ObjectPool<WormSegment> GetPool(WormSegmentType type) => type switch

@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.ExceptionServices;
 using Game.Core.Collections;
 using Game.Core.Timing;
 using Game.Gameplay.Input;
@@ -109,23 +111,48 @@ namespace Game.Presentation.UI.Common.Popups
             bool releaseGameplayLock,
             bool showQueuedPopup)
         {
+            Exception failure = null;
+
             if (_navigation.Deactivate(out PopupView popup))
-                popup.Hide();
+            {
+                try
+                {
+                    popup.Hide();
+                }
+                catch (Exception exception)
+                {
+                    failure = exception;
+                }
+            }
 
-            if (_navigation.ActiveItem != null)
-                return;
-
-            if (releaseGameplayLock)
+            if (_navigation.ActiveItem == null && releaseGameplayLock)
             {
                 if (showQueuedPopup &&
                     _navigation.TryActivateNext(out PopupView queuedPopup))
                 {
-                    ShowActivated(queuedPopup);
-                    return;
+                    try
+                    {
+                        ShowActivated(queuedPopup);
+                    }
+                    catch (Exception exception)
+                    {
+                        failure = CombineFailures(failure, exception);
+                    }
                 }
-
-                ReleaseGameplayLock();
+                else
+                {
+                    try
+                    {
+                        ReleaseGameplayLock();
+                    }
+                    catch (Exception exception)
+                    {
+                        failure = CombineFailures(failure, exception);
+                    }
+                }
             }
+
+            Rethrow(failure);
         }
 
         public void ReleaseGameplayLock()
@@ -200,8 +227,62 @@ namespace Game.Presentation.UI.Common.Popups
             if (popup == null)
                 return;
 
-            LockGameplay();
-            popup.Show();
+            try
+            {
+                LockGameplay();
+                popup.Show();
+            }
+            catch (Exception activationException)
+            {
+                _navigation.Deactivate(out _);
+                Exception rollbackFailure = null;
+
+                try
+                {
+                    popup.Hide();
+                }
+                catch (Exception exception)
+                {
+                    rollbackFailure = exception;
+                }
+
+                try
+                {
+                    ReleaseGameplayLock();
+                }
+                catch (Exception rollbackException)
+                {
+                    rollbackFailure = CombineFailures(
+                        rollbackFailure,
+                        rollbackException);
+                }
+
+                if (rollbackFailure != null)
+                {
+                    throw new AggregateException(
+                        "Popup activation and rollback failed.",
+                        activationException,
+                        rollbackFailure);
+                }
+
+                ExceptionDispatchInfo.Capture(activationException).Throw();
+            }
+        }
+
+        private static Exception CombineFailures(Exception first, Exception second)
+        {
+            return first == null
+                ? second
+                : new AggregateException(
+                    "Multiple popup lifecycle operations failed.",
+                    first,
+                    second);
+        }
+
+        private static void Rethrow(Exception exception)
+        {
+            if (exception != null)
+                ExceptionDispatchInfo.Capture(exception).Throw();
         }
 
         private void HideAllPopups()

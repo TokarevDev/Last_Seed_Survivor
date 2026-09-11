@@ -47,6 +47,9 @@ namespace Game.Bootstrap.Installers.Game
             Container.Bind<WormSpawner>().FromInstance(_wormSpawner).AsSingle();
             Container.Bind<WormController>().FromInstance(_wormController).AsSingle();
             Container.Bind<WormCombatController>().FromInstance(_wormCombatController).AsSingle();
+            Container.Bind<IWormDestructionProgressSnapshotProvider>()
+                .FromInstance(_wormCombatController)
+                .AsSingle();
             Container.Bind<WormSectionHpPresenter>().FromInstance(_sectionHpPresenter).AsSingle();
             Container.Bind<IWormSectionHealthPresentation>()
                 .FromInstance(_sectionHpPresenter)

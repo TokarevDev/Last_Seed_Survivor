@@ -9,7 +9,8 @@ using UnityEngine;
 namespace Game.Gameplay.Enemy.Worm.Combat
 {
     [DisallowMultipleComponent]
-    public sealed class WormCombatController : MonoBehaviour
+    public sealed class WormCombatController : MonoBehaviour,
+        IWormDestructionProgressSnapshotProvider
     {
         [SerializeField] private WormController _wormController;
 
@@ -36,6 +37,9 @@ namespace Game.Gameplay.Enemy.Worm.Combat
                 : 0f;
 
         public float RemainingProgressNormalized => 1f - DestructionProgressNormalized;
+        public WormDestructionProgressSnapshot CurrentProgress => new(
+            _destroyedProgressSegments,
+            _totalProgressSegments);
 
         public void Init(WormSegment head, WormSegment tail, List<WormSection> sections)
         {

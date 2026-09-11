@@ -170,13 +170,6 @@ namespace Game.Presentation.UI.Revive
                 return;
             }
 
-            if (!_rewardedAdService.IsReady)
-            {
-                Debug.LogWarning("WormReviveFlowController: rewarded ad is not ready.", this);
-                SetPopupWaiting(false);
-                return;
-            }
-
             _rewardedAdOperation ??= new RewardedAdOperation(_rewardedAdService);
 
             if (!_rewardedAdOperation.TryBegin(

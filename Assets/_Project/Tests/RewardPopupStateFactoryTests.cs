@@ -17,7 +17,7 @@ namespace Game.Tests
             RewardAttemptState attempts = new(new RewardFlowSettings(1, 1, 1));
             RewardPopupStateFactory factory = new(
                 attempts,
-                new StubRewardedAdService(isReady: true));
+                CreateOperation(new StubRewardedAdService(isReady: true)));
             RewardRollContext context = new(
                 headPathProgressNormalized: 1f,
                 wormDestructionProgressNormalized: 0f,
@@ -40,7 +40,7 @@ namespace Game.Tests
             RewardAttemptState attempts = new(new RewardFlowSettings(1, 1, 0));
             RewardPopupStateFactory factory = new(
                 attempts,
-                new StubRewardedAdService(isReady: true));
+                CreateOperation(new StubRewardedAdService(isReady: true)));
             attempts.ConsumeFreeReroll();
 
             RewardPopupState state = factory.Create(
@@ -60,7 +60,7 @@ namespace Game.Tests
             RewardAttemptState attempts = new(new RewardFlowSettings(1, 1, 1));
             RewardPopupStateFactory factory = new(
                 attempts,
-                new StubRewardedAdService(isReady: true));
+                CreateOperation(new StubRewardedAdService(isReady: true)));
             RewardRollContext context = new(
                 headPathProgressNormalized: 1f,
                 wormDestructionProgressNormalized: 0f,
@@ -83,7 +83,7 @@ namespace Game.Tests
             RewardAttemptState attempts = new(new RewardFlowSettings(0, 1, 1));
             RewardPopupStateFactory factory = new(
                 attempts,
-                new DisabledRewardedAdService());
+                CreateOperation(new DisabledRewardedAdService()));
             RewardRollContext context = new(
                 headPathProgressNormalized: 1f,
                 wormDestructionProgressNormalized: 0f,
@@ -105,7 +105,7 @@ namespace Game.Tests
         {
             RewardAttemptState attempts = new(new RewardFlowSettings(0, 1, 1));
             StubRewardedAdService adService = new(isReady: false);
-            RewardPopupStateFactory factory = new(attempts, adService);
+            RewardPopupStateFactory factory = new(attempts, CreateOperation(adService));
             RewardRollContext context = new(
                 headPathProgressNormalized: 1f,
                 wormDestructionProgressNormalized: 0f,
@@ -142,6 +142,12 @@ namespace Game.Tests
             {
                 onCompleted?.Invoke(IsReady);
             }
+        }
+
+        private static RewardedAdOperation CreateOperation(
+            IRewardedAdService rewardedAdService)
+        {
+            return new RewardedAdOperation(rewardedAdService);
         }
     }
 }

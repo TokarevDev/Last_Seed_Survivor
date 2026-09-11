@@ -10,15 +10,15 @@ namespace Game.Presentation.UI.Rewards
     public sealed class RewardPopupStateFactory
     {
         private readonly RewardAttemptState _attempts;
-        private readonly IRewardedAdService _rewardedAdService;
+        private readonly RewardedAdOperation _rewardedAdOperation;
 
         public RewardPopupStateFactory(
             RewardAttemptState attempts,
-            IRewardedAdService rewardedAdService)
+            RewardedAdOperation rewardedAdOperation)
         {
             _attempts = attempts ?? throw new ArgumentNullException(nameof(attempts));
-            _rewardedAdService = rewardedAdService ??
-                throw new ArgumentNullException(nameof(rewardedAdService));
+            _rewardedAdOperation = rewardedAdOperation ??
+                throw new ArgumentNullException(nameof(rewardedAdOperation));
         }
 
         public RewardPopupState Create(
@@ -28,7 +28,7 @@ namespace Game.Presentation.UI.Rewards
             bool isRewardOperationPending)
         {
             bool canStartRewardedAd =
-                !isRewardOperationPending && _rewardedAdService.IsReady;
+                !isRewardOperationPending && _rewardedAdOperation.IsAvailable;
             bool canTakeAll = _attempts.HasTakeAll
                 && canStartRewardedAd
                 && RewardAdRerollPolicy.CanOfferTakeAll(rollContext);

@@ -17,6 +17,22 @@ namespace Game.Infrastructure.Advertising
 
         public bool IsPending { get; private set; }
 
+        public bool IsAvailable
+        {
+            get
+            {
+                try
+                {
+                    return _rewardedAdService.IsReady;
+                }
+                catch (Exception exception)
+                {
+                    Debug.LogException(exception);
+                    return false;
+                }
+            }
+        }
+
         public bool TryBegin(
             Action<bool> onCompleted,
             Action onCompletionFailed = null)
@@ -24,7 +40,7 @@ namespace Game.Infrastructure.Advertising
             if (onCompleted == null)
                 throw new ArgumentNullException(nameof(onCompleted));
 
-            if (IsPending || !_rewardedAdService.IsReady)
+            if (IsPending || !IsAvailable)
                 return false;
 
             IsPending = true;

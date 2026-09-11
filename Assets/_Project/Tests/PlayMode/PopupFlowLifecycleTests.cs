@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Game.Core.Timing;
 using Game.Gameplay.Enemy.Worm.Movement;
@@ -11,6 +12,7 @@ using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.TestTools;
 using Zenject;
+using Object = UnityEngine.Object;
 
 namespace Game.Tests.PlayMode
 {
@@ -44,6 +46,34 @@ namespace Game.Tests.PlayMode
             Assert.That(popup.IsVisible, Is.False);
             Assert.That(inputLock.IsLocked, Is.False);
             Assert.That(timeScale.TimeScale, Is.EqualTo(InitialTimeScale));
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        [UnityTest]
+        public IEnumerator PopupClose_WhenHiddenObserverThrows_StillRestoresOwnership()
+        {
+            yield return _flow.LoadScene(GameSceneNames.Gameplay);
+
+            SceneContext sceneContext = _flow.GetActiveSceneContext();
+            PopupRoot popupRoot = _flow.FindInActiveScene<PopupRoot>();
+            RevivalPopupView popup = _flow.FindInActiveScene<RevivalPopupView>();
+            IGameplayInputLock inputLock = sceneContext.Container.Resolve<IGameplayInputLock>();
+            ITimeScaleController timeScale = sceneContext.Container.Resolve<ITimeScaleController>();
+            timeScale.TimeScale = InitialTimeScale;
+            Action<PopupView> observer = _ =>
+                throw new InvalidOperationException("Observer failed.");
+
+            popupRoot.Show(popup);
+            popup.Hidden += observer;
+
+            Assert.Throws<InvalidOperationException>(popup.RequestClose);
+            popup.Hidden -= observer;
+
+            Assert.That(popup.IsVisible, Is.False);
+            Assert.That(inputLock.IsLocked, Is.False);
+            Assert.That(timeScale.TimeScale, Is.EqualTo(InitialTimeScale));
+            Assert.DoesNotThrow(popup.RequestClose);
+            yield return null;
             LogAssert.NoUnexpectedReceived();
         }
 

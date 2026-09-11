@@ -1,4 +1,5 @@
 using Game.Gameplay.Signals;
+using Game.Gameplay.Enemy.Worm.Combat;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -11,13 +12,18 @@ namespace Game.Presentation.Worm
         [SerializeField] private TMP_Text _text;
         [SerializeField] private string _format = "Progress: {0}%";
         private SignalBus _signalBus;
+        private IWormDestructionProgressSnapshotProvider _progressSnapshotProvider;
         private bool _isSubscribedToSignals;
 
         [Inject]
-        public void Construct(SignalBus signalBus)
+        public void Construct(
+            SignalBus signalBus,
+            IWormDestructionProgressSnapshotProvider progressSnapshotProvider)
         {
             _signalBus = signalBus;
+            _progressSnapshotProvider = progressSnapshotProvider;
             SubscribeToSignals();
+            RenderCurrentProgress();
         }
 
         private void Awake()
@@ -29,7 +35,7 @@ namespace Game.Presentation.Worm
         private void OnEnable()
         {
             SubscribeToSignals();
-            UpdateProgress(0, 0);
+            RenderCurrentProgress();
         }
 
         private void OnDisable()
@@ -74,6 +80,16 @@ namespace Game.Presentation.Worm
             }
 
             _text.SetText(_format, progress);
+        }
+
+        private void RenderCurrentProgress()
+        {
+            if (_progressSnapshotProvider == null)
+                return;
+
+            WormDestructionProgressSnapshot snapshot =
+                _progressSnapshotProvider.CurrentProgress;
+            UpdateProgress(snapshot.DestroyedSegments, snapshot.TotalSegments);
         }
     }
 

@@ -45,7 +45,7 @@ namespace Game.Tests
                 new RewardRequestLifecycle(),
                 new RewardPopupStateFactory(
                     attempts,
-                    new DisabledRewardedAdService()));
+                    new RewardedAdOperation(new DisabledRewardedAdService())));
 
             Assert.That(GetSubscriberCount(popup, "Selected"), Is.EqualTo(1));
             Assert.That(GetSubscriberCount(popup, "RerollRequested"), Is.EqualTo(1));
