@@ -32,6 +32,7 @@ namespace Game.Presentation.UI.Common
         private void OnEnable()
         {
             _isReturnRequested = false;
+            SetInteractable(true);
 
             if (_button != null)
                 _button.onClick.AddListener(HandleClicked);

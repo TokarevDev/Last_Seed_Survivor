@@ -73,6 +73,12 @@ namespace Game.Presentation.UI.Rewards
         {
             EnsureControllers();
             _actionControls.Subscribe();
+
+            if (_hasBoundChoices && IsVisible)
+            {
+                _animator.ResetAnimatedLayout();
+                StartInteractionGateWhenSafe();
+            }
         }
 
         private void OnDisable()

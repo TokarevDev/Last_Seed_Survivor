@@ -31,6 +31,8 @@ namespace Game.Presentation.UI.Common.Popups
         private void OnEnable()
         {
             EnsureAnimator();
+            _restartRequested = false;
+            SetButtonsInteractable(true);
 
             if (_acceptButton != null)
                 _acceptButton.onClick.AddListener(HandleAcceptClicked);

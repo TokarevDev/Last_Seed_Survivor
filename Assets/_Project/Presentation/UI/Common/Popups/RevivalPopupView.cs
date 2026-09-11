@@ -23,11 +23,16 @@ namespace Game.Presentation.UI.Common.Popups
         public event Action<RevivalPopupIntent> Intent;
 
         private bool _canRevive;
+        private bool _hasRenderedModel;
+        private RevivalPopupViewModel _renderedModel;
         private PopupScaleFadeAnimator _animator;
 
         private void OnEnable()
         {
             EnsureAnimator();
+
+            if (_hasRenderedModel)
+                ApplyModel(_renderedModel);
 
             if (_reviveButton != null)
                 _reviveButton.onClick.AddListener(HandleReviveClicked);
@@ -53,6 +58,13 @@ namespace Game.Presentation.UI.Common.Popups
         }
 
         public void Render(RevivalPopupViewModel model)
+        {
+            _renderedModel = model;
+            _hasRenderedModel = true;
+            ApplyModel(model);
+        }
+
+        private void ApplyModel(RevivalPopupViewModel model)
         {
             int currentPercent = Mathf.RoundToInt(
                 Mathf.Clamp01(model.CurrentProgressNormalized) * 100f);
