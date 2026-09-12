@@ -59,6 +59,12 @@ namespace Game.Gameplay.Enemy.Worm.Balance
         public int MaxHp => _maxHp;
         public float HpMultiplier => _hpMultiplier;
 
+#if UNITY_EDITOR
+        public AnimationCurve EditorTargetSectionLifetimeByProgress =>
+            _targetSectionLifetimeByProgress;
+        public AnimationCurve EditorPressureByProgress => _pressureByProgress;
+#endif
+
         private void OnEnable()
         {
             EnsureCurves();

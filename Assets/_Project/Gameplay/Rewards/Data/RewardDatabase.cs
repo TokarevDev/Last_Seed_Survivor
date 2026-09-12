@@ -17,6 +17,7 @@ namespace Game.Gameplay.Rewards.Data
         public IReadOnlyList<RewardModifierEntry> Rewards => _rewards;
 
 #if UNITY_EDITOR
+        public IReadOnlyList<CocoonRewardProfile> EditorCocoonProfiles => _cocoonProfiles;
         public IReadOnlyList<RewardModifierEntry> EditorRewards => _rewards;
 #endif
 

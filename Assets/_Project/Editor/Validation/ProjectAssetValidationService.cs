@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using Game.Gameplay.Combat.Projectiles.Configs;
 using Game.Gameplay.Combat.Weapons.AcaciaThornWeapon.Configs;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
+using Game.Gameplay.Enemy.Worm.Balance;
+using Game.Gameplay.Enemy.Worm.Movement;
 using Game.Gameplay.Rewards.Data;
+using Game.Presentation.UI.Rewards;
 using Game.Presentation.UI.Rewards.Visuals;
 using UnityEditor;
 using UnityEngine;
@@ -19,31 +22,72 @@ namespace Game.EditorTools.Validation
             List<string> errors = new();
             int validatedAssetCount = 0;
 
-            validatedAssetCount += ValidateAssets<RewardDatabase>(
+            validatedAssetCount += ValidateRequiredAssets<RewardDatabase>(
                 (asset, path) => ProjectConfigurationValidator.ValidateRewardDatabase(
                     asset,
                     path,
-                    errors));
-            validatedAssetCount += ValidateAssets<RewardVisualCatalog>(
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<RewardVisualCatalog>(
                 (asset, path) => ProjectConfigurationValidator.ValidateRewardVisualCatalog(
                     asset,
                     path,
-                    errors));
-            validatedAssetCount += ValidateAssets<WeaponConfig>(
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<RewardIconProfile>(
+                (asset, path) => ProjectConfigurationValidator.ValidateRewardIconProfile(
+                    asset,
+                    path,
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<WeaponConfig>(
                 (asset, path) => ProjectConfigurationValidator.ValidateWeaponConfig(
                     asset,
                     path,
-                    errors));
-            validatedAssetCount += ValidateAssets<ProjectileConfig>(
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<ProjectileConfig>(
                 (asset, path) => ProjectConfigurationValidator.ValidateProjectileConfig(
                     asset,
                     path,
-                    errors));
-            validatedAssetCount += ValidateAssets<AcaciaThornWeaponConfig>(
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<AcaciaThornWeaponConfig>(
                 (asset, path) => ProjectConfigurationValidator.ValidateAcaciaThornConfig(
                     asset,
                     path,
-                    errors));
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<WormHpScalingConfig>(
+                (asset, path) => ProjectConfigurationValidator.ValidateWormHpScalingConfig(
+                    asset,
+                    path,
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<WormPressureConfig>(
+                (asset, path) => ProjectConfigurationValidator.ValidateWormPressureConfig(
+                    asset,
+                    path,
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<WormMovementConfig>(
+                (asset, path) => ProjectConfigurationValidator.ValidateWormMovementConfig(
+                    asset,
+                    path,
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<RewardPopupAnimationConfig>(
+                (asset, path) => ProjectConfigurationValidator.ValidateRewardPopupAnimationConfig(
+                    asset,
+                    path,
+                    errors),
+                errors);
+            validatedAssetCount += ValidateRequiredAssets<RewardPopupActionPresentationConfig>(
+                (asset, path) => ProjectConfigurationValidator.ValidateRewardPopupActionPresentationConfig(
+                    asset,
+                    path,
+                    errors),
+                errors);
 
             if (errors.Count > 0)
             {
@@ -57,12 +101,22 @@ namespace Game.EditorTools.Validation
                 $"{validatedAssetCount} config assets.");
         }
 
-        private static int ValidateAssets<TAsset>(Action<TAsset, string> validate)
+        private static int ValidateRequiredAssets<TAsset>(
+            Action<TAsset, string> validate,
+            ICollection<string> errors)
             where TAsset : ScriptableObject
         {
             string[] assetGuids = AssetDatabase.FindAssets(
                 $"t:{typeof(TAsset).Name}",
                 new[] { ProjectAssetRoot });
+
+            if (assetGuids.Length == 0)
+            {
+                errors.Add(
+                    $"{ProjectAssetRoot}: required config family " +
+                    $"'{typeof(TAsset).Name}' has no assets.");
+                return 0;
+            }
 
             for (int index = 0; index < assetGuids.Length; index++)
             {
