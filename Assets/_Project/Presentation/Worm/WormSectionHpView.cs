@@ -10,9 +10,11 @@ namespace Game.Presentation.Worm
 
         [SerializeField, RequiredViewReference] private TMP_Text _text;
         [SerializeField] private Transform _visualRoot;
-
-        [SerializeField] private float _minScale = 0.9f;
-        [SerializeField] private float _maxScale = 1f;
+        [SerializeField] private string _sortingLayerName = "UI";
+        [SerializeField] private int _sortingOrder = 2600;
+        [SerializeField, Min(1f)] private int _fullScaleHp = 10000;
+        [SerializeField, Min(0f)] private float _minScale = 0.9f;
+        [SerializeField, Min(0f)] private float _maxScale = 1f;
 
         private Transform _target;
         private bool _isVisible = true;
@@ -32,8 +34,8 @@ namespace Game.Presentation.Worm
                 return;
             }
 
-            meshRenderer.sortingLayerName = "UI";
-            meshRenderer.sortingOrder = 2600;
+            meshRenderer.sortingLayerName = _sortingLayerName;
+            meshRenderer.sortingOrder = _sortingOrder;
         }
 
         private void LateUpdate()
@@ -59,6 +61,13 @@ namespace Game.Presentation.Worm
         {
             if (_text == null)
                 Debug.LogError("WormSectionHpView: TMP_Text is not assigned.", this);
+
+            if (string.IsNullOrWhiteSpace(_sortingLayerName))
+                Debug.LogError("WormSectionHpView: Sorting layer name is empty.", this);
+
+            _fullScaleHp = Mathf.Max(1, _fullScaleHp);
+            _minScale = Mathf.Max(0f, _minScale);
+            _maxScale = Mathf.Max(_minScale, _maxScale);
         }
 
         public void Bind(Transform target, int currentHp)
@@ -81,7 +90,7 @@ namespace Game.Presentation.Worm
             else
                 _text.text = WormHpFormatter.Format(current);
 
-            float t = Mathf.InverseLerp(0, 10000, current);
+            float t = Mathf.InverseLerp(0, _fullScaleHp, current);
             float scale = Mathf.Lerp(_maxScale, _minScale, t);
 
             if (_visualRoot != null)

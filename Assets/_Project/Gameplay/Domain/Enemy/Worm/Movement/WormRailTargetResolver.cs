@@ -4,16 +4,18 @@ namespace Game.Gameplay.Enemy.Worm.Movement
 {
     public sealed class WormRailTargetResolver
     {
+        private const int UncachedPointIndex = int.MinValue;
+
         private IWormRailPath _catchUpRail;
-        private int _catchUpPointIndex = -1;
+        private int _catchUpPointIndex = UncachedPointIndex;
         private float _catchUpDistance;
 
         private IWormRailPath _reviveRail;
-        private int _revivePointIndex = -2;
+        private int _revivePointIndex = UncachedPointIndex;
         private float _reviveDistance;
 
         private IWormRailPath _burstDisableRail;
-        private int _burstDisablePointIndex = -2;
+        private int _burstDisablePointIndex = UncachedPointIndex;
         private float _burstDisableDistance;
 
         public bool TryGetCatchUpDistance(
@@ -106,13 +108,13 @@ namespace Game.Gameplay.Enemy.Worm.Movement
         public void Clear()
         {
             _catchUpRail = null;
-            _catchUpPointIndex = -1;
+            _catchUpPointIndex = UncachedPointIndex;
             _catchUpDistance = 0f;
             _reviveRail = null;
-            _revivePointIndex = -2;
+            _revivePointIndex = UncachedPointIndex;
             _reviveDistance = 0f;
             _burstDisableRail = null;
-            _burstDisablePointIndex = -2;
+            _burstDisablePointIndex = UncachedPointIndex;
             _burstDisableDistance = 0f;
         }
     }

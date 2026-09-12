@@ -10,6 +10,8 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
     [DisallowMultipleComponent]
     public sealed class AcaciaThornProjectile : MonoBehaviour
     {
+        private const float DirectionSqrMagnitudeThreshold = 0.0001f;
+
         [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private LayerMask _hitMask;
         [SerializeField, Min(0f)] private float _spawnHitDelay = 0.04f;
@@ -204,7 +206,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         {
             Vector2 normal = (Vector2)(transform.position - hitPosition);
 
-            if (normal.sqrMagnitude < 0.0001f)
+            if (normal.sqrMagnitude < DirectionSqrMagnitudeThreshold)
                 normal = -_direction;
 
             TryBounce(normal.normalized);
@@ -240,7 +242,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
                 normal.y -= 1f;
             }
 
-            if (normal.sqrMagnitude < 0.0001f)
+            if (normal.sqrMagnitude < DirectionSqrMagnitudeThreshold)
                 return;
 
             transform.position = position;
@@ -276,7 +278,8 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
         private void UpdateVisualRotation()
         {
-            if (_renderer == null || _direction.sqrMagnitude < 0.0001f)
+            if (_renderer == null ||
+                _direction.sqrMagnitude < DirectionSqrMagnitudeThreshold)
                 return;
 
             float angle = -Mathf.Atan2(_direction.x, _direction.y) * Mathf.Rad2Deg;
@@ -302,7 +305,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
 
         private static Vector2 NormalizeDirection(Vector2 direction)
         {
-            if (direction.sqrMagnitude < 0.0001f)
+            if (direction.sqrMagnitude < DirectionSqrMagnitudeThreshold)
                 return Vector2.up;
 
             return direction.normalized;
@@ -312,7 +315,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         {
             Vector2 direction = Random.insideUnitCircle;
 
-            if (direction.sqrMagnitude < 0.0001f)
+            if (direction.sqrMagnitude < DirectionSqrMagnitudeThreshold)
                 return Vector2.up;
 
             return direction.normalized;

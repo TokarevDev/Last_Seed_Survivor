@@ -89,6 +89,11 @@ MonoBehaviour:
     - _rarity: 1
       _alternateRarity: 2
       _alternateChance: 0
+  _selectionTuning:
+    _postRevivePrimaryDpsWeightMultiplier: 4
+    _postReviveSecondaryDpsWeightMultiplier: 1.25
+    _paidAssistPrimaryDpsWeightMultiplier: 2.75
+    _paidAssistSecondaryDpsWeightMultiplier: 1.15
   _rewards:
   - _effect: {fileID: 11400000, guid: cfce53d6ccd34bb7b9782fdffe4bfc84, type: 2}
     _category: 1

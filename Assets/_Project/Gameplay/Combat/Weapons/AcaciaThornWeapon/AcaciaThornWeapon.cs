@@ -11,6 +11,8 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
     [DisallowMultipleComponent]
     public sealed class AcaciaThornWeapon : MonoBehaviour
     {
+        private const float DirectionSqrMagnitudeThreshold = 0.0001f;
+
         [SerializeField] private AcaciaThornWeaponConfig _config;
 
         private readonly AcaciaThornRuntimeState _runtimeState = new();
@@ -135,7 +137,7 @@ namespace Game.Gameplay.Combat.Weapons.AcaciaThornWeapon
         {
             Vector2 direction = _firePoint.rotation * Vector2.up;
 
-            if (direction.sqrMagnitude < 0.0001f)
+            if (direction.sqrMagnitude < DirectionSqrMagnitudeThreshold)
                 direction = Vector2.up;
 
             direction.Normalize();

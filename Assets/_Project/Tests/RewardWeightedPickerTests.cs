@@ -26,6 +26,7 @@ namespace Game.Tests
                 RewardPickMode.Any,
                 out RewardModifierEntry selected,
                 default,
+                RewardSelectionTuning.Default,
                 new TestRandomSource());
 
             Assert.That(taken, Is.True);
@@ -44,6 +45,7 @@ namespace Game.Tests
                 RewardPickMode.Any,
                 out RewardModifierEntry selected,
                 default,
+                RewardSelectionTuning.Default,
                 new TestRandomSource());
 
             Assert.That(taken, Is.False);
@@ -69,6 +71,7 @@ namespace Game.Tests
                 RewardPickMode.Any,
                 out RewardModifierEntry selected,
                 default,
+                RewardSelectionTuning.Default,
                 new TestRandomSource(values: new[] { 0.5f }));
 
             Assert.That(taken, Is.True);

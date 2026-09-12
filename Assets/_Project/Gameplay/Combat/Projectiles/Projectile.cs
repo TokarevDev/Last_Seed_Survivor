@@ -14,6 +14,7 @@ namespace Game.Gameplay.Combat.Projectiles
     public sealed class Projectile : MonoBehaviour
     {
         private const int HitSectionsInitialCapacity = 8;
+        private const float DirectionSqrMagnitudeThreshold = 0.001f;
 
         [SerializeField] private SpriteRenderer _renderer;
         [SerializeField] private LayerMask _hitMask;
@@ -150,7 +151,7 @@ namespace Game.Gameplay.Combat.Projectiles
             if (_movement == null || _renderer == null) return;
 
             Vector2 dir = _movement.Direction;
-            if (dir.sqrMagnitude < 0.001f) return;
+            if (dir.sqrMagnitude < DirectionSqrMagnitudeThreshold) return;
 
             float angle = -Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
             _renderer.transform.localRotation =

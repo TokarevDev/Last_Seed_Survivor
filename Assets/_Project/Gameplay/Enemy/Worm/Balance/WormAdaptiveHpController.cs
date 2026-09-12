@@ -9,6 +9,7 @@ namespace Game.Gameplay.Enemy.Worm.Balance
     {
         private const int ThousandHp = 1000;
         private const int TenThousandHp = 10000;
+        private const int HundredThousandHp = 100000;
         private const int MillionHp = 1000000;
         private const int TenMillionHp = 10000000;
 
@@ -264,7 +265,7 @@ namespace Game.Gameplay.Enemy.Worm.Balance
             if (previousHp < ThousandHp) return 1;
             if (previousHp < TenThousandHp) return 100;
             if (previousHp < MillionHp) return ThousandHp;
-            if (previousHp < TenMillionHp) return 100000;
+            if (previousHp < TenMillionHp) return HundredThousandHp;
             return MillionHp;
         }
     }

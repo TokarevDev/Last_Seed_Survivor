@@ -72,6 +72,7 @@ namespace Game.Gameplay.Rewards.Services
                 usePremiumRules,
                 context,
                 rollContext,
+                _database.SelectionTuning,
                 _randomSource);
 
             return result;
@@ -105,6 +106,7 @@ namespace Game.Gameplay.Rewards.Services
             bool usePremiumRules,
             RewardRuntimeContext context,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource)
         {
             RewardWeaponDpsBias weaponDpsBias =
@@ -128,6 +130,7 @@ namespace Game.Gameplay.Rewards.Services
                         usePremiumRules,
                         allowLegendaryFallback,
                         rollContext,
+                        selectionTuning,
                         randomSource,
                         weaponDpsBias,
                         out RewardModifierEntry selected))

@@ -15,6 +15,7 @@ namespace Game.Gameplay.Rewards.Services
             bool usePremiumFallback,
             bool allowLegendaryFallback,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias,
             out RewardModifierEntry selected)
@@ -27,6 +28,7 @@ namespace Game.Gameplay.Rewards.Services
                     usedCategories,
                     usedCategoryRarities,
                     rollContext,
+                    selectionTuning,
                     randomSource,
                     weaponDpsBias,
                     out selected))
@@ -40,6 +42,7 @@ namespace Game.Gameplay.Rewards.Services
                     usedCategories,
                     usedCategoryRarities,
                     rollContext,
+                    selectionTuning,
                     randomSource,
                     weaponDpsBias,
                     out selected))
@@ -53,6 +56,7 @@ namespace Game.Gameplay.Rewards.Services
                     usedCategories,
                     usedCategoryRarities,
                     rollContext,
+                    selectionTuning,
                     randomSource,
                     weaponDpsBias,
                     out selected))
@@ -66,6 +70,7 @@ namespace Game.Gameplay.Rewards.Services
                 usedCategoryRarities,
                 allowLegendaryFallback,
                 rollContext,
+                selectionTuning,
                 randomSource,
                 weaponDpsBias,
                 out selected);
@@ -77,6 +82,7 @@ namespace Game.Gameplay.Rewards.Services
             HashSet<RewardModifierCategory> usedCategories,
             HashSet<int> usedCategoryRarities,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias,
             out RewardModifierEntry selected,
@@ -85,15 +91,15 @@ namespace Game.Gameplay.Rewards.Services
             return RewardWeightedPicker.TryTakeFromRarity(
                        pools, rarity, usedCategories, usedCategoryRarities,
                        RewardPickMode.UniqueCategory, out selected, rollContext,
-                       randomSource, weaponDpsBias, requireAssistDpsReward)
+                       selectionTuning, randomSource, weaponDpsBias, requireAssistDpsReward)
                 || RewardWeightedPicker.TryTakeFromRarity(
                     pools, rarity, usedCategories, usedCategoryRarities,
                     RewardPickMode.UniqueCategoryRarity, out selected, rollContext,
-                    randomSource, weaponDpsBias, requireAssistDpsReward)
+                    selectionTuning, randomSource, weaponDpsBias, requireAssistDpsReward)
                 || RewardWeightedPicker.TryTakeFromRarity(
                     pools, rarity, usedCategories, usedCategoryRarities,
                     RewardPickMode.Any, out selected, rollContext,
-                    randomSource, weaponDpsBias, requireAssistDpsReward);
+                    selectionTuning, randomSource, weaponDpsBias, requireAssistDpsReward);
         }
 
         private static bool TrySelectAssistPrimaryDps(
@@ -102,20 +108,21 @@ namespace Game.Gameplay.Rewards.Services
             HashSet<RewardModifierCategory> usedCategories,
             HashSet<int> usedCategoryRarities,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias,
             out RewardModifierEntry selected)
         {
             if (TrySelectAtRarity(
                     pools, preferredRarity, usedCategories, usedCategoryRarities,
-                    rollContext, randomSource, weaponDpsBias, out selected, true))
+                    rollContext, selectionTuning, randomSource, weaponDpsBias, out selected, true))
             {
                 return true;
             }
 
             if (preferredRarity == RewardRarity.Legendary && TrySelectAtRarity(
                     pools, RewardRarity.Rare, usedCategories, usedCategoryRarities,
-                    rollContext, randomSource, weaponDpsBias, out selected, true))
+                    rollContext, selectionTuning, randomSource, weaponDpsBias, out selected, true))
             {
                 return true;
             }
@@ -123,7 +130,7 @@ namespace Game.Gameplay.Rewards.Services
             return preferredRarity != RewardRarity.Common
                 && TrySelectAtRarity(
                     pools, RewardRarity.Common, usedCategories, usedCategoryRarities,
-                    rollContext, randomSource, weaponDpsBias, out selected, true);
+                    rollContext, selectionTuning, randomSource, weaponDpsBias, out selected, true);
         }
 
         private static bool TrySelectPremiumFallback(
@@ -132,6 +139,7 @@ namespace Game.Gameplay.Rewards.Services
             HashSet<RewardModifierCategory> usedCategories,
             HashSet<int> usedCategoryRarities,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias,
             out RewardModifierEntry selected)
@@ -145,10 +153,10 @@ namespace Game.Gameplay.Rewards.Services
 
             return TrySelectAtRarity(
                        pools, first, usedCategories, usedCategoryRarities,
-                       rollContext, randomSource, weaponDpsBias, out selected)
+                       rollContext, selectionTuning, randomSource, weaponDpsBias, out selected)
                 || TrySelectAtRarity(
                     pools, second, usedCategories, usedCategoryRarities,
-                    rollContext, randomSource, weaponDpsBias, out selected);
+                    rollContext, selectionTuning, randomSource, weaponDpsBias, out selected);
         }
 
         private static bool TrySelectFromAllRarities(
@@ -157,6 +165,7 @@ namespace Game.Gameplay.Rewards.Services
             HashSet<int> usedCategoryRarities,
             bool allowLegendary,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias,
             out RewardModifierEntry selected)
@@ -164,15 +173,15 @@ namespace Game.Gameplay.Rewards.Services
             return RewardWeightedPicker.TryTakeFromAllRarities(
                        pools, usedCategories, usedCategoryRarities,
                        RewardPickMode.UniqueCategory, out selected, allowLegendary,
-                       rollContext, randomSource, weaponDpsBias)
+                       rollContext, selectionTuning, randomSource, weaponDpsBias)
                 || RewardWeightedPicker.TryTakeFromAllRarities(
                     pools, usedCategories, usedCategoryRarities,
                     RewardPickMode.UniqueCategoryRarity, out selected, allowLegendary,
-                    rollContext, randomSource, weaponDpsBias)
+                    rollContext, selectionTuning, randomSource, weaponDpsBias)
                 || RewardWeightedPicker.TryTakeFromAllRarities(
                     pools, usedCategories, usedCategoryRarities,
                     RewardPickMode.Any, out selected, allowLegendary,
-                    rollContext, randomSource, weaponDpsBias);
+                    rollContext, selectionTuning, randomSource, weaponDpsBias);
         }
     }
 

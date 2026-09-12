@@ -11,6 +11,8 @@ namespace Game.Gameplay.Enemy.Worm.Balance
 {
     public static class WeaponPowerEstimator
     {
+        private const float MinimumShotCycleTime = 0.01f;
+
         public static WeaponPowerSnapshot Estimate(ProjectileWeapon weapon)
         {
             if (weapon == null)
@@ -200,9 +202,9 @@ namespace Game.Gameplay.Enemy.Worm.Balance
                 fireRateBonus);
 
             float salvoTime = Mathf.Max(0, salvoShots - 1) *
-                Mathf.Max(0.01f, runtimeState.SalvoInterval);
+                Mathf.Max(MinimumShotCycleTime, runtimeState.SalvoInterval);
 
-            return Mathf.Max(0.01f, shotCooldown + salvoTime);
+            return Mathf.Max(MinimumShotCycleTime, shotCooldown + salvoTime);
         }
 
         private static float EstimateShotCycleTime(
@@ -220,9 +222,9 @@ namespace Game.Gameplay.Enemy.Worm.Balance
                 fireRateBonus);
 
             float salvoTime = Mathf.Max(0, salvoShots - 1) *
-                Mathf.Max(0.01f, config.SalvoInterval);
+                Mathf.Max(MinimumShotCycleTime, config.SalvoInterval);
 
-            return Mathf.Max(0.01f, cooldown + salvoTime);
+            return Mathf.Max(MinimumShotCycleTime, cooldown + salvoTime);
         }
     }
 

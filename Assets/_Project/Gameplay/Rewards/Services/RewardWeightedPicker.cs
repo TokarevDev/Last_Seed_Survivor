@@ -14,6 +14,7 @@ namespace Game.Gameplay.Rewards.Services
             RewardPickMode mode,
             out RewardModifierEntry selected,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias = default,
             bool requireAssistDpsReward = false)
@@ -30,6 +31,7 @@ namespace Game.Gameplay.Rewards.Services
                 mode,
                 out selected,
                 rollContext,
+                selectionTuning,
                 randomSource,
                 weaponDpsBias,
                 requireAssistDpsReward);
@@ -43,6 +45,7 @@ namespace Game.Gameplay.Rewards.Services
             out RewardModifierEntry selected,
             bool allowLegendary,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias = default)
         {
@@ -58,6 +61,7 @@ namespace Game.Gameplay.Rewards.Services
                 mode,
                 allowLegendary,
                 rollContext,
+                selectionTuning,
                 weaponDpsBias);
 
             if (totalWeight <= 0f)
@@ -93,6 +97,7 @@ namespace Game.Gameplay.Rewards.Services
                     currentWeight += RewardSelectionPolicy.GetEffectiveWeight(
                         entry,
                         rollContext,
+                        selectionTuning,
                         weaponDpsBias);
 
                     if (roll >= currentWeight)
@@ -114,6 +119,7 @@ namespace Game.Gameplay.Rewards.Services
             RewardPickMode mode,
             out RewardModifierEntry selected,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             IRandomSource randomSource,
             RewardWeaponDpsBias weaponDpsBias,
             bool requireAssistDpsReward)
@@ -149,6 +155,7 @@ namespace Game.Gameplay.Rewards.Services
                     totalWeight += RewardSelectionPolicy.GetEffectiveWeight(
                         entry,
                         rollContext,
+                        selectionTuning,
                         weaponDpsBias);
                 }
             }
@@ -177,6 +184,7 @@ namespace Game.Gameplay.Rewards.Services
                 currentWeight += RewardSelectionPolicy.GetEffectiveWeight(
                     entry,
                     rollContext,
+                    selectionTuning,
                     weaponDpsBias);
 
                 if (roll >= currentWeight)
@@ -197,6 +205,7 @@ namespace Game.Gameplay.Rewards.Services
             RewardPickMode mode,
             bool allowLegendary,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             RewardWeaponDpsBias weaponDpsBias)
         {
             float totalWeight = 0f;
@@ -225,6 +234,7 @@ namespace Game.Gameplay.Rewards.Services
                         totalWeight += RewardSelectionPolicy.GetEffectiveWeight(
                             entry,
                             rollContext,
+                            selectionTuning,
                             weaponDpsBias);
                     }
                 }

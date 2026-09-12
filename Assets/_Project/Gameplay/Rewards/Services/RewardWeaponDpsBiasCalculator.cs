@@ -68,6 +68,8 @@ namespace Game.Gameplay.Rewards.Services
 
     public static class RewardWeaponDpsBiasCalculator
     {
+        private const float MinimumComparableDps = 0.01f;
+
         public static RewardWeaponDpsBias Calculate(RewardRuntimeContext context)
         {
             if (!HasAdditionalWeaponUnlocked(context))
@@ -83,7 +85,7 @@ namespace Game.Gameplay.Rewards.Services
             float acaciaDps = Math.Max(0f, acaciaPower.EstimatedDps);
             float strongerDps = Math.Max(mainDps, acaciaDps);
 
-            if (strongerDps <= 0.01f)
+            if (strongerDps <= MinimumComparableDps)
                 return RewardWeaponDpsBias.None;
 
             float imbalance = Math.Abs(mainDps - acaciaDps) / strongerDps;

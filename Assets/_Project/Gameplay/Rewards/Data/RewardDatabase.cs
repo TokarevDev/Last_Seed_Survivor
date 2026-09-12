@@ -7,6 +7,8 @@ namespace Game.Gameplay.Rewards.Data
     public sealed class RewardDatabase : ScriptableObject
     {
         [SerializeField] private List<CocoonRewardProfile> _cocoonProfiles = new();
+        [SerializeField] private RewardSelectionTuning _selectionTuning =
+            RewardSelectionTuning.Default;
         [SerializeField] private List<RewardModifierEntry> _rewards;
 
         public IReadOnlyList<CocoonRewardProfile> CocoonProfiles =>
@@ -15,6 +17,7 @@ namespace Game.Gameplay.Rewards.Data
                 : CocoonRewardProfile.Defaults;
 
         public IReadOnlyList<RewardModifierEntry> Rewards => _rewards;
+        public RewardSelectionTuning SelectionTuning => _selectionTuning;
 
 #if UNITY_EDITOR
         public IReadOnlyList<CocoonRewardProfile> EditorCocoonProfiles => _cocoonProfiles;

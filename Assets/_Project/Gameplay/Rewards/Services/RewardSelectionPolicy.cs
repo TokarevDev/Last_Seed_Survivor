@@ -13,22 +13,24 @@ namespace Game.Gameplay.Rewards.Services
 
     public static class RewardSelectionPolicy
     {
-        private const float PostRevivePrimaryDpsWeightMultiplier = 4f;
-        private const float PostReviveSecondaryDpsWeightMultiplier = 1.25f;
-        private const float PaidAssistPrimaryDpsWeightMultiplier = 2.75f;
-        private const float PaidAssistSecondaryDpsWeightMultiplier = 1.15f;
+        private const float MinimumEffectiveWeight = 0.01f;
+        private const int RarityKeyStride = (int)RewardRarity.Legendary + 1;
 
         public static float GetEffectiveWeight(
             RewardModifierEntry entry,
             RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning,
             RewardWeaponDpsBias weaponDpsBias = default)
         {
             if (entry == null || entry.Weight <= 0f)
                 return 0f;
 
             float multiplier = weaponDpsBias.GetMultiplier(GetWeaponGroup(entry));
-            multiplier *= GetAssistDpsWeightMultiplier(entry, rollContext);
-            return Math.Max(0.01f, entry.Weight * multiplier);
+            multiplier *= GetAssistDpsWeightMultiplier(
+                entry,
+                rollContext,
+                selectionTuning);
+            return Math.Max(MinimumEffectiveWeight, entry.Weight * multiplier);
         }
 
         public static bool IsEligible(
@@ -92,7 +94,7 @@ namespace Game.Gameplay.Rewards.Services
 
         public static int GetCategoryRarityKey(RewardModifierEntry entry)
         {
-            return ((int)entry.Category * 10) + (int)entry.Rarity;
+            return ((int)entry.Category * RarityKeyStride) + (int)entry.Rarity;
         }
 
         public static bool IsNewWeaponUnlockReward(RewardModifierEntry entry)
@@ -135,22 +137,23 @@ namespace Game.Gameplay.Rewards.Services
 
         private static float GetAssistDpsWeightMultiplier(
             RewardModifierEntry entry,
-            RewardRollContext rollContext)
+            RewardRollContext rollContext,
+            RewardSelectionTuning selectionTuning)
         {
             if (rollContext.HasRevivedThisRun)
             {
                 return GetDpsWeightMultiplier(
                     entry,
-                    PostRevivePrimaryDpsWeightMultiplier,
-                    PostReviveSecondaryDpsWeightMultiplier);
+                    selectionTuning.PostRevivePrimaryDpsWeightMultiplier,
+                    selectionTuning.PostReviveSecondaryDpsWeightMultiplier);
             }
 
             if (rollContext.IsPaidAssistRoll)
             {
                 return GetDpsWeightMultiplier(
                     entry,
-                    PaidAssistPrimaryDpsWeightMultiplier,
-                    PaidAssistSecondaryDpsWeightMultiplier);
+                    selectionTuning.PaidAssistPrimaryDpsWeightMultiplier,
+                    selectionTuning.PaidAssistSecondaryDpsWeightMultiplier);
             }
 
             return 1f;

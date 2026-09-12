@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using NUnit.Framework;
 
 using Game.Gameplay.Rewards.Data;
@@ -46,6 +47,42 @@ namespace Game.Tests
                 RewardWeaponGroup.None);
 
             Assert.That(isEligible, Is.False);
+        }
+
+        [Test]
+        public void GetEffectiveWeight_UsesConfiguredAssistMultipliers()
+        {
+            var entry = new RewardModifierEntry();
+            SetField(entry, "_category", RewardModifierCategory.Damage);
+            var tuning = new RewardSelectionTuning(
+                postRevivePrimaryDpsWeightMultiplier: 7f,
+                postReviveSecondaryDpsWeightMultiplier: 2f,
+                paidAssistPrimaryDpsWeightMultiplier: 5f,
+                paidAssistSecondaryDpsWeightMultiplier: 1.5f);
+            var revived = new RewardRollContext(0f, 0f, true);
+            RewardRollContext paid = new RewardRollContext(0f, 0f, false)
+                .WithPaidAssistRoll();
+
+            float revivedWeight = RewardSelectionPolicy.GetEffectiveWeight(
+                entry,
+                revived,
+                tuning);
+            float paidWeight = RewardSelectionPolicy.GetEffectiveWeight(
+                entry,
+                paid,
+                tuning);
+
+            Assert.That(revivedWeight, Is.EqualTo(7f));
+            Assert.That(paidWeight, Is.EqualTo(5f));
+        }
+
+        private static void SetField<TValue>(object target, string fieldName, TValue value)
+        {
+            FieldInfo field = target.GetType().GetField(
+                fieldName,
+                BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.That(field, Is.Not.Null, $"Missing test field '{fieldName}'.");
+            field.SetValue(target, value);
         }
     }
 }
