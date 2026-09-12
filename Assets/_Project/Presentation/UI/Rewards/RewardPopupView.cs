@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Game.Gameplay.Rewards.Runtime;
+using Game.Presentation.Validation;
 using Game.Presentation.UI.Common.Popups;
 using Game.Presentation.UI.Rewards.Visuals;
 using TMPro;
@@ -12,15 +13,15 @@ namespace Game.Presentation.UI.Rewards
     [DisallowMultipleComponent]
     public sealed class RewardPopupView : PopupView
     {
-        [SerializeField] private List<RewardButtonView> _buttons;
-        [SerializeField] private RewardVisualCatalog _visualCatalog;
-        [SerializeField] private Button _rerollButton;
-        [SerializeField] private Button _adRerollButton;
-        [SerializeField] private Button _takeAllButton;
+        [SerializeField, RequiredViewReference] private List<RewardButtonView> _buttons;
+        [SerializeField, RequiredViewReference] private RewardVisualCatalog _visualCatalog;
+        [SerializeField, RequiredViewReference] private Button _rerollButton;
+        [SerializeField, RequiredViewReference] private Button _adRerollButton;
+        [SerializeField, RequiredViewReference] private Button _takeAllButton;
 
         [Header("Animation")]
-        [SerializeField] private RewardPopupAnimationConfig _animationConfig;
-        [SerializeField] private CanvasGroup _canvasGroup;
+        [SerializeField, RequiredViewReference] private RewardPopupAnimationConfig _animationConfig;
+        [SerializeField, RequiredViewReference] private CanvasGroup _canvasGroup;
         [SerializeField] private RectTransform[] _topSlideGroups;
 
         [Header("Animation Audio")]
@@ -32,12 +33,12 @@ namespace Game.Presentation.UI.Rewards
         [SerializeField, Range(0f, 1f)] private float _animationVolume = 1f;
 
         [Header("Action State Text")]
-        [SerializeField] private RewardPopupActionPresentationConfig _actionPresentationConfig;
-        [SerializeField] private TMP_Text _rerollAttemptsText;
-        [SerializeField] private TMP_Text _adRerollAttemptsText;
-        [SerializeField] private TMP_Text _takeAllAttemptsText;
-        [SerializeField] private TMP_Text _guaranteeText;
-        [SerializeField] private TMP_Text _adRerollGuaranteeText;
+        [SerializeField, RequiredViewReference] private RewardPopupActionPresentationConfig _actionPresentationConfig;
+        [SerializeField, RequiredViewReference] private TMP_Text _rerollAttemptsText;
+        [SerializeField, RequiredViewReference] private TMP_Text _adRerollAttemptsText;
+        [SerializeField, RequiredViewReference] private TMP_Text _takeAllAttemptsText;
+        [SerializeField, RequiredViewReference] private TMP_Text _guaranteeText;
+        [SerializeField, RequiredViewReference] private TMP_Text _adRerollGuaranteeText;
 
         public event Action<RewardChoiceData> Selected;
         public event Action RerollRequested;

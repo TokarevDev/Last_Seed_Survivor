@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using Game.Core.Collections;
 using Game.Gameplay.Enemy.Worm.Combat;
+using Game.Presentation.Validation;
 using UnityEngine;
 
 namespace Game.Presentation.Worm
 {
     public sealed class WormSectionHpPresenter : MonoBehaviour, IWormSectionHealthPresentation
     {
-        [SerializeField] private WormSectionHpView _viewPrefab;
-        [SerializeField] private Transform _root;
+        [SerializeField, RequiredViewReference] private WormSectionHpView _viewPrefab;
+        [SerializeField, RequiredViewReference] private Transform _root;
 
         private readonly Dictionary<WormSection, WormSectionHpView> _views = new();
         private WormSectionHpViewPool _viewPool;

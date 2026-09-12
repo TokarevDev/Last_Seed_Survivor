@@ -1,3 +1,4 @@
+using Game.Presentation.Validation;
 using TMPro;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ namespace Game.Presentation.Worm
     {
         private const int HpTextBufferSize = 16;
 
-        [SerializeField] private TMP_Text _text;
+        [SerializeField, RequiredViewReference] private TMP_Text _text;
         [SerializeField] private Transform _visualRoot;
 
         [SerializeField] private float _minScale = 0.9f;

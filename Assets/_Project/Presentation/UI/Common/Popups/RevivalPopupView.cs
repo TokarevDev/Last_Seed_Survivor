@@ -1,5 +1,6 @@
 
 using System;
+using Game.Presentation.Validation;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,13 +9,13 @@ namespace Game.Presentation.UI.Common.Popups
 {
     public sealed class RevivalPopupView : PopupView
     {
-        [SerializeField] private Button _reviveButton;
-        [SerializeField] private Button _giveUpButton;
+        [SerializeField, RequiredViewReference] private Button _reviveButton;
+        [SerializeField, RequiredViewReference] private Button _giveUpButton;
         [SerializeField] private RectTransform _animatedContentRoot;
-        [SerializeField] private Slider _remainingSlider;
-        [SerializeField] private TMP_Text _progressText;
-        [SerializeField] private TMP_Text _percentText;
-        [SerializeField] private TMP_Text _attemptsText;
+        [SerializeField, RequiredViewReference] private Slider _remainingSlider;
+        [SerializeField, RequiredViewReference] private TMP_Text _progressText;
+        [SerializeField, RequiredViewReference] private TMP_Text _percentText;
+        [SerializeField, RequiredViewReference] private TMP_Text _attemptsText;
         [SerializeField] private string _progressFormat = "Only {0}% of the level remains.";
         [SerializeField] private string _attemptsFormat = "attempts left: x{0}";
         [SerializeField, Min(0f)] private float _showAnimationDuration = 0.55f;

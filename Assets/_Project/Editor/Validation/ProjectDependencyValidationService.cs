@@ -19,6 +19,7 @@ namespace Game.EditorTools.Validation
             {
                 int validatedSceneCount = ZenUnityEditorUtil.ValidateAllActiveScenes();
                 ProjectAssetValidationService.ValidateAllProjectConfigs();
+                ProjectViewReferenceValidationService.ValidateAllEnabledBuildScenesAndPrefabs();
                 Debug.Log(
                     $"Last Seed dependency validation succeeded for " +
                     $"{validatedSceneCount} enabled build scenes.");
@@ -47,6 +48,7 @@ namespace Game.EditorTools.Validation
             {
                 ZenUnityEditorUtil.ValidateCurrentSceneSetup();
                 ProjectAssetValidationService.ValidateAllProjectConfigs();
+                ProjectViewReferenceValidationService.ValidateCurrentSceneAndProjectPrefabs();
                 validationCompleted = true;
             });
 

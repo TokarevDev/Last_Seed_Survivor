@@ -2,6 +2,7 @@ using System;
 using DG.Tweening;
 using Game.Core.Combat;
 using Game.Gameplay.Signals;
+using Game.Presentation.Validation;
 using TMPro;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace Game.Presentation.Worm
             Critical = 2
         }
 
-        [SerializeField] private TMP_Text _text;
+        [SerializeField, RequiredViewReference] private TMP_Text _text;
         [SerializeField] private float _yOffset = 0.2f;
         [SerializeField] private Color _criticalColor = new Color(1f, 0.45f, 0.05f);
         [SerializeField, Min(1f)] private float _criticalScaleMultiplier = 1.3f;

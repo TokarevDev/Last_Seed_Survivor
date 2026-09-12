@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using Game.Gameplay.Rewards.Runtime;
+using Game.Presentation.Validation;
 using Game.Presentation.UI.Rewards.Visuals;
 using TMPro;
 using UnityEngine;
@@ -11,18 +12,18 @@ namespace Game.Presentation.UI.Rewards
     [DisallowMultipleComponent]
     public sealed class RewardButtonView : MonoBehaviour
     {
-        [SerializeField] private Button _button;
-        [SerializeField] private CanvasGroup _canvasGroup;
-        [SerializeField] private Image _targetIcon;
-        [SerializeField] private TMP_Text _title;
-        [SerializeField] private TMP_Text _description;
-        [SerializeField] private TMP_Text _value;
+        [SerializeField, RequiredViewReference] private Button _button;
+        [SerializeField, RequiredViewReference] private CanvasGroup _canvasGroup;
+        [SerializeField, RequiredViewReference] private Image _targetIcon;
+        [SerializeField, RequiredViewReference] private TMP_Text _title;
+        [SerializeField, RequiredViewReference] private TMP_Text _description;
+        [SerializeField, RequiredViewReference] private TMP_Text _value;
 
         [Header("Rarity Popup Visuals")]
-        [SerializeField] private Image _commonVisual;
-        [SerializeField] private Image _rareVisual;
-        [SerializeField] private Image _legendaryVisual;
-        [SerializeField] private Image _weaponUnlockVisual;
+        [SerializeField, RequiredViewReference] private Image _commonVisual;
+        [SerializeField, RequiredViewReference] private Image _rareVisual;
+        [SerializeField, RequiredViewReference] private Image _legendaryVisual;
+        [SerializeField, RequiredViewReference] private Image _weaponUnlockVisual;
 
         [Header("Text Highlighting")]
         [SerializeField] private Color32 _numberColor = new(105, 255, 120, 255);

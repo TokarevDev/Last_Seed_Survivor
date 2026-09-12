@@ -1,4 +1,5 @@
 using System;
+using Game.Presentation.Validation;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -8,8 +9,8 @@ namespace Game.Presentation.UI.Common.Popups
     [DisallowMultipleComponent]
     public sealed class WinPopupView : PopupView
     {
-        [SerializeField] private Button _acceptButton;
-        [SerializeField] private Button _doubleRewardButton;
+        [SerializeField, RequiredViewReference] private Button _acceptButton;
+        [SerializeField, RequiredViewReference] private Button _doubleRewardButton;
         [SerializeField] private RectTransform _animatedContentRoot;
         [SerializeField] private bool _closeOnAccept = true;
         [SerializeField] private bool _closeOnDoubleReward = true;
