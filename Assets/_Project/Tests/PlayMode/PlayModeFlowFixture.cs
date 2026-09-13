@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Text;
 using NUnit.Framework;
@@ -62,6 +63,21 @@ namespace Game.Tests.PlayMode
             yield return WaitForInitializationFrames();
         }
 
+        public IEnumerator WaitForCondition(
+            Func<bool> predicate,
+            string operation,
+            float timeoutSeconds = DefaultSceneTimeoutSeconds)
+        {
+            Assert.That(predicate, Is.Not.Null);
+            float deadline = Time.realtimeSinceStartup + timeoutSeconds;
+
+            while (!predicate() && Time.realtimeSinceStartup < deadline)
+                yield return null;
+
+            if (!predicate())
+                Assert.Fail($"Timed out after {timeoutSeconds} seconds while {operation}.");
+        }
+
         public SceneContext GetActiveSceneContext()
         {
             Scene activeScene = SceneManager.GetActiveScene();
@@ -86,7 +102,7 @@ namespace Game.Tests.PlayMode
             Time.timeScale = 1f;
 
             if (ProjectContext.HasInstance)
-                Object.Destroy(ProjectContext.Instance.gameObject);
+                UnityEngine.Object.Destroy(ProjectContext.Instance.gameObject);
 
             yield return null;
         }

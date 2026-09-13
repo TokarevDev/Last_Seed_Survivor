@@ -13,7 +13,7 @@ namespace Game.Tests.PlayMode
         private readonly PlayModeFlowFixture _flow = new();
 
         [UnityTest]
-        public IEnumerator BootstrapToLobbyToGameplayToLobby_CompletesThroughUiRoutes()
+        public IEnumerator RepeatedSceneFlow_DoubleClicksCompleteEachUiRouteOnce()
         {
             yield return _flow.LoadSceneAndWaitFor(
                 GameSceneNames.Bootstrap,
@@ -26,6 +26,7 @@ namespace Game.Tests.PlayMode
             Assert.That(startBattle.TryGetComponent(out Button lobbyButton), Is.True);
 
             lobbyButton.onClick.Invoke();
+            lobbyButton.onClick.Invoke();
             yield return _flow.WaitForActiveScene(
                 GameSceneNames.Gameplay,
                 "waiting for the Lobby battle button to route to Game");
@@ -36,9 +37,28 @@ namespace Game.Tests.PlayMode
             Assert.That(backToLobby.TryGetComponent(out Button gameplayButton), Is.True);
 
             gameplayButton.onClick.Invoke();
+            gameplayButton.onClick.Invoke();
             yield return _flow.WaitForActiveScene(
                 GameSceneNames.Lobby,
                 "waiting for the Game back button to route to Lobby");
+
+            Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo(GameSceneNames.Lobby));
+
+            startBattle = _flow.FindInActiveScene<LobbyStartBattleButton>();
+            Assert.That(startBattle.TryGetComponent(out lobbyButton), Is.True);
+            lobbyButton.onClick.Invoke();
+            lobbyButton.onClick.Invoke();
+            yield return _flow.WaitForActiveScene(
+                GameSceneNames.Gameplay,
+                "waiting for the second Lobby-to-Game route");
+
+            backToLobby = _flow.FindInActiveScene<GameplayBackToLobbyButton>();
+            Assert.That(backToLobby.TryGetComponent(out gameplayButton), Is.True);
+            gameplayButton.onClick.Invoke();
+            gameplayButton.onClick.Invoke();
+            yield return _flow.WaitForActiveScene(
+                GameSceneNames.Lobby,
+                "waiting for the second Game-to-Lobby route");
 
             Assert.That(SceneManager.GetActiveScene().name, Is.EqualTo(GameSceneNames.Lobby));
             LogAssert.NoUnexpectedReceived();
