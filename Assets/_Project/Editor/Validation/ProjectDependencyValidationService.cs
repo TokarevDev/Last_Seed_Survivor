@@ -2,6 +2,7 @@ using System;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Zenject.Internal;
 
 namespace Game.EditorTools.Validation
@@ -17,6 +18,7 @@ namespace Game.EditorTools.Validation
 
             try
             {
+                EnsureLoadedScenesAreSaved();
                 int validatedSceneCount = ZenUnityEditorUtil.ValidateAllActiveScenes();
                 ProjectAssetValidationService.ValidateAllProjectConfigs();
                 ProjectViewReferenceValidationService.ValidateAllEnabledBuildScenesAndPrefabs();
@@ -90,6 +92,23 @@ namespace Game.EditorTools.Validation
             }
 
             return false;
+        }
+
+        private static void EnsureLoadedScenesAreSaved()
+        {
+            for (int sceneIndex = 0; sceneIndex < SceneManager.sceneCount; sceneIndex++)
+            {
+                Scene scene = SceneManager.GetSceneAt(sceneIndex);
+
+                if (!scene.isLoaded || !scene.isDirty)
+                    continue;
+
+                string sceneIdentifier = string.IsNullOrWhiteSpace(scene.path)
+                    ? scene.name
+                    : scene.path;
+                throw new InvalidOperationException(
+                    $"Save scene '{sceneIdentifier}' before running full project validation.");
+            }
         }
     }
 }

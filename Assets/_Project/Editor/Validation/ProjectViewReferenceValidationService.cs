@@ -15,7 +15,7 @@ namespace Game.EditorTools.Validation
     {
         private const string ProjectAssetRoot = "Assets/_Project";
 
-        public static void ValidateAllEnabledBuildScenesAndPrefabs()
+        internal static void ValidateAllEnabledBuildScenesAndPrefabs()
         {
             List<string> errors = new();
             int validatedReferenceCount = 0;
@@ -102,25 +102,12 @@ namespace Game.EditorTools.Validation
             ICollection<string> errors,
             ref int validatedReferenceCount)
         {
-            Scene scene = SceneManager.GetSceneByPath(scenePath);
-            bool openedForValidation = !scene.IsValid() || !scene.isLoaded;
-
-            if (openedForValidation)
-                scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Additive);
-
-            try
-            {
-                AppendSceneErrors(
-                    scene,
-                    scenePath,
-                    errors,
-                    ref validatedReferenceCount);
-            }
-            finally
-            {
-                if (openedForValidation && scene.IsValid())
-                    EditorSceneManager.CloseScene(scene, removeScene: true);
-            }
+            Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+            AppendSceneErrors(
+                scene,
+                scenePath,
+                errors,
+                ref validatedReferenceCount);
         }
 
         private static void AppendSceneErrors(
