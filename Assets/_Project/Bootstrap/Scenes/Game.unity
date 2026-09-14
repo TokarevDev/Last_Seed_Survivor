@@ -535,6 +535,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7401c3494cf5c2648b4f1d4e9465b1de, type: 3}
   m_Name:
   m_EditorClassIdentifier: Game.Bootstrap::Game.Bootstrap.Installers.Game.GameSignalsInstaller
+  _damagePopupPresenter: {fileID: 1484420117}
 --- !u!1 &192453717
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,15 +10,20 @@ namespace Game.Presentation.Signals
     public sealed class WormCombatSignalPublisher : IWormCombatEventPublisher
     {
         private readonly SignalBus _signalBus;
+        private readonly IDamageViewRequestSink _damageViewRequestSink;
 
-        public WormCombatSignalPublisher(SignalBus signalBus)
+        public WormCombatSignalPublisher(
+            SignalBus signalBus,
+            IDamageViewRequestSink damageViewRequestSink)
         {
             _signalBus = signalBus ?? throw new ArgumentNullException(nameof(signalBus));
+            _damageViewRequestSink = damageViewRequestSink ??
+                throw new ArgumentNullException(nameof(damageViewRequestSink));
         }
 
         public void PublishDamage(in DamageViewRequest request)
         {
-            _signalBus.Fire(new WormDamageDealtSignal(request));
+            _damageViewRequestSink.Present(request);
         }
 
         public void PublishRewardRequested(

@@ -109,7 +109,8 @@ namespace Game.Tests.PlayMode
             yield return _flow.LoadScene(GameSceneNames.Gameplay);
 
             SceneContext sceneContext = _flow.GetActiveSceneContext();
-            SignalBus signalBus = sceneContext.Container.Resolve<SignalBus>();
+            IWormCombatEventPublisher combatEventPublisher =
+                sceneContext.Container.Resolve<IWormCombatEventPublisher>();
             WormDamagePopupPresenter presenter =
                 _flow.FindInActiveScene<WormDamagePopupPresenter>();
             WormDamagePopupView[] initialPopupViews = FindLoadedSceneObjects<WormDamagePopupView>();
@@ -125,7 +126,7 @@ namespace Game.Tests.PlayMode
                     worldPosition: Vector3.zero,
                     kind: DamageKind.Critical,
                     isCritical: true);
-                signalBus.Fire(new WormDamageDealtSignal(request));
+                combatEventPublisher.PublishDamage(request);
                 presenter.ClearActivePopups();
             }
 
