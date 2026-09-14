@@ -1,6 +1,7 @@
 using System.Reflection;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Signals;
+using Game.Presentation.UI.Combat;
 using Game.Presentation.UI.Rewards;
 using Game.Presentation.Worm;
 using NUnit.Framework;
@@ -50,6 +51,47 @@ namespace Game.Tests.PlayMode
             }
         }
 
+        [Test]
+        public void WormSpawnerConstruct_WhenSecondSubscriptionFails_RollsBackFirstSignal()
+        {
+            SignalBus signalBus = CreateSignalBusWith<WormReviveGrantedSignal>();
+            GameObject owner = new("WormSpawner");
+            WormSpawner spawner = owner.AddComponent<WormSpawner>();
+
+            try
+            {
+                Assert.Throws<ZenjectException>(() =>
+                    spawner.Construct(signalBus, null, null, null));
+
+                Assert.DoesNotThrow(() => signalBus.Fire<WormReviveGrantedSignal>());
+            }
+            finally
+            {
+                Object.DestroyImmediate(owner);
+            }
+        }
+
+        [Test]
+        public void VictoryControllerConstruct_WhenSecondSubscriptionFails_RollsBackFirstSignal()
+        {
+            SignalBus signalBus = CreateSignalBusWith<WormDiedSignal>();
+            GameObject owner = new("WormVictoryPopupController");
+            WormVictoryPopupController controller =
+                owner.AddComponent<WormVictoryPopupController>();
+
+            try
+            {
+                Assert.Throws<ZenjectException>(() =>
+                    controller.Construct(signalBus, null));
+
+                Assert.DoesNotThrow(() => signalBus.Fire<WormDiedSignal>());
+            }
+            finally
+            {
+                Object.DestroyImmediate(owner);
+            }
+        }
+
         private static bool GetHasRevivedThisRun(RewardSessionController controller)
         {
             FieldInfo field = typeof(RewardSessionController).GetField(
@@ -67,6 +109,14 @@ namespace Game.Tests.PlayMode
             Assert.That(field, Is.Not.Null);
             return ((System.Delegate)field.GetValue(sessionState))
                 ?.GetInvocationList().Length ?? 0;
+        }
+
+        private static SignalBus CreateSignalBusWith<TSignal>()
+        {
+            DiContainer container = new();
+            SignalBusInstaller.Install(container);
+            container.DeclareSignal<TSignal>();
+            return container.Resolve<SignalBus>();
         }
     }
 }

@@ -112,7 +112,29 @@ namespace Game.Presentation.Worm
                 return;
 
             _signalBus.Subscribe<WormReviveGrantedSignal>(HandleReviveGranted);
-            _signalBus.Subscribe<WeaponRuntimeStatsChangedSignal>(OnWeaponRuntimeStatsChanged);
+
+            try
+            {
+                _signalBus.Subscribe<WeaponRuntimeStatsChangedSignal>(
+                    OnWeaponRuntimeStatsChanged);
+            }
+            catch (Exception subscriptionException)
+            {
+                try
+                {
+                    _signalBus.Unsubscribe<WormReviveGrantedSignal>(HandleReviveGranted);
+                }
+                catch (Exception rollbackException)
+                {
+                    throw new AggregateException(
+                        "Worm spawner signal subscription and rollback both failed.",
+                        subscriptionException,
+                        rollbackException);
+                }
+
+                throw;
+            }
+
             _isSubscribedToSignals = true;
         }
 

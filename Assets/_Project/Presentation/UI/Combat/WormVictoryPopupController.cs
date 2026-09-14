@@ -86,7 +86,28 @@ namespace Game.Presentation.UI.Combat
                 return;
 
             _signalBus.Subscribe<WormDiedSignal>(HandleWormDied);
-            _signalBus.Subscribe<VictoryPopupIntentSignal>(HandleVictoryIntent);
+
+            try
+            {
+                _signalBus.Subscribe<VictoryPopupIntentSignal>(HandleVictoryIntent);
+            }
+            catch (Exception subscriptionException)
+            {
+                try
+                {
+                    _signalBus.Unsubscribe<WormDiedSignal>(HandleWormDied);
+                }
+                catch (Exception rollbackException)
+                {
+                    throw new AggregateException(
+                        "Victory popup signal subscription and rollback both failed.",
+                        subscriptionException,
+                        rollbackException);
+                }
+
+                throw;
+            }
+
             _isSubscribedToSignals = true;
         }
 
