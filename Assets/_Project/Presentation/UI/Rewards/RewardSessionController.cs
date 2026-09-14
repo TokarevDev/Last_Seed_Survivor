@@ -1,3 +1,4 @@
+using System;
 using Game.Gameplay.Rewards.Services;
 using Game.Gameplay.Signals;
 using Zenject;
@@ -26,7 +27,28 @@ namespace Game.Presentation.UI.Rewards
                 return;
 
             _signalBus.Subscribe<WormReviveGrantedSignal>(HandleReviveGranted);
-            _signalBus.Subscribe<WormRewardRequestedSignal>(HandleRewardRequested);
+
+            try
+            {
+                _signalBus.Subscribe<WormRewardRequestedSignal>(HandleRewardRequested);
+            }
+            catch (Exception subscriptionException)
+            {
+                try
+                {
+                    _signalBus.Unsubscribe<WormReviveGrantedSignal>(HandleReviveGranted);
+                }
+                catch (Exception rollbackException)
+                {
+                    throw new AggregateException(
+                        "Reward session signal subscription and rollback both failed.",
+                        subscriptionException,
+                        rollbackException);
+                }
+
+                throw;
+            }
+
             _isSubscribed = true;
         }
 

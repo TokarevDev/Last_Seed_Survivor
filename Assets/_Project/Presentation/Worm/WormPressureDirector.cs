@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Enemy.Worm;
 using Game.Gameplay.Enemy.Worm.Balance;
@@ -177,10 +179,59 @@ namespace Game.Presentation.Worm
                 _isSubscribedToSignals || !isActiveAndEnabled)
                 return;
 
-            _combatSessionState.ShootingEnabledChanged += HandleShootingStateChanged;
-            _signalBus.Subscribe<WormDiedSignal>(HandleWormDied);
-            _signalBus.Subscribe<WormReviveRollbackCompletedSignal>(HandleReviveRollbackCompleted);
-            _isSubscribedToSignals = true;
+            bool sessionStateSubscribed = false;
+            bool wormDiedSubscribed = false;
+
+            try
+            {
+                _combatSessionState.ShootingEnabledChanged += HandleShootingStateChanged;
+                sessionStateSubscribed = true;
+                _signalBus.Subscribe<WormDiedSignal>(HandleWormDied);
+                wormDiedSubscribed = true;
+                _signalBus.Subscribe<WormReviveRollbackCompletedSignal>(
+                    HandleReviveRollbackCompleted);
+                _isSubscribedToSignals = true;
+            }
+            catch (Exception subscriptionException)
+            {
+                List<Exception> rollbackFailures = null;
+
+                if (wormDiedSubscribed)
+                {
+                    try
+                    {
+                        _signalBus.Unsubscribe<WormDiedSignal>(HandleWormDied);
+                    }
+                    catch (Exception rollbackException)
+                    {
+                        rollbackFailures = new List<Exception> { rollbackException };
+                    }
+                }
+
+                if (sessionStateSubscribed)
+                {
+                    try
+                    {
+                        _combatSessionState.ShootingEnabledChanged -=
+                            HandleShootingStateChanged;
+                    }
+                    catch (Exception rollbackException)
+                    {
+                        rollbackFailures ??= new List<Exception>();
+                        rollbackFailures.Add(rollbackException);
+                    }
+                }
+
+                if (rollbackFailures != null)
+                {
+                    rollbackFailures.Insert(0, subscriptionException);
+                    throw new AggregateException(
+                        "Worm pressure signal subscription and rollback failed.",
+                        rollbackFailures);
+                }
+
+                throw;
+            }
         }
 
         private void UnsubscribeFromSignals()
