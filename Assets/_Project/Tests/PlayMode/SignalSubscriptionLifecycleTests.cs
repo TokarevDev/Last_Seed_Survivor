@@ -1,6 +1,7 @@
 using System.Reflection;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Signals;
+using Game.Presentation.Player;
 using Game.Presentation.UI.Combat;
 using Game.Presentation.UI.Rewards;
 using Game.Presentation.Worm;
@@ -42,6 +43,29 @@ namespace Game.Tests.PlayMode
             {
                 Assert.Throws<ZenjectException>(() =>
                     director.Construct(signalBus, sessionState));
+
+                Assert.That(GetSessionSubscriberCount(sessionState), Is.Zero);
+            }
+            finally
+            {
+                Object.DestroyImmediate(owner);
+            }
+        }
+
+        [Test]
+        public void WeaponAnimatorConstruct_WhenSignalSubscriptionFails_RollsBackSessionSubscription()
+        {
+            DiContainer container = new();
+            SignalBusInstaller.Install(container);
+            SignalBus signalBus = container.Resolve<SignalBus>();
+            CombatSessionState sessionState = new();
+            GameObject owner = new("WeaponAutoAttackAnimator");
+            WeaponAutoAttackAnimator animator = owner.AddComponent<WeaponAutoAttackAnimator>();
+
+            try
+            {
+                Assert.Throws<ZenjectException>(() =>
+                    animator.Construct(sessionState, signalBus, null));
 
                 Assert.That(GetSessionSubscriberCount(sessionState), Is.Zero);
             }

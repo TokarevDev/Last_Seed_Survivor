@@ -1,3 +1,4 @@
+using System;
 using Game.Gameplay.Combat;
 using Game.Gameplay.Combat.Weapons.ProjectileWeapon;
 using Game.Gameplay.Signals;
@@ -223,7 +224,29 @@ namespace Game.Presentation.Player
                 return;
 
             _combatSessionState.ShootingEnabledChanged += HandleShootingStateChanged;
-            _signalBus.Subscribe<WeaponAttackCycleStartedSignal>(HandleAttackCycleStarted);
+
+            try
+            {
+                _signalBus.Subscribe<WeaponAttackCycleStartedSignal>(HandleAttackCycleStarted);
+            }
+            catch (Exception subscriptionException)
+            {
+                try
+                {
+                    _combatSessionState.ShootingEnabledChanged -=
+                        HandleShootingStateChanged;
+                }
+                catch (Exception rollbackException)
+                {
+                    throw new AggregateException(
+                        "Weapon animation signal subscription and rollback both failed.",
+                        subscriptionException,
+                        rollbackException);
+                }
+
+                throw;
+            }
+
             _isSubscribedToSignals = true;
         }
 
