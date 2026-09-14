@@ -90,6 +90,52 @@ namespace Game.Tests
             Assert.That(navigator.IsNavigating, Is.False);
         }
 
+        [Test]
+        public void TryNavigateAsync_WhenActivationThrows_DoesNotRetryAndReleasesNavigator()
+        {
+            FakeSceneLoader loader = new();
+            SceneNavigator<TestScene> navigator = CreateNavigator(loader);
+            InvalidOperationException activationException =
+                new("Scene activation failed.");
+            loader.Operation.ActivationException = activationException;
+            loader.Operation.MarkReady();
+
+            InvalidOperationException thrown =
+                Assert.ThrowsAsync<InvalidOperationException>(async () =>
+                    await navigator.TryNavigateAsync(
+                        TestScene.Gameplay,
+                        CancellationToken.None));
+
+            Assert.That(thrown, Is.SameAs(activationException));
+            Assert.That(loader.Operation.ActivationCount, Is.EqualTo(1));
+            Assert.That(navigator.IsNavigating, Is.False);
+        }
+
+        [Test]
+        public void TryNavigateAsync_WhenCancellationCleanupActivationThrows_PreservesBothFailures()
+        {
+            FakeSceneLoader loader = new();
+            SceneNavigator<TestScene> navigator = CreateNavigator(loader);
+            InvalidOperationException activationException =
+                new("Forced scene activation failed.");
+            loader.Operation.ActivationException = activationException;
+            using CancellationTokenSource cancellationSource = new();
+
+            UniTask<bool> navigation = navigator.TryNavigateAsync(
+                TestScene.Lobby,
+                cancellationSource.Token);
+            cancellationSource.Cancel();
+
+            AggregateException thrown =
+                Assert.ThrowsAsync<AggregateException>(async () => await navigation);
+
+            Assert.That(thrown.InnerExceptions, Has.Count.EqualTo(2));
+            Assert.That(thrown.InnerExceptions[0], Is.InstanceOf<OperationCanceledException>());
+            Assert.That(thrown.InnerExceptions[1], Is.SameAs(activationException));
+            Assert.That(loader.Operation.ActivationCount, Is.EqualTo(1));
+            Assert.That(navigator.IsNavigating, Is.False);
+        }
+
         private static SceneNavigator<TestScene> CreateNavigator(FakeSceneLoader loader)
         {
             SceneRouteCatalog<TestScene> catalog = new(new[]
@@ -127,6 +173,7 @@ namespace Game.Tests
             private readonly UniTaskCompletionSource _completion = new();
 
             public int ActivationCount { get; private set; }
+            public Exception ActivationException { get; set; }
 
             public UniTask WaitUntilReadyAsync(CancellationToken cancellationToken)
             {
@@ -136,6 +183,10 @@ namespace Game.Tests
             public void Activate()
             {
                 ActivationCount++;
+
+                if (ActivationException != null)
+                    throw ActivationException;
+
                 _completion.TrySetResult();
             }
 

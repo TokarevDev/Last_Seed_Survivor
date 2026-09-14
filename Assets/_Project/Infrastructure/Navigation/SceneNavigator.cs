@@ -45,6 +45,7 @@ namespace Game.Infrastructure.Navigation
                     $"Scene loader did not create an operation for '{sceneName}'.");
 
             _activeLoadOperation = loadOperation;
+            bool activationAttempted = false;
             bool activationRequested = false;
 
             try
@@ -57,17 +58,34 @@ namespace Game.Infrastructure.Navigation
                 await UniTask.WhenAll(readinessTask, transitionTask);
                 cancellationToken.ThrowIfCancellationRequested();
 
+                activationAttempted = true;
                 loadOperation.Activate();
                 activationRequested = true;
                 await loadOperation.WaitUntilCompletedAsync(CancellationToken.None);
                 return true;
             }
-            catch
+            catch (Exception navigationException)
             {
-                if (!activationRequested)
-                    loadOperation.Activate();
+                if (!activationAttempted)
+                {
+                    try
+                    {
+                        activationAttempted = true;
+                        loadOperation.Activate();
+                        activationRequested = true;
+                    }
+                    catch (Exception activationException)
+                    {
+                        throw new AggregateException(
+                            "Navigation failed and forced scene activation also failed.",
+                            navigationException,
+                            activationException);
+                    }
+                }
 
-                await CompleteFailedTransitionAsync(loadOperation);
+                if (activationRequested)
+                    await CompleteFailedTransitionAsync(loadOperation);
+
                 throw;
             }
             finally
