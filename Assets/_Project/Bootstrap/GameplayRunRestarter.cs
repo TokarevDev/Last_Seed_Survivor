@@ -49,6 +49,18 @@ namespace Game.Bootstrap
 
             _isRestarting = true;
 
+            try
+            {
+                RestartRunInternal();
+            }
+            finally
+            {
+                _isRestarting = false;
+            }
+        }
+
+        private void RestartRunInternal()
+        {
             _popupRoot?.HideActive();
             _popupRoot?.ReleaseGameplayLock();
             Time.timeScale = 1f;
@@ -68,8 +80,6 @@ namespace Game.Bootstrap
             _rewardSessionController.ResetSession();
 
             _wormSpawner?.SpawnWorm();
-
-            _isRestarting = false;
         }
     }
 }
