@@ -110,7 +110,7 @@ namespace Game.Gameplay.Rewards.Services
             if (context == null)
                 return WeaponPowerSnapshot.Invalid;
 
-            return WeaponPowerEstimator.Estimate(
+            return ProjectileWeaponPowerEstimator.Estimate(
                 context.MainWeaponConfig,
                 context.MainWeaponState);
         }
@@ -121,7 +121,7 @@ namespace Game.Gameplay.Rewards.Services
             if (context == null)
                 return WeaponPowerSnapshot.Invalid;
 
-            return WeaponPowerEstimator.Estimate(
+            return AcaciaThornWeaponPowerEstimator.Estimate(
                 context.AcaciaThornConfig,
                 context.AcaciaThornState);
         }

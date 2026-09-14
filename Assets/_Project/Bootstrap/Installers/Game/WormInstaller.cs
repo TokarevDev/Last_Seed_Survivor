@@ -69,6 +69,8 @@ namespace Game.Bootstrap.Installers.Game
             Container.Bind<WormSpawnLifecycle>().AsSingle();
             Container.Bind<IWormPathProgressProvider>().FromInstance(_wormController).AsSingle();
             Container.Bind<IWormHpScalingPolicy>().FromInstance(_hpScalingConfig).AsSingle();
+            Container.Bind<IWeaponPowerSource>().To<ProjectileWeaponPowerSource>().AsSingle();
+            Container.Bind<IWeaponPowerSource>().To<AcaciaThornWeaponPowerSource>().AsSingle();
             Container.Bind<IWeaponPowerProvider>().To<WeaponPowerProvider>().AsSingle();
             Container.Bind<WormCombatBurstController>().AsSingle();
             Container.Bind<WormLifecycleController>().AsSingle();

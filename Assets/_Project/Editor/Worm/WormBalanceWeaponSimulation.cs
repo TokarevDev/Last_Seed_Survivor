@@ -58,11 +58,13 @@ namespace Game.EditorTools.Worm
             WeaponRuntimeState mainState,
             AcaciaThornRuntimeState acaciaState)
         {
-            return WeaponPowerEstimator.Estimate(
-                settings.MainWeaponConfig,
-                mainState,
-                settings.AcaciaThornConfig,
-                acaciaState);
+            return WeaponPowerAggregator.Combine(
+                ProjectileWeaponPowerEstimator.Estimate(
+                    settings.MainWeaponConfig,
+                    mainState),
+                AcaciaThornWeaponPowerEstimator.Estimate(
+                    settings.AcaciaThornConfig,
+                    acaciaState));
         }
 
         public static int BuildMainWeaponDamage(
