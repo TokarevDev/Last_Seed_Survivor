@@ -476,6 +476,6 @@ Third-party packages and assets retain their respective vendor or upstream licen
 
 Oleksandr Tokarev
 
-Unity Developer · C# Gameplay Programmer
+Unity Developer
 
 [Portfolio](https://tokarevdev.github.io/) · [Email](mailto:otokarevdev@gmail.com)
